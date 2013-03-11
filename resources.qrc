@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/addvector_icon.png</file>
+        <file>images/asc_icon.png</file>
+        <file>images/clear_icon.png</file>
+        <file>images/com_icon.png</file>
+        <file>images/connoff_icon.png</file>
+        <file>images/connon_icon.png</file>
+        <file>images/delete_icon.png</file>
+        <file>images/echooff_icon.png</file>
+        <file>images/echoon_icon.png</file>
+        <file>images/hex_icon.png</file>
+        <file>images/inout_icon.png</file>
+        <file>images/less_icon.png</file>
+        <file>images/more_icon.png</file>
+        <file>images/pause_icon.png</file>
+        <file>images/play_icon.png</file>
+        <file>images/send_icon.png</file>
+        <file>images/tcp_icon.png</file>
+        <file>images/triangle_icon.png</file>
+        <file>images/udp_icon.png</file>
+        <file>styles/flipp.css</file>
+    </qresource>
+</RCC>
