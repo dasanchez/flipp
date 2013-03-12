@@ -13,6 +13,7 @@ Flipp::Flipp(QWidget *parent)
 
     connections->newConnection();
     terminals->newTerminal();
+    parsers->newParser();
     terminals->terminalList.at(0)->assignConnection(connections->connectionList.at(0));
 
     //    mainLayout = new QHBoxLayout;
@@ -28,7 +29,7 @@ Flipp::Flipp(QWidget *parent)
     setCentralWidget(terminals);
 
     addDockWidget(Qt::LeftDockWidgetArea,connectionDock);
-    addDockWidget(Qt::RightDockWidgetArea,parserDock);
+    addDockWidget(Qt::BottomDockWidgetArea,parserDock);
 
     this->setWindowTitle(tr("f l i p p"));
     //     this->setWindowFlags(Qt::CustomizeWindowHint); //Set window with no title bar

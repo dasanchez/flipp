@@ -3,6 +3,8 @@
 ParserListWidget::ParserListWidget(QWidget *parent) :
     QWidget(parent)
 {
+    parserList = new QList<ParserWidget*>;
+
     widgetNameLabel = new QLabel("Variable List");
     newParserButton = new QPushButton("New Parser");
     newParserButton->setFixedHeight(24);
@@ -18,4 +20,47 @@ ParserListWidget::ParserListWidget(QWidget *parent) :
     mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(topLayout);
     mainLayout->addWidget(listWidget);
+
+    connect(newParserButton,SIGNAL(clicked()),this,SLOT(newParser()));
+    connect(listWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
+    connect(listWidget,SIGNAL(itemMoved(int, int, QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
+}
+
+void ParserListWidget::itemRemoved(int row)
+{
+    parserList->removeAt(row);
+}
+
+void ParserListWidget::sizeChanged(QSize newSize)
+{
+    ParserWidget *parser = static_cast<ParserWidget*>(QObject::sender());
+    int row = parserList->indexOf(parser);
+    listWidget->item(row)->setSizeHint(newSize);
+}
+
+void ParserListWidget::resorted(int src, int dest, QListWidgetItem *item)
+{
+    parserList->insert(dest, parserList->takeAt(src));
+}
+
+void ParserListWidget::parserRemoved()
+{
+    ParserWidget* parser = static_cast<ParserWidget*>(QObject::sender());
+     int row = parserList->indexOf(parser);
+     QListWidgetItem *item = listWidget->item(row);
+     parserList->removeAt(row);
+     listWidget->removeItemWidget(item);
+     listWidget->takeItem(row);
+}
+
+void ParserListWidget::newParser()
+{
+    ParserWidget *parser = new ParserWidget;
+    QListWidgetItem *item = new QListWidgetItem;
+    listWidget->addItem(item);
+    listWidget->setItemWidget(item,parser);
+    parserList->append(parser);
+    connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
+    connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
+    item->setSizeHint(parser->sizeHint());
 }

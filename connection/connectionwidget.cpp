@@ -3,15 +3,15 @@
 ConnectionWidget::ConnectionWidget(QWidget *parent) :
     QWidget(parent)
 {
-    tcpIconPixmap = QPixmap("../QConnect/tcp_icon.png");
-    udpIconPixmap = QPixmap("../QConnect/udp_icon.png");
-    comIconPixmap = QPixmap("../QConnect/com_icon.png");
-    moreIconPixmap = QPixmap("../QConnect/more_icon.png");
-    lessIconPixmap = QPixmap("../QConnect/less_icon.png");
-    delIconPixmap = QPixmap("../QConnect/delete_icon.png");
-    connOffIconPixmap = QPixmap("../QConnect/connoff_icon.png");
-    connOnIconPixmap = QPixmap("../QConnect/connon_icon.png");
-    inOutIconPixmap = QPixmap("../QConnect/inout_icon.png");
+    tcpIconPixmap = QPixmap(":/images/tcp_icon.png");
+    udpIconPixmap = QPixmap(":/images/udp_icon.png");
+    comIconPixmap = QPixmap(":/images/com_icon.png");
+    moreIconPixmap = QPixmap(":/images/more_icon.png");
+    lessIconPixmap = QPixmap(":/images/less_icon.png");
+    delIconPixmap = QPixmap(":/images/delete_icon.png");
+    connOffIconPixmap = QPixmap(":/images/connoff_icon.png");
+    connOnIconPixmap = QPixmap(":/images/connon_icon.png");
+    inOutIconPixmap = QPixmap(":/images/inout_icon.png");
 
     isExpanded=true;
 

@@ -20,5 +20,17 @@
         <file>images/triangle_icon.png</file>
         <file>images/udp_icon.png</file>
         <file>styles/flipp.css</file>
+        <file>images/addbyte_icon.png</file>
+        <file>images/addnumber_icon.png</file>
+        <file>images/byte_icon.png</file>
+        <file>images/cycle_icon.png</file>
+        <file>images/fixlen_icon.png</file>
+        <file>images/hexoff_icon.png</file>
+        <file>images/hexon_icon.png</file>
+        <file>images/matchoff_icon.png</file>
+        <file>images/matchon_icon.png</file>
+        <file>images/number_icon.png</file>
+        <file>images/varlen_icon.png</file>
+        <file>images/vector_icon.png</file>
     </qresource>
 </RCC>

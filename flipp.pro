@@ -21,7 +21,11 @@ SOURCES += main.cpp\
     terminal/terminallistwidget.cpp \
     terminal/terminalwidget.cpp \
     terminal/qterminaledit.cpp \
-    parser/parserlistwidget.cpp
+    parser/parserlistwidget.cpp \
+    parser/vectoritemwidget.cpp \
+    parser/parserengine.cpp \
+    parser/variablewidget.cpp \
+    parser/parserwidget.cpp
 
 HEADERS  += flipp.h \
     livelistwidget/livelistwidget.h \
@@ -31,7 +35,11 @@ HEADERS  += flipp.h \
     terminal/terminallistwidget.h \
     terminal/terminalwidget.h \
     terminal/qterminaledit.h \
-    parser/parserlistwidget.h
+    parser/parserlistwidget.h \
+    parser/vectoritemwidget.h \
+    parser/parserengine.h \
+    parser/variablewidget.h \
+    parser/parserwidget.h
 
 RESOURCES += \
     resources.qrc
