@@ -59,7 +59,7 @@ ParserWidget::ParserWidget(QWidget *parent) :
     mainLayout->addWidget(lw);
     setLayout(mainLayout);
     setMinimumWidth(500);
-    setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Expanding);
+    setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Minimum);
 //    setMinimumHeight(400);
 
     connect(addByteButton,SIGNAL(clicked()),this,SLOT(addVariable()));

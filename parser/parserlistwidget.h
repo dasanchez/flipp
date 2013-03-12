@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QSplitter>
+#include <QScrollArea>
 #include <livelistwidget/livelistwidget.h>
 #include <parser/parserwidget.h>
 
@@ -30,9 +32,14 @@ private slots:
 private:
     QLabel *widgetNameLabel;
     QPushButton *newParserButton;
-    LiveListWidget *listWidget;
+//    LiveListWidget *listWidget;
     QVBoxLayout *mainLayout;
     QHBoxLayout *topLayout;
+
+    QSplitter *splitter;
+    QScrollArea *scrollArea;
+    QVBoxLayout *scrollAreaVLayout;
+    QWidget *saWidgetContents;
 
 };
 

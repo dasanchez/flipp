@@ -4,15 +4,15 @@ TerminalWidget::TerminalWidget(QWidget *parent) :
     QWidget(parent)
 {
 
-    delIconPixmap = QPixmap("../QConnect/delete_icon.png");
-    echoOnIconPixmap = QPixmap("../QConnect/echoon_icon.png");
-    echoOffIconPixmap = QPixmap("../QConnect/echooff_icon.png");
-    playIconPixmap = QPixmap("../QConnect/play_icon.png");
-    pauseIconPixmap = QPixmap("../QConnect/pause_icon.png");
-    clearIconPixmap = QPixmap("../QConnect/clear_icon.png");
-    ascIconPixmap = QPixmap("../QConnect/asc_icon.png");
-    hexIconPixmap = QPixmap("../QConnect/hex_icon.png");
-    sendIconPixmap = QPixmap("../QConnect/send_icon.png");
+    delIconPixmap = QPixmap(":/images/delete_icon.png");
+    echoOnIconPixmap = QPixmap(":/images/echoon_icon.png");
+    echoOffIconPixmap = QPixmap(":/images/echooff_icon.png");
+    playIconPixmap = QPixmap(":/images/play_icon.png");
+    pauseIconPixmap = QPixmap(":/images/pause_icon.png");
+    clearIconPixmap = QPixmap(":/images/clear_icon.png");
+    ascIconPixmap = QPixmap(":/images/asc_icon.png");
+    hexIconPixmap = QPixmap(":/images/hex_icon.png");
+    sendIconPixmap = QPixmap(":/images/send_icon.png");
 
     connectionWidget = new ConnectionWidget;
     paused = false;
@@ -38,12 +38,6 @@ TerminalWidget::TerminalWidget(QWidget *parent) :
     connect(sendButton,SIGNAL(clicked()),this,SLOT(sendPacket()));
     connect(asciiTerminal,SIGNAL(textEntered(QString,bool)),this,SLOT(textEntered(QString,bool)));
     connect(hexTerminal,SIGNAL(textEntered(QString,bool)),this,SLOT(textEntered(QString,bool)));
-
-    // Styling
-//    QFile qss("../QConnect/terminalwidget.css");
-//    qss.open(QFile::ReadOnly);
-//    setStyleSheet(qss.readAll());
-//    qss.close();
 }
 
 TerminalWidget::~TerminalWidget()
