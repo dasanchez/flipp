@@ -456,7 +456,6 @@ void VariableWidget::setupUI()
     matchEdit = new QLineEdit;
     matchEdit->setToolTip("Enter the byte array to match");
     matchEdit->setFixedHeight(24);
-    matchEdit->setFrame(false);
     matchEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     hexButton = new QPushButton;
     hexButton->setToolTip("Toggle between ASCII and hexadecimal display");
@@ -518,7 +517,7 @@ void VariableWidget::setupUI()
 
     vectorItemList = new LiveListWidget(this);
     vectorItemList->setVisible(false);
-    vectorItemList->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
+    vectorItemList->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Maximum);
 
     addVectorByte();
 

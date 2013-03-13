@@ -5,16 +5,26 @@ ParserListWidget::ParserListWidget(QWidget *parent) :
 {
     parserList = new QList<ParserWidget*>;
 
-    widgetNameLabel = new QLabel("Variable List");
-    newParserButton = new QPushButton("New Parser");
+    widgetNameLabel = new QLabel("Parsers");
+
+    QFont font = widgetNameLabel->font();
+    font.setPointSize(font.pointSize()+4);
+    widgetNameLabel->setFont(font);
+
+    newParserButton = new QPushButton("New");
     newParserButton->setFixedHeight(24);
+    newParserButton->setFixedWidth(100);
 
     splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);
     splitter->setChildrenCollapsible(false);
+    splitter->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
+    splitter->setHandleWidth(1);
 
     scrollArea = new QScrollArea;
     scrollAreaVLayout = new QVBoxLayout;
+    scrollAreaVLayout->setSpacing(0);
+    scrollAreaVLayout->setMargin(0);
     saWidgetContents = new QWidget();
 
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -27,19 +37,13 @@ ParserListWidget::ParserListWidget(QWidget *parent) :
     topLayout->addWidget(widgetNameLabel);
     topLayout->addWidget(newParserButton);
 
-//    listWidget = new LiveListWidget(this);
-//    listWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
-//    listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
     mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(topLayout);
-//    mainLayout->addWidget(listWidget);
-     mainLayout->addWidget(scrollArea);
-     setLayout(mainLayout);
+    mainLayout->addWidget(scrollArea);
+    setLayout(mainLayout);
 
+    setMinimumWidth(620);
     connect(newParserButton,SIGNAL(clicked()),this,SLOT(newParser()));
-//    connect(listWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
-//    connect(listWidget,SIGNAL(itemMoved(int, int, QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
 }
 
 void ParserListWidget::itemRemoved(int row)
@@ -50,10 +54,14 @@ void ParserListWidget::itemRemoved(int row)
 
 void ParserListWidget::sizeChanged(QSize newSize)
 {
-    ParserWidget *parser = static_cast<ParserWidget*>(QObject::sender());
-    int row = parserList->indexOf(parser);
+    QList<int> sizes;
+    foreach(ParserWidget *pw,*parserList)
+    {
+        sizes.append(pw->sizeHint().height());
 
-//    listWidget->item(row)->setSizeHint(newSize);
+    }
+    splitter->setSizes(sizes);
+    splitter->update();
 }
 
 void ParserListWidget::resorted(int src, int dest, QListWidgetItem *item)
@@ -64,24 +72,16 @@ void ParserListWidget::resorted(int src, int dest, QListWidgetItem *item)
 void ParserListWidget::parserRemoved()
 {
     ParserWidget* parser = static_cast<ParserWidget*>(QObject::sender());
-     int row = parserList->indexOf(parser);
-//     QListWidgetItem *item = listWidget->item(row);
-     parserList->removeAt(row);
-       parser->deleteLater();
-//     listWidget->removeItemWidget(item);
-//     listWidget->takeItem(row);
+    int row = parserList->indexOf(parser);
+    parserList->removeAt(row);
+    parser->deleteLater();
 }
 
 void ParserListWidget::newParser()
 {
     ParserWidget *parser = new ParserWidget;
-//    QListWidgetItem *item = new QListWidgetItem;
-//    listWidget->addItem(item);
-//    listWidget->setItemWidget(item,parser);
     splitter->addWidget(parser);
-
     parserList->append(parser);
-//    connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
+    connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
     connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
-//    item->setSizeHint(parser->sizeHint());
 }

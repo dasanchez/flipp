@@ -32,7 +32,6 @@ private slots:
 private:
     QLabel *widgetNameLabel;
     QPushButton *newParserButton;
-//    LiveListWidget *listWidget;
     QVBoxLayout *mainLayout;
     QHBoxLayout *topLayout;
 

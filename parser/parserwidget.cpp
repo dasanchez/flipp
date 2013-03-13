@@ -59,8 +59,7 @@ ParserWidget::ParserWidget(QWidget *parent) :
     mainLayout->addWidget(lw);
     setLayout(mainLayout);
     setMinimumWidth(500);
-    setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Minimum);
-//    setMinimumHeight(400);
+    setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
 
     connect(addByteButton,SIGNAL(clicked()),this,SLOT(addVariable()));
     connect(addNumberButton,SIGNAL(clicked()),this,SLOT(addVariable()));
@@ -69,13 +68,6 @@ ParserWidget::ParserWidget(QWidget *parent) :
     connect(deleteButton,SIGNAL(clicked()),this,SIGNAL(deleteParser()));
     connect(lw,SIGNAL(itemMoved(int,int,QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
     connect(lw,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
-//    connect(ui->printListButton,SIGNAL(clicked()),this,SLOT(printList()));
-
-    // Styling
-//    QFile qss("../WidgetDrag/widgetdrag.css");
-//    qss.open(QFile::ReadOnly);
-//    setStyleSheet(qss.readAll());
-//    qss.close();
 
 }
 
@@ -89,14 +81,17 @@ void ParserWidget::toggleExpand()
     expanded=!expanded;
     if(expanded)
     {
+        mainLayout->addWidget(lw);
         lw->setVisible(true);
         expandButton->setIcon(QIcon(moreIconPixmap));
     }
     else
     {
+        mainLayout->removeWidget(lw);
         lw->setVisible(false);
         expandButton->setIcon(QIcon(lessIconPixmap));
     }
+    emit update();
     emit changeSize(this->sizeHint());
 }
 

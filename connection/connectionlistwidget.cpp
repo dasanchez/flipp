@@ -5,9 +5,13 @@ ConnectionListWidget::ConnectionListWidget(QWidget *parent)
     : QWidget(parent)
 {
 
-    widgetNameLabel = new QLabel("Connection List");
-    newConnBtn = new QPushButton("New Connection");
+    widgetNameLabel = new QLabel("Connections");
+    QFont font = widgetNameLabel->font();
+    font.setPointSize(font.pointSize()+4);
+    widgetNameLabel->setFont(font);
+    newConnBtn = new QPushButton("New");
     newConnBtn->setFixedHeight(24);
+    newConnBtn->setFixedWidth(100);
 
     topLayout = new QHBoxLayout;
     topLayout->addWidget(widgetNameLabel);

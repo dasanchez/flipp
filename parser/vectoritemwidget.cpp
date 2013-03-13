@@ -223,9 +223,9 @@ void VectorItemWidget::setupUi()
     // typeButton & lengthButton
     nameEdit = new QLineEdit("variable");
     nameEdit->setToolTip("Enter the variable name");
-    nameEdit->setMinimumWidth(60);
+    nameEdit->setMinimumWidth(40);
     nameEdit->setFixedHeight(24);
-    nameEdit->setFrame(false);
+    nameEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     typeButton = new QPushButton;
     typeButton->setToolTip("Toggle between byte, number, and vector type");
     typeButton->setIcon(typeIcon);
@@ -251,9 +251,8 @@ void VectorItemWidget::setupUi()
     matchButton->setIcon(matchoffIcon);
     matchEdit = new QLineEdit;
     matchEdit->setToolTip("Enter the byte array to match");
-    matchEdit->setFixedWidth(100);
     matchEdit->setFixedHeight(24);
-    matchEdit->setFrame(false);
+    matchEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     hexButton = new QPushButton;
     hexButton->setToolTip("Toggle between ASCII and hexadecimal display");
     hexButton->setFixedWidth(24);
@@ -281,6 +280,7 @@ void VectorItemWidget::setupUi()
     mainLayout->addLayout(titleLayout);
     this->setLayout(mainLayout);
     this->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+
     connect(delButton,SIGNAL(clicked()),this,SIGNAL(deleteVar()));
     connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(changeName(QString)));
     connect(typeButton,SIGNAL(clicked()),this,SLOT(toggleType()));

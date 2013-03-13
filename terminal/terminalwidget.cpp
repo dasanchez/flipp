@@ -208,21 +208,24 @@ void TerminalWidget::sendPacket()
 {
     QString displayPacket = packetEdit->text();
     QByteArray output;
-    if(hexPacket)
+    if(!displayPacket.isEmpty())
     {
-        output.append(displayPacket);
-        output = QByteArray::fromHex(output);
+        if(hexPacket)
+        {
+            output.append(displayPacket);
+            output = QByteArray::fromHex(output);
+        }
+        else
+        {
+            output.append(displayPacket);
+        }
+        if(echoing)
+        {
+            asciiTerminal->appendText(output,true);
+            hexTerminal->appendText(output,true);
+        }
+        emit sendData(output);
     }
-    else
-    {
-        output.append(displayPacket);
-    }
-    if(echoing)
-    {
-        asciiTerminal->appendText(output,true);
-        hexTerminal->appendText(output,true);
-    }
-    emit sendData(output);
 }
 
 QString TerminalWidget::char2hex(QString characters)

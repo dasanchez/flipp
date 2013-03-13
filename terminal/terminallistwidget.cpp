@@ -3,9 +3,13 @@
 TerminalListWidget::TerminalListWidget(QWidget *parent) :
     QWidget(parent)
 {
-    widgetNameLabel = new QLabel("Terminal List");
-    newTerminalButton = new QPushButton("New Terminal");
+    widgetNameLabel = new QLabel("Terminals");
+    QFont font = widgetNameLabel->font();
+    font.setPointSize(font.pointSize()+4);
+    widgetNameLabel->setFont(font);
+    newTerminalButton = new QPushButton("New");
     newTerminalButton->setFixedHeight(24);
+    newTerminalButton->setFixedWidth(100);
 
     topLayout = new QHBoxLayout;
     topLayout->addWidget(widgetNameLabel);

@@ -32,11 +32,6 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(dataConnection,SIGNAL(overrideBaud(QString)),portEdit,SLOT(setText(QString)));
     connect(dataConnection,SIGNAL(connectionError(QString)),this,SLOT(errorReceived(QString)));
 
-    // Styling
-//    QFile qss("../QConnect/connectionwidget.css");
-//    qss.open(QFile::ReadOnly);
-//    setStyleSheet(qss.readAll());
-//    qss.close();
 }
 
 ConnectionWidget::~ConnectionWidget()
