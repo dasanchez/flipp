@@ -287,6 +287,7 @@ void TerminalWidget::setupUI()
     // UI controls
 
     connectionBox = new QComboBox;
+    connectionBox->setItemDelegate(new QStyledItemDelegate);
     connectionBox->setToolTip("Select a connection");
     connectionBox->setFixedHeight(24);
     connectionBox->setMinimumWidth(100);

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     parser/vectoritemwidget.cpp \
     parser/parserengine.cpp \
     parser/variablewidget.cpp \
-    parser/parserwidget.cpp
+    parser/parserwidget.cpp \
+    plotter/plotterwidget.cpp
 
 HEADERS  += flipp.h \
     livelistwidget/livelistwidget.h \
@@ -39,7 +40,8 @@ HEADERS  += flipp.h \
     parser/vectoritemwidget.h \
     parser/parserengine.h \
     parser/variablewidget.h \
-    parser/parserwidget.h
+    parser/parserwidget.h \
+    plotter/plotterwidget.h
 
 RESOURCES += \
     resources.qrc

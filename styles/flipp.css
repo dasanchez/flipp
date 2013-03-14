@@ -2,6 +2,11 @@
 background-color: rgb(0,0,0);
 }
 
+ParserWidget {
+border: 2px solid rgb(250,20,0);
+
+}
+
 QComboBox {
 border: 2px solid rgb(100,100,100);
 border-radius: 4px;
@@ -29,11 +34,46 @@ QComboBox:down-arrow {
 
 QComboBox QAbstractItemView {
 color: rgb(200,200,200);
-border: 2px solid darkgray;
+border: 1px solid darkgray;
 selection-background-color: lightgray;
 selection-color: black;
-border-radius: 4px;
+border-radius: 2px;
 }
+
+QComboBox QAbstractItemView::item {
+min-height: 24px;
+color: rgb(250,250,250);
+}
+
+ QDockWidget {
+     border: 1px solid lightgray;
+	 color: rgb(100,100,100);
+/*     titlebar-close-icon: url(close.png);
+     titlebar-normal-icon: url(undock.png);*/
+ }
+
+ QDockWidget::title {
+     text-align: left; /* align the text to the left */
+     background: rgb(100,100,100);
+     padding-left: 5px;
+	 color: rgb(100,100,100);
+ }
+
+ /*
+ QDockWidget::close-button, QDockWidget::float-button {
+     border: 1px solid transparent;
+     background: darkgray;
+     padding: 0px;
+ }
+
+ QDockWidget::close-button:hover, QDockWidget::float-button:hover {
+     background: gray;
+ }
+
+ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
+     padding: 1px -1px -1px 1px;
+ }
+ */
 
 QLabel {
 color: rgb(250,250,250);
@@ -67,6 +107,43 @@ border-color: rgb(0,0,0);
 QListView::item:hover {
 background-color: rgb(50,50,50);
 }
+
+ QMenu {
+     background-color: #ABABAB; /* sets background of the menu */
+     border: 1px solid black;
+ }
+
+ QMenu::item {
+     /* sets background of menu item. set this to something non-transparent
+         if you want menu color and menu item color to be different */
+     background-color: transparent;
+ }
+
+ QMenu::item:selected { /* when user selects item using mouse or keyboard */
+     background-color: transparent;
+ }
+
+ QMenuBar {
+     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 lightgray, stop:1 darkgray);
+ }
+ 
+  QMenuBar::item {
+     spacing: 5px; /* spacing between menu bar items */
+     padding: 5px 10px;
+     background: transparent;
+     border-radius: 4px;
+	 /*min-width: 40px;*/
+	 /*selection-border-color: rgb(100,100,100);*/
+ }
+
+ QMenuBar::item:selected { /* when selected using mouse or keyboard */
+     background: #a8a8a8;
+ }
+ 
+ QMenuBar::item:pressed {
+     background: #888888;
+ }
 
 QPlainTextEdit::focus {
 background-color: rgb(20,20,20);

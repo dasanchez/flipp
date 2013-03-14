@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QDialog>
+#include <QStyledItemDelegate>
 #include <terminal/qterminaledit.h>
 #include <connection/connectionwidget.h>
 //#include "connectionwidget.h"
