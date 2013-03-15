@@ -17,8 +17,9 @@ class ParserListWidget : public QWidget
 public:
     explicit ParserListWidget(QWidget *parent = 0);
     QList<ParserWidget*> *parserList;
+    QStringList *nameList;
 signals:
-
+    void parserListChanged(QStringList*);
 public slots:
 
     void newParser();
@@ -40,6 +41,11 @@ private:
     QVBoxLayout *scrollAreaVLayout;
     QWidget *saWidgetContents;
 
+    QString newParserName(void);
+    void checkAllNames(void);
+     void updateList(void);
+private slots:
+    void nameChanged(void);
 };
 
 #endif // VARIABLELISTWIDGET_H

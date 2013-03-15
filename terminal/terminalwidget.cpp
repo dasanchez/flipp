@@ -113,7 +113,7 @@ void TerminalWidget::updateConnections(QStringList connectionNames)
     int index = connectionBox->findText(connectionWidget->getName());
     if(index>=0)
         connectionBox->setCurrentIndex(index);
-
+    changeConnection(connectionBox->currentText());
 }
 
 void TerminalWidget::textEntered(QString newText, bool isHex)

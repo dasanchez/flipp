@@ -36,6 +36,7 @@ private:
         void createMenus();
 private slots:
     void handleTerminalRequest(TerminalWidget*,QString);
+    void handlePlotterConnectionRequest(QString);
 
 };
 

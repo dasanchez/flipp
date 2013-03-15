@@ -4,6 +4,8 @@
 PlotterWidget::PlotterWidget(QWidget *parent)
     : QWidget(parent)
 {
+    connectionWidget = new ConnectionWidget;
+    parserWidget = new ParserWidget;
 
     widgetNameLabel = new QLabel("Profiles");
     QFont font = widgetNameLabel->font();
@@ -18,7 +20,6 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     connectionBox->setItemDelegate(new QStyledItemDelegate);
     connectionBox->setFixedHeight(24);
     connectionBox->addItem("Connection 001");
-    connectionBox->addItem("Connection 002");
 
     parserBox = new QComboBox;
     parserBox->setItemDelegate(new QStyledItemDelegate);
@@ -43,11 +44,53 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     mainLayout->addWidget(tableWidget);
 
     this->setLayout(mainLayout);
-//    setFixedWidth(410);
+
+    connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
+
+    //    setFixedWidth(410);
 
 }
 
 PlotterWidget::~PlotterWidget()
 {
 
+}
+
+void PlotterWidget::updateConnections(QStringList connectionNames)
+{
+    connectionBox->clear();
+    connectionBox->addItems(connectionNames);
+    //    int index = connectionBox->findText(connectionWidget->getName());
+    //    if(index>=0)
+    //        connectionBox->setCurrentIndex(index);
+    changeConnection(connectionBox->currentText());
+}
+
+void PlotterWidget::updateParsers(QStringList *parserNames)
+{
+    parserBox->clear();
+    parserBox->addItems(*parserNames);
+    //    int index = parserBox->findText(connectionWidget->getName());
+    //    if(index>=0)
+    //        parserBox->setCurrentIndex(index);
+}
+
+void PlotterWidget::changeConnection(QString connection)
+{
+    //    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
+    //    disconnect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
+    emit terminalConnectionRequest(connection);
+}
+
+void PlotterWidget::assignConnection(ConnectionWidget *connWidget)
+{
+    connectionWidget=connWidget;
+    //    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
+    //    connect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
+    connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
+}
+
+void PlotterWidget::detachConnection()
+{
+    connectionWidget = new ConnectionWidget;
 }

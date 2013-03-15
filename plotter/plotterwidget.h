@@ -24,8 +24,11 @@ public:
     ~PlotterWidget();
 
 public slots:
+    void updateConnections(QStringList);
+    void updateParsers(QStringList*);
+    void assignConnection(ConnectionWidget *);
 signals:
-
+    void terminalConnectionRequest(QString);
 private:
 
     QLabel *widgetNameLabel;
@@ -38,8 +41,12 @@ private:
     QHBoxLayout *dataSourceLayout;
     QVBoxLayout *mainLayout;
 
+    ConnectionWidget *connectionWidget;
+    ParserWidget *parserWidget;
 
 private slots:
+     void changeConnection(QString);
+     void detachConnection(void);
 };
 
 #endif // CONNECTIONWIDGET_H

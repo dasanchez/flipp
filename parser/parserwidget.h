@@ -16,15 +16,23 @@ public:
     explicit ParserWidget(QWidget *parent = 0);
     ~ParserWidget();
     QList<ComplexVariable*> *variableList;
+    QString getName();
+    bool hasValidName(void);
+    void setName(QString);
 signals:
     void updateVariableList();
     void changeSize(QSize);
     void deleteParser(void);
+    void nameChange(void);
+public slots:
+    void setNameValid(bool);
 private:
     QHBoxLayout *controlLayout;
+
     QVBoxLayout *mainLayout;
 
     QLineEdit *nameEdit;
+    QLabel *statusBar;
     QPushButton *addByteButton;
     QPushButton *addNumberButton;
     QPushButton *addVectorButton;
@@ -33,7 +41,9 @@ private:
 
     QList<VariableWidget*> *vwList;
     LiveListWidget *lw;
+    QString parserName;
 
+    bool validName;
     bool expanded;
 
     // Assets

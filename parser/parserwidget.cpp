@@ -5,7 +5,7 @@
 ParserWidget::ParserWidget(QWidget *parent) :
     QWidget(parent)
 {
-// Assets
+    // Assets
     addByteIconPixmap = QPixmap(":/images/addbyte_icon.png");
     addNumberIconPixmap = QPixmap(":/images/addnumber_icon.png");
     addVectorIconPixmap = QPixmap(":/images/addvector_icon.png");
@@ -15,8 +15,10 @@ ParserWidget::ParserWidget(QWidget *parent) :
 
     expanded=true;
 
-    nameEdit = new QLineEdit("Parser 001");
+    nameEdit = new QLineEdit("Parser 1");
     nameEdit->setFixedHeight(24);
+    statusBar = new QLabel("Ready");
+    statusBar->setFixedHeight(24);
     addByteButton = new QPushButton;
     addByteButton->setFixedHeight(24);
     addByteButton->setFixedWidth(24);
@@ -48,6 +50,7 @@ ParserWidget::ParserWidget(QWidget *parent) :
 
     controlLayout = new QHBoxLayout;
     controlLayout->addWidget(nameEdit);
+    controlLayout->addWidget(statusBar);
     controlLayout->addWidget(addByteButton);
     controlLayout->addWidget(addNumberButton);
     controlLayout->addWidget(addVectorButton);
@@ -61,6 +64,7 @@ ParserWidget::ParserWidget(QWidget *parent) :
     setMinimumWidth(500);
     setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
 
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
     connect(addByteButton,SIGNAL(clicked()),this,SLOT(addVariable()));
     connect(addNumberButton,SIGNAL(clicked()),this,SLOT(addVariable()));
     connect(addVectorButton,SIGNAL(clicked()),this,SLOT(addVariable()));
@@ -73,7 +77,37 @@ ParserWidget::ParserWidget(QWidget *parent) :
 
 ParserWidget::~ParserWidget()
 {
-//    delete ui;
+    //    delete ui;
+}
+
+QString ParserWidget::getName()
+{
+    return nameEdit->text();
+}
+
+bool ParserWidget::hasValidName()
+{
+    return validName;
+}
+
+void ParserWidget::setNameValid(bool isValid)
+{
+    validName = isValid;
+    if(validName)
+    {
+        statusBar->setText("Ready");
+    }
+    else
+    {
+        statusBar->setText("Name is not valid");
+    }
+}
+
+void ParserWidget::setName(QString newName)
+{
+    disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
+    nameEdit->setText(newName);
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
 }
 
 void ParserWidget::toggleExpand()
@@ -123,13 +157,13 @@ void ParserWidget::addVariable()
     item->setSizeHint(vw->sizeHint());
     lw->setItemWidget(item,vw);
 
-//    connect(vw,SIGNAL(nameChange(QString)),this,SLOT(nameChanged(QString)));
-//    connect(vw,SIGNAL(typeChange(int)),this,SLOT(typeChanged(int)));
-//    connect(vw,SIGNAL(lengthToggle(bool)),this,SLOT(lengthToggled(bool)));
-//    connect(vw,SIGNAL(lengthChange(int)),this,SLOT(lengthChanged(int)));
-//    connect(vw,SIGNAL(matchToggle(bool)),this,SLOT(matchToggled(bool)));
-//    connect(vw,SIGNAL(matchChange(QString)),this,SLOT(matchChanged(QString)));
-//    connect(vw,SIGNAL(repeatChange(int)),this,SLOT(repeatChanged(int)));
+    //    connect(vw,SIGNAL(nameChange(QString)),this,SLOT(nameChanged(QString)));
+    //    connect(vw,SIGNAL(typeChange(int)),this,SLOT(typeChanged(int)));
+    //    connect(vw,SIGNAL(lengthToggle(bool)),this,SLOT(lengthToggled(bool)));
+    //    connect(vw,SIGNAL(lengthChange(int)),this,SLOT(lengthChanged(int)));
+    //    connect(vw,SIGNAL(matchToggle(bool)),this,SLOT(matchToggled(bool)));
+    //    connect(vw,SIGNAL(matchChange(QString)),this,SLOT(matchChanged(QString)));
+    //    connect(vw,SIGNAL(repeatChange(int)),this,SLOT(repeatChanged(int)));
     connect(vw,SIGNAL(sizeToggled(QSize)),this,SLOT(itemSize(QSize)));
     connect(vw,SIGNAL(deleteVar()),this,SLOT(remVariable()));
     connect(vw,SIGNAL(variableChanged()),this,SLOT(variableListChanged()));

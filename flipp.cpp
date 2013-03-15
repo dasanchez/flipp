@@ -9,7 +9,9 @@ Flipp::Flipp(QWidget *parent)
     plotter = new PlotterWidget(this);
 
     connect(connections,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
+    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotter,SLOT(updateConnections(QStringList)));
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
+    connect(parsers,SIGNAL(parserListChanged(QStringList*)),plotter,SLOT(updateParsers(QStringList*)));
 
     connections->newConnection();
     terminals->newTerminal();
@@ -45,6 +47,18 @@ void Flipp::handleTerminalRequest(TerminalWidget *terminal,QString name)
         if(connection->getName()==name)
         {
             terminal->assignConnection(connection);
+        }
+    }
+}
+
+void Flipp::handlePlotterConnectionRequest(QString name)
+{
+    foreach(ConnectionWidget *connection,connections->connectionList)
+    {
+        if(connection->getName()==name)
+        {
+            plotter->assignConnection(connection);
+            qDebug() << tr("Connection assigned");
         }
     }
 }
