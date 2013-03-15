@@ -3,6 +3,8 @@ flipp
 
 ##Flexible Integrated Parser and Plotter
 
+![flipp Screenshot - Windows 8](./window.png "2013-03-14")
+
 This program will provide an interface to do the following:
 
 1. Connect to a TCP, UDP, or serial data stream.
