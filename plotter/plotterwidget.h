@@ -38,9 +38,11 @@ private:
     QComboBox *connectionBox;
     QComboBox *parserBox;
     QTableWidget *tableWidget;
+//    QFrame *plotFrame;
 
     QHBoxLayout *topLayout;
     QHBoxLayout *dataSourceLayout;
+//    QHBoxLayout *contentLayout;
     QVBoxLayout *mainLayout;
 
     ConnectionWidget *connectionWidget;
@@ -50,7 +52,9 @@ private slots:
      void changeConnection(QString);
      void detachConnection(void);
      void changeParser(QString);
+     void detachParser(void);
      void populateParserTable();
+//     void variableListChanged();
 };
 
 #endif // CONNECTIONWIDGET_H

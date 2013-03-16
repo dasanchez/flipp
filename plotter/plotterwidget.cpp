@@ -29,6 +29,15 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     tableWidget = new QTableWidget(this);
     tableWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
     tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    tableWidget->setColumnCount(2);
+    QStringList tableHeaders;
+    tableHeaders.append("Field");
+    tableHeaders.append("Value");
+    tableWidget->setHorizontalHeaderLabels(tableHeaders);
+    tableWidget->setMaximumWidth(300);
+
+//    plotFrame = new QFrame;
+//    plotFrame->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
 
     topLayout = new QHBoxLayout;
     topLayout->addWidget(widgetNameLabel);
@@ -38,10 +47,16 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     dataSourceLayout->addWidget(connectionBox);
     dataSourceLayout->addWidget(parserBox);
 
+//    contentLayout = new QHBoxLayout;
+//    contentLayout->addWidget(tableWidget);
+//    contentLayout->addWidget(plotFrame);
+
+
     mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(topLayout);
     mainLayout->addLayout(dataSourceLayout);
     mainLayout->addWidget(tableWidget);
+//    mainLayout->addLayout(contentLayout);
 
     this->setLayout(mainLayout);
 
@@ -104,18 +119,23 @@ void PlotterWidget::changeParser(QString parserName)
 void PlotterWidget::assignParser(ParserWidget *parser)
 {
     parserWidget = parser;
-
+    connect(parserWidget,SIGNAL(updateVariableList()),this,SLOT(populateParserTable()));
+    connect(parserWidget,SIGNAL(deleteParser()),this,SLOT(detachParser()));
     // Populate QTableWidget
     populateParserTable();
+}
+
+void PlotterWidget::detachParser()
+{
+    parserWidget = new ParserWidget;
 }
 
 void PlotterWidget::populateParserTable()
 {
     qDebug() << "populate table";
-    tableWidget->clear();
+//    tableWidget->clear();
     quint8 i=0;
     tableWidget->setRowCount(parserWidget->variableList->size());
-    tableWidget->setColumnCount(2);
     foreach(ComplexVariable *var,*parserWidget->variableList)
     {
 //        qDebug() << "row: " << i << ", varName: " << var->name;
