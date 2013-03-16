@@ -37,6 +37,7 @@ private:
 private slots:
     void handleTerminalRequest(TerminalWidget*,QString);
     void handlePlotterConnectionRequest(QString);
+    void handlePlotterParserRequest(QString);
 
 };
 

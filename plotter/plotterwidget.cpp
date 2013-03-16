@@ -46,6 +46,7 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     this->setLayout(mainLayout);
 
     connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
+    connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
 
     //    setFixedWidth(410);
 
@@ -79,7 +80,7 @@ void PlotterWidget::changeConnection(QString connection)
 {
     //    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
     //    disconnect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
-    emit terminalConnectionRequest(connection);
+    emit plotterConnectionRequest(connection);
 }
 
 void PlotterWidget::assignConnection(ConnectionWidget *connWidget)
@@ -93,4 +94,31 @@ void PlotterWidget::assignConnection(ConnectionWidget *connWidget)
 void PlotterWidget::detachConnection()
 {
     connectionWidget = new ConnectionWidget;
+}
+
+void PlotterWidget::changeParser(QString parserName)
+{
+    emit plotterParserRequest(parserName);
+}
+
+void PlotterWidget::assignParser(ParserWidget *parser)
+{
+    parserWidget = parser;
+
+    // Populate QTableWidget
+    populateParserTable();
+}
+
+void PlotterWidget::populateParserTable()
+{
+    qDebug() << "populate table";
+    tableWidget->clear();
+    quint8 i=0;
+    tableWidget->setRowCount(parserWidget->variableList->size());
+    foreach(ComplexVariable *var,*parserWidget->variableList)
+    {
+        qDebug() << "row: " << i << ", varName: " << var->name;
+        QTableWidgetItem *item = new QTableWidgetItem(var->name);
+        tableWidget->setItem(i++,0,item);
+    }
 }

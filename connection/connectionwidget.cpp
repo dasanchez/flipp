@@ -16,10 +16,11 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     isExpanded=true;
 
     setupUI();
-    toggleType();
-    toggleType();
-    addressEdit->setText("COM3");
-    addressChanged("COM3");
+
+//    toggleType();
+//    toggleType();
+//    addressEdit->setText("COM3");
+//    addressChanged("COM3");
 
     // Data connection Signals
     connect(typeButton,SIGNAL(clicked()),this,SLOT(toggleType()));
@@ -296,7 +297,7 @@ void ConnectionWidget::setupUI()
     addressEdit->setMinimumWidth(80);
     addressEdit->setFixedHeight(24);
     addressEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-    portEdit = new QLineEdit("52292");
+    portEdit = new QLineEdit("50500");
     portEdit->setToolTip("Enter an IP port or baud rate");
     portEdit->setMinimumWidth(60);
     portEdit->setFixedHeight(24);

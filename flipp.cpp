@@ -12,6 +12,8 @@ Flipp::Flipp(QWidget *parent)
     connect(connections,SIGNAL(connectionListChanged(QStringList)),plotter,SLOT(updateConnections(QStringList)));
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
     connect(parsers,SIGNAL(parserListChanged(QStringList*)),plotter,SLOT(updateParsers(QStringList*)));
+    connect(plotter,SIGNAL(plotterConnectionRequest(QString)),this,SLOT(handlePlotterConnectionRequest(QString)));
+    connect(plotter,SIGNAL(plotterParserRequest(QString)),this,SLOT(handlePlotterParserRequest(QString)));
 
     connections->newConnection();
     terminals->newTerminal();
@@ -59,6 +61,18 @@ void Flipp::handlePlotterConnectionRequest(QString name)
         {
             plotter->assignConnection(connection);
             qDebug() << tr("Connection assigned");
+        }
+    }
+}
+
+void Flipp::handlePlotterParserRequest(QString name)
+{
+    foreach(ParserWidget *parser,*parsers->parserList)
+    {
+        if(parser->getName()==name)
+        {
+            plotter->assignParser(parser);
+            qDebug() << tr("Parser assigned");
         }
     }
 }

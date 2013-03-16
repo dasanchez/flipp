@@ -27,8 +27,10 @@ public slots:
     void updateConnections(QStringList);
     void updateParsers(QStringList*);
     void assignConnection(ConnectionWidget *);
+    void assignParser(ParserWidget *);
 signals:
-    void terminalConnectionRequest(QString);
+    void plotterConnectionRequest(QString);
+    void plotterParserRequest(QString);
 private:
 
     QLabel *widgetNameLabel;
@@ -47,6 +49,8 @@ private:
 private slots:
      void changeConnection(QString);
      void detachConnection(void);
+     void changeParser(QString);
+     void populateParserTable();
 };
 
 #endif // CONNECTIONWIDGET_H
