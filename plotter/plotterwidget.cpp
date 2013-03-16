@@ -115,10 +115,16 @@ void PlotterWidget::populateParserTable()
     tableWidget->clear();
     quint8 i=0;
     tableWidget->setRowCount(parserWidget->variableList->size());
+    tableWidget->setColumnCount(2);
     foreach(ComplexVariable *var,*parserWidget->variableList)
     {
-        qDebug() << "row: " << i << ", varName: " << var->name;
+//        qDebug() << "row: " << i << ", varName: " << var->name;
         QTableWidgetItem *item = new QTableWidgetItem(var->name);
-        tableWidget->setItem(i++,0,item);
+        item->setFlags(Qt::NoItemFlags);
+        tableWidget->setItem(i,0,item);
+        QTableWidgetItem *item2 = new QTableWidgetItem;
+        item2->setFlags(Qt::NoItemFlags);
+        tableWidget->setItem(i,1,item2);
+        i++;
     }
 }
