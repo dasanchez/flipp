@@ -33,20 +33,22 @@ signals:
     void plotterParserRequest(QString);
 private:
 
-    QLabel *widgetNameLabel;
-    QPushButton *newProfileButton;
+//    QLabel *widgetNameLabel;
+//    QPushButton *newProfileButton;
     QComboBox *connectionBox;
     QComboBox *parserBox;
     QTableWidget *tableWidget;
-//    QFrame *plotFrame;
+    QFrame *plotFrame;
 
-    QHBoxLayout *topLayout;
+//    QHBoxLayout *topLayout;
     QHBoxLayout *dataSourceLayout;
-//    QHBoxLayout *contentLayout;
+    QHBoxLayout *contentLayout;
     QVBoxLayout *mainLayout;
 
     ConnectionWidget *connectionWidget;
     ParserWidget *parserWidget;
+
+    quint8 calcRowCount();
 
 private slots:
      void changeConnection(QString);

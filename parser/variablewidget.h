@@ -17,10 +17,6 @@
 #include <parser/vectoritemwidget.h>
 #include <parser/parserengine.h>
 
-#define BYTTYPE 0
-#define NUMTYPE 1
-#define VECTYPE 2
-
 class VariableWidget : public QWidget
 {
     Q_OBJECT

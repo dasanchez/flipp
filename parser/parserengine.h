@@ -3,6 +3,10 @@
 
 #include <QObject>
 
+#define BYTTYPE 0
+#define NUMTYPE 1
+#define VECTYPE 2
+
 class BaseVariable{
 public:
     QString name;
