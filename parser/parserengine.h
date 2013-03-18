@@ -2,10 +2,15 @@
 #define PARSERENGINE_H
 
 #include <QObject>
+#include <QRegExp>
+#include <QDebug>
 
 #define BYTTYPE 0
 #define NUMTYPE 1
 #define VECTYPE 2
+
+enum parsingstate{START,PARSE};
+enum byteDecision{BYTE_HANDLED,LIST_COMPLETE,LIST_INVALID};
 
 class BaseVariable{
 public:
@@ -29,18 +34,11 @@ public:
     QList<BaseVariable*> *vector;
 };
 
-
-class VariableClass {
+class ParsedValues{
 public:
-    QString name;
-    quint8 type;
-    bool fixed;
-    bool match;
-    quint8 length;
-    quint8 repeat;
-    QByteArray matchBytes;
-    QList<QByteArray> received;
-    QList<double> numValue;
+    QList<QByteArray*> bytesFound;
+    QList<double*> valuesFound;
+    QList<int*> varTypes;
 };
 
 class ParserEngine : public QObject
@@ -49,13 +47,24 @@ class ParserEngine : public QObject
 public:
     explicit ParserEngine(QObject *parent = 0);
     
+    void setVariables(QList<ComplexVariable*> *);
 signals:
-    
+    void dataParsed(QList<ParsedValues*> *);
 public slots:
+    void parseData(QByteArray);
 
 private:
-    QList<VariableClass*> *variable;
+    QList<ComplexVariable*> *targetVars;
+    QList<ParsedValues*> *resultVals;
+    QByteArray buffer;
+    quint8 varIndex;
+    quint8 matchIndex;
+    quint8 vecIndex;
 
+    // Private functions
+    byteDecision checkByte(char);
+
+    void resetVariables();
 };
 
 #endif // PARSERENGINE_H
