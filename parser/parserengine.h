@@ -10,7 +10,7 @@
 #define VECTYPE 2
 
 enum parsingstate{START,PARSE};
-enum byteDecision{BYTE_HANDLED,LIST_COMPLETE,LIST_INVALID};
+enum byteDecision{BYTE_HANDLED,BYTE_COMPLETES,BYTE_INVALID};
 
 class BaseVariable{
 public:
@@ -48,6 +48,7 @@ public:
     explicit ParserEngine(QObject *parent = 0);
     
     void setVariables(QList<ComplexVariable*> *);
+    bool isValid(QByteArray *);
 signals:
     void dataParsed(QList<ParsedValues*> *);
 public slots:
@@ -60,6 +61,8 @@ private:
     quint8 varIndex;
     quint8 matchIndex;
     quint8 vecIndex;
+    quint8 repeatIndex;
+    bool validList;
 
     // Private functions
     byteDecision checkByte(char);
