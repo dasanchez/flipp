@@ -377,31 +377,12 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                     // 3. Variable length in the last vector position and the next variable is not a number or a matched byte.
                     // 4. Variable length in the last position and the 1st variable is not a number or a matched byte.
                     // 5. Byte array to match is empty
-                    if(j<targetVars->at(i)->vector->size()-1)
+                    if(!(targetVars->at(i)->vector->at(j)->fixed || targetVars->at(i)->vector->at(j)->match))
                     {
-                        // Case 1
-                        if(!(targetVars->at(i)->vector->at(j+1)->match || targetVars->at(i)->vector->at(j+1)->type==NUMTYPE))
+                        if(j<targetVars->at(i)->vector->size()-1)
                         {
-                            testout.append("Use a number or matched-byte array in after a variable-length byte array");
-                            checkOutput->append(testout);
-                            validList=false;
-                            return validList;
-                        }
-                    }
-                    else
-                    {
-                        // Case 2
-                        if(!(targetVars->at(i)->vector->at(0)->match || targetVars->at(i+1)->vector->at(0)->type==NUMTYPE))
-                        {
-                            testout.append("Start with a number or matched byte array when the last variable is a variable-length byte array");
-                            checkOutput->append(testout);
-                            validList=false;
-                            return validList;
-                        }
-                        if(i<targetVars->size()-1)
-                        {
-                            // Case 3
-                            if(!(targetVars->at(i+1)->match || targetVars->at(i+1)->type==NUMTYPE))
+                            // Case 1
+                            if(!(targetVars->at(i)->vector->at(j+1)->match || targetVars->at(i)->vector->at(j+1)->type==NUMTYPE))
                             {
                                 testout.append("Use a number or matched-byte array in after a variable-length byte array");
                                 checkOutput->append(testout);
@@ -409,8 +390,40 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                                 return validList;
                             }
                         }
+                        else
+                        {
+                            // Case 2
+                            if(!(targetVars->at(i)->vector->at(0)->match || targetVars->at(i+1)->vector->at(0)->type==NUMTYPE))
+                            {
+                                testout.append("Start with a number or matched byte array when the last variable is a variable-length byte array");
+                                checkOutput->append(testout);
+                                validList=false;
+                                return validList;
+                            }
+                            if(i<targetVars->size()-1)
+                            {
+                                // Case 3
+                                if(!(targetVars->at(i+1)->match || targetVars->at(i+1)->type==NUMTYPE))
+                                {
+                                    testout.append("Use a number or matched-byte array in after a variable-length byte array");
+                                    checkOutput->append(testout);
+                                    validList=false;
+                                    return validList;
+                                }
+                            }
+                            else
+                            {
+                                // Case 4
+                                if(!(targetVars->at(0)->match || targetVars->at(0)->type==NUMTYPE))
+                                {
+                                    testout.append("Start with a number or matched byte array when the last variable is a variable-length byte array");
+                                    checkOutput->append(testout);
+                                    validList=false;
+                                    return validList;
+                                }
+                            }
+                        }
                     }
-
                     break;
                 case NUMTYPE:
                     // Invalid cases:
@@ -418,6 +431,55 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                     // 2. Variable length in the last vector position and the 1st vector item is also a number.
                     // 3. Variable length in the last vector position and the next variable is also a number.
                     // 4. Variable length in the last vector position and the 1st variable is also a number.
+
+                    if(!targetVars->at(i)->vector->at(j)->fixed)
+                    {
+                        if(j<targetVars->at(i)->vector->size()-1)
+                        {
+                            // Case 1
+                            if(!(targetVars->at(i)->vector->at(j+1)->match || targetVars->at(i)->vector->at(j+1)->type==NUMTYPE))
+                            {
+                                testout.append("Use a byte array after a variable-length number");
+                                checkOutput->append(testout);
+                                validList=false;
+                                return validList;
+                            }
+                        }
+                        else
+                        {
+                            // Case 2
+                            if(targetVars->at(i)->vector->at(0)->type==NUMTYPE)
+                            {
+                                testout.append("Start with a byte array if the last variable is a variable-length number");
+                                checkOutput->append(testout);
+                                validList=false;
+                                return validList;
+                            }
+                            // Case 3
+                            if(i<targetVars->size()-1)
+                            {
+                                if(targetVars->at(i+1)->type==NUMTYPE)
+                                {
+                                    testout.append("Use a byte array after a variable-length number");
+                                    checkOutput->append(testout);
+                                    validList=false;
+                                    return validList;
+                                }
+                            }
+                            else
+                            {
+                                // Case 4
+                                if(targetVars->at(0)->type==NUMTYPE)
+                                {
+                                    testout.append("Start with a byte array if the last variable is a variable-length number");
+                                    checkOutput->append(testout);
+                                    validList=false;
+                                    return validList;
+                                }
+                            }
+                        }
+                    }
+
                     break;
                 default:
                     break;
