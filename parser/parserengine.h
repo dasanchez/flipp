@@ -66,6 +66,8 @@ private:
 
     // Private functions
     byteDecision checkByte(char);
+    void assignNonNumber(char);
+    void assignNumber(char);
 
     void resetVariables();
 };
