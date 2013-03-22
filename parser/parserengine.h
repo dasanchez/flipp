@@ -41,6 +41,31 @@ public:
     QList<int*> varTypes;
 };
 
+class SingleResult{
+public:
+    QByteArray varBytes;
+    double varValue;
+    int varType;
+};
+
+class SingleVector{
+public:
+    QList<SingleResult*> *vectorResult;
+};
+
+class VectorReps{
+public:
+    QList<SingleVector*> *vectorReps;
+};
+
+class VectorListResult{
+public:
+    QList<QList<SingleResult> > *vectorList;
+};
+
+
+
+
 class ParserEngine : public QObject
 {
     Q_OBJECT
@@ -56,7 +81,9 @@ public slots:
 
 private:
     QList<ComplexVariable*> *targetVars;
-    QList<ParsedValues*> *resultVals;
+    QList<VectorReps*> *masterList;
+//       QList<QList<SingleResult> > *vectorList;
+//    QList<VectorListResult*> *parsedResult;
     QByteArray buffer;
     quint8 varIndex;
     quint8 matchIndex;
@@ -68,6 +95,8 @@ private:
     byteDecision checkByte(char);
     void assignNonNumber(char);
     void assignNumber(char);
+    void variableComplete();
+    void clearVariables();
 
     void resetVariables();
 };

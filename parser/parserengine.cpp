@@ -4,7 +4,9 @@ ParserEngine::ParserEngine(QObject *parent) :
     QObject(parent)
 {
     targetVars = new QList<ComplexVariable*>;
-    resultVals = new QList<ParsedValues*>;
+    //    parsedResult = new QList<VectorListResult*>;
+//    vectorList = new QList<QList<SingleResult> >;
+    masterList = new QList<VectorReps*>;
     varIndex=0;
     matchIndex =0;
     vecIndex=0;
@@ -54,13 +56,23 @@ byteDecision ParserEngine::checkByte(char onebyte)
     if(targetVars->at(varIndex)->type==BYTTYPE || (targetVars->at(varIndex)->type==VECTYPE && targetVars->at(varIndex)->vector->at(vecIndex)->type==BYTTYPE))
     {
         // Assign non-number to array
+        // Possible responses:
+        // 1. Byte was handled without errors.
+        // 2. Byte was demeed invalid, try next variable
+        // 3. Byte was deemed invalid, eliminate current buffer
         assignNonNumber(onebyte);
     }
     else if(targetVars->at(varIndex)->type==NUMTYPE || (targetVars->at(varIndex)->type==VECTYPE && targetVars->at(varIndex)->vector->at(vecIndex)->type==NUMTYPE))
     {
+        // Assign number to array
+        // Possible responses:
+        // 1. Number has handled without errors.
+        // 2. Number was deemed invalid, try next variable
+        // 3. Number was deemed invalid, eliminate current buffer
         assignNumber(onebyte);
     }
 
+    /*
     while(!handled)
     {
         ComplexVariable *currentVar = targetVars->at(varIndex);
@@ -239,7 +251,7 @@ byteDecision ParserEngine::checkByte(char onebyte)
         }
     }
 
-
+*/
     //    qDebug() << onebyte;
 
 
@@ -248,38 +260,33 @@ byteDecision ParserEngine::checkByte(char onebyte)
 
 void ParserEngine::resetVariables()
 {
-    resultVals->clear();
+    masterList->clear();
     varIndex=0;
     matchIndex=0;
     vecIndex=0;
     repeatIndex =0;
     for(quint8 i=0;i<targetVars->size();i++)
     {
-        ParsedValues *pvs = new ParsedValues;
-        pvs->bytesFound.clear();
-        pvs->valuesFound.clear();
-        pvs->varTypes.clear();
+        // Populate vector list result with data containers
         switch(targetVars->at(i)->type)
         {
         case VECTYPE:
-            for(quint8 j=0;j<targetVars->at(i)->vector->size();j++)
-            {
-                // Assign properties for each BaseVariable
-                pvs->varTypes.append(new int);
-                pvs->bytesFound.append(new QByteArray);
-                *pvs->varTypes[j]=targetVars->at(i)->vector->at(j)->type;
-            }
+            // Iterate through each repetition
+
+                // Iterate through each vector element
+
+
             break;
         default:
-            pvs->varTypes.append(new int);
-            pvs->bytesFound.append(new QByteArray);
-            pvs->valuesFound.append(new double);
-            *pvs->varTypes[0]=targetVars->at(i)->type;
+//            SingleResult sr;
+//            QList<SingleResult> srl;
+//            srl.append(sr);
+//            vectorList->append(srl);
             break;
         }
-
-        resultVals->append(pvs);
+//        masterList->append(srlist);
     }
+
 }
 
 bool ParserEngine::isValid(QByteArray *checkOutput)
@@ -618,6 +625,20 @@ void ParserEngine::assignNonNumber(char newChar)
     if(targetVars->at(varIndex)->match)
     {
 
+        if(targetVars->at(varIndex)->matchBytes.at(matchIndex)==newChar)
+        {
+            // Byte matches OK
+            // Two cases:
+            // 1. Byte completes matchBytes array
+            // 2. Byte does not complete matchBytes array
+            //            *resultVals->at(varIndex)->bytesFound[repeatIndex].append(newChar);
+            //            if(resultVals->at(varIndex)->bytesFound.size()==targetVars->at(varIndex)->matchBytes.size())
+            //            {
+            //                // Case 1
+            //                variableComplete();
+            //                return;
+            //            }
+        }
     }
     // Do BaseVariable next
     if(targetVars->at(varIndex)->type==VECTYPE && targetVars->at(varIndex)->vector->at(vecIndex)->match)
@@ -647,3 +668,57 @@ void ParserEngine::assignNumber(char newChar)
 
     // Do BaseVariable next
 }
+
+void ParserEngine::variableComplete()
+{
+    // ComplexVariable case:
+    if(targetVars->at(varIndex)->type==VECTYPE)
+    {
+        vecIndex++;
+        if(vecIndex==targetVars->at(varIndex)->vector->size())
+        {
+            // Vector is complete
+            repeatIndex++;
+            vecIndex=0;
+            if(repeatIndex==targetVars->at(varIndex)->repeat)
+            {
+                // All repetitions have been caught.
+                varIndex++;
+                repeatIndex=0;
+            }
+        }
+        else
+        {
+            // Vector is not complete yet
+            return;
+        }
+    }
+    else
+    {
+        // For BYTTYPE and NUMTYPE, always increase variable index
+        varIndex++;
+    }
+    if(varIndex==targetVars->size())
+    {
+        //        emit dataParsed(resultVals);
+        clearVariables();
+    }
+}
+
+void ParserEngine::clearVariables()
+{
+    //    resultVals->clear();
+    varIndex=0;
+    matchIndex=0;
+    vecIndex=0;
+    repeatIndex =0;
+    //    for(quint8 i=0;i<resultVals->size();i++)
+    //    {
+    //        for(quint j=0;j<resultVals->at(i)->bytesFound.size();j++)
+    //        {
+    //            resultVals->at(i)->bytesFound.at(j)->clear();
+    //            resultVals->at(i)->valuesFound.at(j)->clear();
+    //        }
+    //    }
+}
+
