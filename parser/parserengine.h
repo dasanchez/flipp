@@ -50,21 +50,13 @@ public:
 
 class SingleVector{
 public:
-    QList<SingleResult*> *vectorResult;
+    QList<SingleResult> vector;
 };
 
-class VectorReps{
+class RepeatedVector{
 public:
-    QList<SingleVector*> *vectorReps;
+    QList<SingleVector> vectors;
 };
-
-class VectorListResult{
-public:
-    QList<QList<SingleResult> > *vectorList;
-};
-
-
-
 
 class ParserEngine : public QObject
 {
@@ -81,7 +73,7 @@ public slots:
 
 private:
     QList<ComplexVariable*> *targetVars;
-    QList<VectorReps*> *masterList;
+    QList<RepeatedVector> masterList;
 //       QList<QList<SingleResult> > *vectorList;
 //    QList<VectorListResult*> *parsedResult;
     QByteArray buffer;
