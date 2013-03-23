@@ -5,8 +5,8 @@ ParserEngine::ParserEngine(QObject *parent) :
 {
     targetVars = new QList<ComplexVariable*>;
     //    parsedResult = new QList<VectorListResult*>;
-//    vectorList = new QList<QList<SingleResult> >;
-    masterList = new QList<VectorReps*>;
+    //    vectorList = new QList<QList<SingleResult> >;
+    //    masterList = new QList<VectorReps*>;
     varIndex=0;
     matchIndex =0;
     vecIndex=0;
@@ -260,31 +260,46 @@ byteDecision ParserEngine::checkByte(char onebyte)
 
 void ParserEngine::resetVariables()
 {
-    masterList->clear();
+    masterList.clear();
     varIndex=0;
     matchIndex=0;
     vecIndex=0;
     repeatIndex =0;
     for(quint8 i=0;i<targetVars->size();i++)
     {
+        RepeatedVector repVec;
         // Populate vector list result with data containers
         switch(targetVars->at(i)->type)
         {
         case VECTYPE:
+        {
             // Iterate through each repetition
-
+            for(quint8 j=0;j<targetVars->at(i)->repeat;j++)
+            {
                 // Iterate through each vector element
-
-
+                SingleVector sv;
+                for(quint8 k=0;k<targetVars->at(i)->vector->size();k++)
+                {
+                    SingleResult sr;
+                    sv.vector.append(sr);
+                }
+                repVec.vectors.append(sv);
+            }
+        }
             break;
         default:
-//            SingleResult sr;
-//            QList<SingleResult> srl;
-//            srl.append(sr);
-//            vectorList->append(srl);
+
+            SingleVector sv;
+            SingleResult sr;
+            sv.vector.append(sr);
+            repVec.vectors.append(sv);
+            //            QList<SingleResult> srl;
+            //            srl.append(sr);
+            //            vectorList->append(srl);
             break;
         }
-//        masterList->append(srlist);
+        masterList.append(repVec);
+        //        masterList->append(srlist);
     }
 
 }
