@@ -9,6 +9,10 @@
 #define NUMTYPE 1
 #define VECTYPE 2
 
+#define VALID_CHAR 0
+#define INVALID_OK 1
+#define INVALID_ERR 2
+
 enum parsingstate{START,PARSE};
 enum byteDecision{BYTE_HANDLED,BYTE_COMPLETES,BYTE_INVALID};
 
@@ -50,6 +54,7 @@ public:
 
 class SingleVector{
 public:
+<<<<<<< HEAD
     QList<SingleResult> vector;
 };
 
@@ -58,6 +63,16 @@ public:
     QList<SingleVector> vectors;
 };
 
+=======
+    QList<SingleResult*> vector;
+};
+
+class RepeatedVector{
+public:
+    QList<SingleVector> vectors;
+};
+
+>>>>>>> Updates to parser engine
 class ParserEngine : public QObject
 {
     Q_OBJECT
@@ -85,8 +100,8 @@ private:
 
     // Private functions
     byteDecision checkByte(char);
-    void assignNonNumber(char);
-    void assignNumber(char);
+    int assignNonNumber(char);
+    int assignNumber(char);
     void variableComplete();
     void clearVariables();
 
