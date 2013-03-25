@@ -12,6 +12,9 @@ ParserEngine::ParserEngine(QObject *parent) :
     vecIndex=0;
     repeatIndex=0;
     validList=false;
+
+    // Look for an array of bytes that can contain +/-, spaces, and decimal points.
+    numRegex.setPattern("( *[-+]? *\\d+\\.?\\d*)|( *[-+]? *\\d*\\.?\\d+)| +| *[+-]| *[+-] +| *[+-]? *\\.");
 }
 
 void ParserEngine::setVariables(QList<ComplexVariable*> *newVars)
@@ -26,7 +29,7 @@ void ParserEngine::parseData(QByteArray dataIn)
     {
         foreach(char ch,dataIn)
         {
-            //            qDebug() << ch;
+//                        qDebug() << ch;
             checkByte(ch);
         }
     }
@@ -48,9 +51,7 @@ byteDecision ParserEngine::checkByte(char onebyte)
 {
 
     byteDecision dec=BYTE_HANDLED;
-    QRegExp regexp;
-    // Look for an array of bytes that can contain +/-, spaces, and decimal points.
-    regexp.setPattern("( *[-+]? *\\d+\\.?\\d*)|( *[-+]? *\\d*\\.?\\d+)| +| *[+-]| *[+-] +| *[+-]? *\\.");
+
     bool handled=false;
 
     if(targetVars->at(varIndex)->type==BYTTYPE || (targetVars->at(varIndex)->type==VECTYPE && targetVars->at(varIndex)->vector->at(vecIndex)->type==BYTTYPE))
@@ -89,7 +90,20 @@ byteDecision ParserEngine::checkByte(char onebyte)
         // 1. Number has handled without errors.
         // 2. Number was deemed invalid, try next variable
         // 3. Number was deemed invalid, eliminate current buffer
-
+        switch(assignNumber(onebyte))
+        {
+        case VALID_CHAR:
+            // Case 1
+            break;
+        case INVALID_OK:
+            // Case 2
+            break;
+        case INVALID_ERR:
+            // Case 3
+            break;
+        default:
+            break;
+        }
     }
 
     /*
@@ -300,12 +314,8 @@ void ParserEngine::resetVariables()
                 SingleVector sv;
                 for(quint8 k=0;k<targetVars->at(i)->vector->size();k++)
                 {
-<<<<<<< HEAD
-                    SingleResult sr;
-=======
                     SingleResult *sr = new SingleResult;
                     sr->varType=targetVars->at(i)->vector->at(k)->type;
->>>>>>> Updates to parser engine
                     sv.vector.append(sr);
                 }
                 repVec.vectors.append(sv);
@@ -315,19 +325,10 @@ void ParserEngine::resetVariables()
         default:
 
             SingleVector sv;
-<<<<<<< HEAD
-            SingleResult sr;
-            sv.vector.append(sr);
-            repVec.vectors.append(sv);
-            //            QList<SingleResult> srl;
-            //            srl.append(sr);
-            //            vectorList->append(srl);
-=======
 
             SingleResult *sr = new SingleResult;
             sv.vector.append(sr);
             repVec.vectors.append(sv);
->>>>>>> Updates to parser engine
             break;
         }
         masterList.append(repVec);
@@ -821,53 +822,174 @@ int ParserEngine::assignNonNumber(char newChar)
 
 int ParserEngine::assignNumber(char newChar)
 {
-    // Do ComplexVariable first
-    if(targetVars->at(varIndex)->type!=VECTYPE)
+    // 1st check: is it a number-friendly byte?
+    switch(newChar)
     {
-        if(targetVars->at(varIndex)->fixed)
+    case ' ':
+    case '+':
+    case '-':
+    case '.':
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+        // Incoming byte is a number
+        // Cases:
+        // Complex Variable
+        if(targetVars->at(varIndex)->type!=VECTYPE)
         {
-            // Fixed length
-            // Case 1: Incoming byte completes length
-            // Case 2: Incoming byte does not complete length
-            // Case 3: Incoming byte invalidates buffer
-            masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
-            if(masterList.at(varIndex).vectors[0].vector[0]->varBytes.size()==targetVars->at(varIndex)->length)
+
+            if(targetVars->at(varIndex)->fixed)
             {
-                variableComplete();
+                // Fixed length
+                // Case 1: Incoming byte completes length
+                // Case 2: Incoming byte does not complete length
+                // Case 3: Incoming byte invalidates buffer
+                masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
+                if(masterList.at(varIndex).vectors[0].vector[0]->varBytes.size()==targetVars->at(varIndex)->length)
+                {
+                    // Case 1
+                    masterList.at(varIndex).vectors[0].vector[0]->varValue=masterList.at(varIndex).vectors[0].vector[0]->varBytes.toDouble();
+                    variableComplete();
+                }
+                return VALID_CHAR;
             }
-            return VALID_CHAR;
+            else
+            {
+                // Variable length
+                // Case 1: Incoming byte keeps buffer valid
+                // Case 2: Incoming byte invalidates buffer
+                QByteArray checkArray;
+                checkArray.append(masterList.at(varIndex).vectors[0].vector[0]->varBytes);
+                checkArray.append(newChar);
+                if(numRegex.indexIn(checkArray)==0)
+                {
+                    // Case 1
+                    masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
+                    return VALID_CHAR;
+                }
+                else
+                {
+                    // Case 2
+                    masterList.at(varIndex).vectors[0].vector[0]->varValue=masterList.at(varIndex).vectors[0].vector[0]->varBytes.toDouble();
+                    variableComplete();
+                    return INVALID_OK;
+                }
+            }
+
+        }
+        // Base Variable
+        else
+        {
+            if(targetVars->at(varIndex)->vector->at(vecIndex)->fixed)
+            {
+                // Fixed length
+                // Case 1: Incoming byte completes length
+                // Case 2: Incoming byte does not complete length
+                // Case 3: Incoming byte invalidates buffer
+                masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
+                if(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.size()==targetVars->at(varIndex)->vector->at(vecIndex)->length)
+                {
+                    // Case 1
+                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varValue=masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.toDouble();
+                    variableComplete();
+                }
+                return VALID_CHAR;
+            }
+            else
+            {
+                // Variable length
+                // Case 1: Incoming byte keeps buffer valid
+                // Case 2: Incoming byte invalidates buffer
+                QByteArray checkArray;
+                checkArray.append(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes);
+                checkArray.append(newChar);
+                if(numRegex.indexIn(checkArray)==0)
+                {
+                    // Case 1
+                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
+                    return VALID_CHAR;
+                }
+                else
+                {
+                    // Case 2
+                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varValue=masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.toDouble();
+                    variableComplete();
+                    return INVALID_OK;
+                }
+            }
+        }
+        break;
+    default:
+        // Incoming byte is not even a number
+        // Check Complex Variable first
+        if(targetVars->at(varIndex)->type!=VECTYPE)
+        {
+            if(targetVars->at(varIndex)->fixed)
+            {
+                return INVALID_ERR;
+            }
+            else
+            {
+                // Variable-length
+                // Case 1: Incoming byte keeps buffer valid
+                // Case 2: Incoming byte invalidates buffer
+                QByteArray checkArray;
+                checkArray.append(masterList.at(varIndex).vectors[0].vector[0]->varBytes);
+                checkArray.append(newChar);
+                if(numRegex.indexIn(checkArray)==0)
+                {
+                    // Case 1
+                    masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
+                    return VALID_CHAR;
+                }
+                else
+                {
+                    // Case 2
+                    masterList.at(varIndex).vectors[0].vector[0]->varValue=masterList.at(varIndex).vectors[0].vector[0]->varBytes.toDouble();
+                    variableComplete();
+                    return INVALID_OK;
+                }
+            }
         }
         else
         {
-            // Variable length
-            // Case 1: Incoming byte keeps buffer valid
-            // Case 2: Incoming byte invalidates buffer
-        }
-    }
-    else
-    {
-        if(targetVars->at(varIndex)->vector->at(vecIndex)->fixed)
-        {
-            // Fixed length
-            // Case 1: Incoming byte completes length
-            // Case 2: Incoming byte does not complete length
-            // Case 3: Incoming byte invalidates buffer
-            masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
-            if(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.size()==targetVars->at(varIndex)->vector->at(vecIndex)->length)
+            // Base Variable
+            if(targetVars->at(varIndex)->vector->at(vecIndex)->fixed)
             {
-                variableComplete();
+                return INVALID_ERR;
             }
-            return VALID_CHAR;
+            else
+            {
+                // Variable-length
+                // Case 1: Incoming byte keeps buffer valid
+                // Case 2: Incoming byte invalidates buffer
+                QByteArray checkArray;
+                checkArray.append(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes);
+                checkArray.append(newChar);
+                if(numRegex.indexIn(checkArray)==0)
+                {
+                    // Case 1
+                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
+                    return VALID_CHAR;
+                }
+                else
+                {
+                    // Case 2
+                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varValue=masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.toDouble();
+                    variableComplete();
+                    return INVALID_OK;
+                }
+            }
         }
-        else
-        {
-            // Variable length
-        }
+        break;
     }
-
-
-    // Do BaseVariable next
-    return VALID_CHAR;
 }
 
 void ParserEngine::variableComplete()

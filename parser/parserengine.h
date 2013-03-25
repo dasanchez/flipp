@@ -54,16 +54,6 @@ public:
 
 class SingleVector{
 public:
-<<<<<<< HEAD
-    QList<SingleResult> vector;
-};
-
-class RepeatedVector{
-public:
-    QList<SingleVector> vectors;
-};
-
-=======
     QList<SingleResult*> vector;
 };
 
@@ -72,7 +62,6 @@ public:
     QList<SingleVector> vectors;
 };
 
->>>>>>> Updates to parser engine
 class ParserEngine : public QObject
 {
     Q_OBJECT
@@ -97,6 +86,9 @@ private:
     quint8 vecIndex;
     quint8 repeatIndex;
     bool validList;
+    QRegExp numRegex;
+    // Look for an array of bytes that can contain +/-, spaces, and decimal points.
+
 
     // Private functions
     byteDecision checkByte(char);
