@@ -29,7 +29,7 @@ void ParserEngine::parseData(QByteArray dataIn)
     {
         foreach(char ch,dataIn)
         {
-//                        qDebug() << ch;
+            //                        qDebug() << ch;
             checkByte(ch);
         }
     }
@@ -52,59 +52,158 @@ byteDecision ParserEngine::checkByte(char onebyte)
 
     byteDecision dec=BYTE_HANDLED;
 
-    bool handled=false;
+//    bool handled=false;
 
-    if(targetVars->at(varIndex)->type==BYTTYPE || (targetVars->at(varIndex)->type==VECTYPE && targetVars->at(varIndex)->vector->at(vecIndex)->type==BYTTYPE))
+    if(targetVars->at(varIndex)->type!=VECTYPE)
     {
-        // Assign non-number to array
-        // Possible responses:
-        // 1. Byte was handled without errors.
-        // 2. Byte was demeed invalid, try next variable
-        // 3. Byte was deemed invalid, eliminate current buffer
-        switch(assignNonNumber(onebyte))
+        if(targetVars->at(varIndex)->type==BYTTYPE)
         {
-        case VALID_CHAR:
-            // Case 1
-            break;
-        case INVALID_OK:
-            // Case 2
-            // A number was found. Is next variable/vector item a number?
-            switch(assignNumber(onebyte))
+            // Assign non-number to array
+            // Possible responses:
+            // 1. Byte was handled without errors.
+            // 2. Byte was demeed invalid, try next variable
+            // 3. Byte was deemed invalid, eliminate current buffer
+            switch(assignNonNumber(onebyte))
             {
+            case VALID_CHAR:
+                // Case 1
+                break;
+            case INVALID_OK:
+                // Case 2
+                // A number was found. Is next variable/vector item a number?
+                switch(assignNumber(onebyte))
+                {
+                case VALID_CHAR:
+                    return BYTE_HANDLED;
+                    break;
+                case INVALID_OK:
+                case INVALID_ERR:
+                default:
+                    clearVariables();
+                    return BYTE_INVALID;
+                    break;
+                }
+                break;
+            case INVALID_ERR:
+                // Case 3
+                clearVariables();
+                return BYTE_INVALID;
+                break;
             default:
                 break;
             }
-
-            break;
-        case INVALID_ERR:
-            // Case 3
-            break;
-        default:
-            break;
         }
-    }
-    else if(targetVars->at(varIndex)->type==NUMTYPE || (targetVars->at(varIndex)->type==VECTYPE && targetVars->at(varIndex)->vector->at(vecIndex)->type==NUMTYPE))
-    {
-        // Assign number to array
-        // Possible responses:
-        // 1. Number has handled without errors.
-        // 2. Number was deemed invalid, try next variable
-        // 3. Number was deemed invalid, eliminate current buffer
-        switch(assignNumber(onebyte))
+        else
         {
-        case VALID_CHAR:
-            // Case 1
-            break;
-        case INVALID_OK:
-            // Case 2
-            break;
-        case INVALID_ERR:
-            // Case 3
-            break;
-        default:
-            break;
+            // Assign number
+            // Possible responses:
+            // 1. Number has handled without errors.
+            // 2. Number was deemed invalid, try next variable
+            // 3. Number was deemed invalid, eliminate current buffer
+            switch(assignNumber(onebyte))
+            {
+            case VALID_CHAR:
+                // Case 1
+                break;
+            case INVALID_OK:
+                // Case 2
+                // A number character was found. Can it be assigned to the next variable?
+                switch(assignNonNumber(onebyte))
+                {
+                    case VALID_CHAR:
+                    return BYTE_HANDLED;
+                    break;
+                default:
+                    clearVariables();
+                    return BYTE_INVALID;
+                    break;
+                }
+                break;
+            case INVALID_ERR:
+                // Case 3
+                clearVariables();
+                return BYTE_INVALID;
+                break;
+            default:
+                break;
+            }
         }
     }
+    else
+    {
+        if(targetVars->at(varIndex)->vector->at(vecIndex)->type==BYTTYPE)
+        {
+            // Assign non-number to array
+            // Possible responses:
+            // 1. Byte was handled without errors.
+            // 2. Byte was demeed invalid, try next variable
+            // 3. Byte was deemed invalid, eliminate current buffer
+            switch(assignNonNumber(onebyte))
+            {
+            case VALID_CHAR:
+                // Case 1
+                return BYTE_HANDLED;
+                break;
+            case INVALID_OK:
+                // Case 2
+                // A number was found. Is next variable/vector item a number?
+                switch(assignNumber(onebyte))
+                {
+                case VALID_CHAR:
+                    return BYTE_HANDLED;
+                    break;
+                default:
+                    clearVariables();
+                    return BYTE_INVALID;
+                    break;
+                }
+                break;
+            case INVALID_ERR:
+                // Case 3
+                clearVariables();
+                return BYTE_INVALID;
+                break;
+            default:
+                break;
+            }
+        }
+        else
+        {
+            // Number type
+            // Possible responses:
+            // 1. Number has handled without errors.
+            // 2. Number was deemed invalid, try next variable
+            // 3. Number was deemed invalid, eliminate current buffer
+            switch(assignNumber(onebyte))
+            {
+            case VALID_CHAR:
+                // Case 1
+                return BYTE_HANDLED;
+                break;
+            case INVALID_OK:
+                switch(assignNonNumber(onebyte))
+                {
+                case VALID_CHAR:
+                    return BYTE_HANDLED;
+                    break;
+                default:
+                    clearVariables();
+                    return BYTE_INVALID;
+                    break;
+                }
+                // Case 2
+                break;
+            case INVALID_ERR:
+                // Case 3
+                clearVariables();
+                return BYTE_INVALID;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
 
     /*
     while(!handled)
@@ -1037,13 +1136,19 @@ void ParserEngine::clearVariables()
     matchIndex=0;
     vecIndex=0;
     repeatIndex =0;
-    //    for(quint8 i=0;i<resultVals->size();i++)
-    //    {
-    //        for(quint j=0;j<resultVals->at(i)->bytesFound.size();j++)
-    //        {
-    //            resultVals->at(i)->bytesFound.at(j)->clear();
-    //            resultVals->at(i)->valuesFound.at(j)->clear();
-    //        }
-    //    }
+    for(quint8 i=0;i<masterList.size();i++)
+    {
+        for(quint8 j=0;j<masterList.at(i).vectors.size();j++)
+        {
+            for(quint8 k=0;k<masterList.at(i).vectors.at(j).vector.size();k++)
+            {
+                masterList.at(i).vectors.at(j).vector.at(k)->varBytes.clear();
+                masterList.at(i).vectors.at(j).vector.at(k)->varValue=0;
+//                resultVals->at(i)->bytesFound.at(j)->clear();
+//                resultVals->at(i)->valuesFound.at(j)->clear();
+            }
+        }
+    }
+    //    masterList.at(1).
 }
 
