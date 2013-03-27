@@ -4,9 +4,8 @@ ParserEngine::ParserEngine(QObject *parent) :
     QObject(parent)
 {
     targetVars = new QList<ComplexVariable*>;
-    //    parsedResult = new QList<VectorListResult*>;
-    //    vectorList = new QList<QList<SingleResult> >;
-    //    masterList = new QList<VectorReps*>;
+    buffer.clear();
+    bufferCount=0;
     varIndex=0;
     matchIndex =0;
     vecIndex=0;
@@ -29,8 +28,15 @@ void ParserEngine::parseData(QByteArray dataIn)
     {
         foreach(char ch,dataIn)
         {
-            //                        qDebug() << ch;
-            checkByte(ch);
+//            buffer.append(ch);
+            switch(checkByte(ch))
+            {
+            case BYTE_INVALID:
+                // Eliminate left-most byte from buffer and try again.
+                break;
+            default:
+                break;
+            }
         }
     }
 }
@@ -52,7 +58,7 @@ byteDecision ParserEngine::checkByte(char onebyte)
 
     byteDecision dec=BYTE_HANDLED;
 
-//    bool handled=false;
+    //    bool handled=false;
 
     if(targetVars->at(varIndex)->type!=VECTYPE)
     {
@@ -67,6 +73,7 @@ byteDecision ParserEngine::checkByte(char onebyte)
             {
             case VALID_CHAR:
                 // Case 1
+                return BYTE_HANDLED;
                 break;
             case INVALID_OK:
                 // Case 2
@@ -110,7 +117,7 @@ byteDecision ParserEngine::checkByte(char onebyte)
                 // A number character was found. Can it be assigned to the next variable?
                 switch(assignNonNumber(onebyte))
                 {
-                    case VALID_CHAR:
+                case VALID_CHAR:
                     return BYTE_HANDLED;
                     break;
                 default:
@@ -204,195 +211,12 @@ byteDecision ParserEngine::checkByte(char onebyte)
         }
     }
 
-
-    /*
-    while(!handled)
-    {
-        ComplexVariable *currentVar = targetVars->at(varIndex);
-        switch(currentVar->type)
-        {
-        case BYTTYPE:
-            if(currentVar->match)
-            {
-                // Matched byte array
-                // Possible cases:
-                // 1. Incoming byte fits but matchBytes is not fully matched
-                // 2. Incoming byte fits, completing matchBytes
-                // 3. Incoming byte doesn't fit.
-                if(currentVar->matchBytes.at(matchIndex)==onebyte)
-                {
-                    resultVals->at(varIndex)->bytesFound[0]->append(onebyte);
-                    if(currentVar->matchBytes.size()==resultVals->at(varIndex)->bytesFound.at(0)->size())
-                    {
-                        // Case 2:
-                        //                    qDebug() << *resultVals->at(varIndex)->bytesFound.at(0);
-                        matchIndex=0;
-                        varIndex++;
-                    }
-                    else
-                    {
-                        // Case 1:
-                        matchIndex++;
-                    }
-                }
-                else
-                {
-                    // Case 3
-                    dec=BYTE_INVALID;
-                    resultVals->at(varIndex)->bytesFound[0]->clear();
-                    varIndex=0;
-                    matchIndex=0;
-                }
-                handled=true;
-            }
-            else if(currentVar->fixed)
-            {
-                // Fixed-length byte array
-                // Possible cases:
-                // 1. Incoming byte does not complete length
-                // 2. Incoming byte completes length
-
-                // Case 1
-                resultVals->at(varIndex)->bytesFound[0]->append(onebyte);
-                if(currentVar->length==resultVals->at(varIndex)->bytesFound.at(0)->size())
-                {
-                    // Case 2
-                    //                qDebug() << *resultVals->at(varIndex)->bytesFound.at(0);
-                    varIndex++;
-                }
-                handled=true;
-            }
-            else
-            {
-                // Variable-length byte array
-                // Possible cases:
-                // 1. Incoming byte is not a number character
-                // 2. Incoming byte is a number character
-                if((onebyte>='0' && onebyte<='9') || onebyte=='+' || onebyte=='-' || onebyte=='.')
-                {
-                    // Case 2
-                    // Incoming byte can be:
-                    // A. Part of the next variable
-                    // B. Part of the 1st variable if the current variable is the last one [COMPLETE]
-                    // C. Part of the 1st item if the next variable is a vector
-                    // D. Part of the 1st item if the current variable is the last one and the 1st variable is a vector [COMPLETE]
-
-                    //                qDebug() << *resultVals->at(varIndex)->bytesFound.at(0);
-                    varIndex++;
-                    //                    checkByte(onebyte);
-                }
-                else
-                {
-                    // Case 1
-                    resultVals->at(varIndex)->bytesFound[0]->append(onebyte);
-                    handled=true;
-                }
-            }
-            break;
-        case NUMTYPE:
-            if(currentVar->fixed)
-            {
-                // Fixed-length number
-                // Possible cases:
-                // 1. Incoming byte completes length
-                // 2. Incoming byte does not complete length
-                // 3. Incoming byte invalidates the current bytesFound array
-                // 4. Incoming byte is not a valid number
-
-                // CHECK FOR CASES 3 & 4 FIRST!!
-
-                // Case 2
-                resultVals->at(varIndex)->bytesFound[0]->append(onebyte);
-                if(currentVar->length==resultVals->at(varIndex)->bytesFound.at(0)->size())
-                {
-                    // Case 1
-                    double newVal = resultVals->at(varIndex)->bytesFound.at(0)->toDouble();
-                    *resultVals->at(varIndex)->valuesFound[0]=newVal;
-                    //                qDebug() << *resultVals->at(varIndex)->bytesFound.at(0) << ", number: " << newVal;
-                    varIndex++;
-                }
-                handled=true;
-            }
-            else
-            {
-                // Variable-length number
-                // Possible cases
-                // 1. Incoming byte keeps the bytesFound array valid
-                // 2. Incoming byte invalidates the current bytesFound array
-                // 3. Incoming byte is not a valid number
-                if(!((onebyte>='0' && onebyte<='9') || onebyte=='+' || onebyte=='-' || onebyte=='.'))
-                {
-                    // Case 3
-                    // Assume byte variable is now present.
-                    //                qDebug() << *resultVals->at(varIndex)->bytesFound.at(0);
-                    double newVal = resultVals->at(varIndex)->bytesFound.at(0)->toDouble();
-                    *resultVals->at(varIndex)->valuesFound[0]=newVal;
-                    varIndex++;
-                    //                    checkByte(onebyte);
-                }
-                else
-                {
-                    resultVals->at(varIndex)->bytesFound[0]->append(onebyte);
-                    handled=true;
-                }
-
-            }
-            break;
-        case VECTYPE:
-            // We'll get here.
-            BaseVariable *currentVectorItem;
-            currentVectorItem = currentVar->vector->at(vecIndex);
-            switch(currentVectorItem->type)
-            {
-            case BYTTYPE:
-                if(currentVectorItem->match)
-                {
-
-                }
-                else if(currentVectorItem->fixed)
-                {
-
-                }
-                else
-                {
-
-                }
-                break;
-            case NUMTYPE:
-                if(currentVectorItem->fixed)
-                {
-
-                }
-                else
-                {
-
-                }
-                break;
-            default:
-                break;
-            }
-
-            break;
-        default:
-            break;
-        }
-        if (varIndex>=targetVars->size())
-        {
-            // Emit result
-            emit dataParsed(resultVals);
-            resetVariables();
-        }
-    }
-
-*/
-    //    qDebug() << onebyte;
-
-
     return dec;
 }
 
 void ParserEngine::resetVariables()
 {
+    buffer.clear();
     masterList.clear();
     varIndex=0;
     matchIndex=0;
@@ -1072,7 +896,8 @@ int ParserEngine::assignNumber(char newChar)
                 QByteArray checkArray;
                 checkArray.append(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes);
                 checkArray.append(newChar);
-                if(numRegex.indexIn(checkArray)==0)
+
+                if(numRegex.indexIn(checkArray)==0 && numRegex.matchedLength()==checkArray.size())
                 {
                     // Case 1
                     masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
@@ -1122,7 +947,7 @@ void ParserEngine::variableComplete()
     }
     if(varIndex==targetVars->size())
     {
-        //        emit dataParsed(resultVals);
+        emit dataParsed(masterList);
         qDebug() << "Full list caught";
         clearVariables();
 
@@ -1144,8 +969,8 @@ void ParserEngine::clearVariables()
             {
                 masterList.at(i).vectors.at(j).vector.at(k)->varBytes.clear();
                 masterList.at(i).vectors.at(j).vector.at(k)->varValue=0;
-//                resultVals->at(i)->bytesFound.at(j)->clear();
-//                resultVals->at(i)->valuesFound.at(j)->clear();
+                //                resultVals->at(i)->bytesFound.at(j)->clear();
+                //                resultVals->at(i)->valuesFound.at(j)->clear();
             }
         }
     }

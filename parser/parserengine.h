@@ -38,13 +38,6 @@ public:
     QList<BaseVariable*> *vector;
 };
 
-class ParsedValues{
-public:
-    QList<QByteArray*> bytesFound;
-    QList<double*> valuesFound;
-    QList<int*> varTypes;
-};
-
 class SingleResult{
 public:
     QByteArray varBytes;
@@ -67,20 +60,18 @@ class ParserEngine : public QObject
     Q_OBJECT
 public:
     explicit ParserEngine(QObject *parent = 0);
-    
     void setVariables(QList<ComplexVariable*> *);
     bool isValid(QByteArray *);
 signals:
-    void dataParsed(QList<ParsedValues*> *);
+    void dataParsed(QList<RepeatedVector>);
 public slots:
     void parseData(QByteArray);
 
 private:
     QList<ComplexVariable*> *targetVars;
     QList<RepeatedVector> masterList;
-//       QList<QList<SingleResult> > *vectorList;
-//    QList<VectorListResult*> *parsedResult;
     QByteArray buffer;
+    quint8 bufferCount;
     quint8 varIndex;
     quint8 matchIndex;
     quint8 vecIndex;
@@ -96,7 +87,6 @@ private:
     int assignNumber(char);
     void variableComplete();
     void clearVariables();
-
     void resetVariables();
 };
 
