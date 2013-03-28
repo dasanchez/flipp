@@ -11,6 +11,7 @@ ParserEngine::ParserEngine(QObject *parent) :
     vecIndex=0;
     repeatIndex=0;
     validList=false;
+    listComplete=true;
 
     // Look for an array of bytes that can contain +/-, spaces, and decimal points.
     numRegex.setPattern("( *[-+]? *\\d+\\.?\\d*)|( *[-+]? *\\d*\\.?\\d+)| +| *[+-]| *[+-] +| *[+-]? *\\.");
@@ -42,16 +43,8 @@ void ParserEngine::parseData(QByteArray dataIn)
 }
 
 // CheckByte receives a single byte, and allocates it to the corresponding variable.
-// There are two special cases of byte processing:
-
-// 1. The current variable is a variable-length byte array and a number is received.
-// If the number can be allocated to the next variable (or variable #0 if the current
-// byte array is the last element in the list), the current byte array is closed.
-// Otherwise the function returns INVALID_MATCH
-
-// 2. The current variable is a variable-length number and a non-valid byte is received.
-// If the byte can be allocated to the next variable (or variable #0 if the current number
-// is the last element in the list), the current number is closed.
+// Each allocation function will return a qualifier based on how the new byte
+// fits in with the previously collected data.
 
 byteDecision ParserEngine::checkByte(char onebyte)
 {
@@ -947,6 +940,7 @@ void ParserEngine::variableComplete()
     }
     if(varIndex==targetVars->size())
     {
+        listComplete=true;
         emit dataParsed(masterList);
         qDebug() << "Full list caught";
         clearVariables();
