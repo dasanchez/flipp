@@ -77,9 +77,8 @@ private:
     quint8 vecIndex;
     quint8 repeatIndex;
     bool validList;
+    bool listComplete;
     QRegExp numRegex;
-    // Look for an array of bytes that can contain +/-, spaces, and decimal points.
-
 
     // Private functions
     byteDecision checkByte(char);
