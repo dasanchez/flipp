@@ -13,6 +13,7 @@
 #include <QStyledItemDelegate>
 #include <connection/connectionwidget.h>
 #include <parser/parserwidget.h>
+#include <parser/parserengine.h>
 #include <livelistwidget/livelistwidget.h>
 
 class PlotterWidget : public QWidget
@@ -47,6 +48,7 @@ private:
 
     ConnectionWidget *connectionWidget;
     ParserWidget *parserWidget;
+    ParserEngine *parserEngine;
 
     quint8 calcRowCount();
 
@@ -56,6 +58,7 @@ private slots:
      void changeParser(QString);
      void detachParser(void);
      void populateParserTable();
+     void parsedDataReady(QList<RepeatedVector> parsedData);
 //     void variableListChanged();
 };
 
