@@ -6,6 +6,7 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 {
     connectionWidget = new ConnectionWidget;
     parserWidget = new ParserWidget;
+    parserEngine = new ParserEngine;
 
     //    widgetNameLabel = new QLabel("Profiles");
     //    QFont font = widgetNameLabel->font();
@@ -76,6 +77,7 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
+    connect(parserEngine,SIGNAL(dataParsed(QList<RepeatedVector>)),this,SLOT(parsedDataReady(QList<RepeatedVector>)));
 
     //    setFixedWidth(410);
 
@@ -117,6 +119,7 @@ void PlotterWidget::assignConnection(ConnectionWidget *connWidget)
     connectionWidget=connWidget;
     //    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
     //    connect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
+    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
 }
 
@@ -188,9 +191,13 @@ void PlotterWidget::populateParserTable()
             tableWidget->setItem(i,1,item2);
             i++;
         }
-
-
     }
+
+    // Set up parser engine with the new parser properties
+    parserEngine->setVariables(parserWidget->variableList);
+    QByteArray *check = new QByteArray;
+    parserEngine->isValid(check);
+    qDebug() << *check;
 }
 
 quint8 PlotterWidget::calcRowCount()
@@ -210,4 +217,62 @@ quint8 PlotterWidget::calcRowCount()
     }
     qDebug() << total << " rows";
     return total;
+}
+
+void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
+{
+    QString output;
+    output.append("List found:\n");
+    int i=0;
+
+    foreach(RepeatedVector repVector, parsedData)
+    {
+        QTableWidgetItem *item = tableWidget->item(i,1);
+        if(repVector.vectors.size()<2)
+        {
+            // Single variable
+            if(repVector.vectors.at(0).vector.at(0)->varType==BYTTYPE)
+            {
+                item->setText(repVector.vectors.at(0).vector.at(0)->varBytes);
+//                tableWidget->set
+//                tableWidget->setItem(i,1,repVector.vectors.at(0).vector.at(0)->varBytes);
+            }
+            else
+            {
+                // Number variable
+                item->setText(QString("%1").arg(repVector.vectors.at(0).vector.at(0)->varValue));
+//                tableWidget->setItem(i,1,QString("%1").arg(repVector.vectors.at(0).vector.at(0)->varValue));
+            }
+
+        }
+        else
+        {
+            // Vector
+            item->setText("OK");
+//            tableWidget->setItem(i,1,"OK");
+
+            //            foreach(SingleVector sinVector, repVector.vectors)
+            //            {
+            //                foreach(SingleResult *sinResult, sinVector.vector)
+            //                {
+            //                    switch(sinResult->varType)
+            //                    {
+            //                    case BYTTYPE:
+            //                        output.append(" B: ");
+            //                        output.append(sinResult->varBytes);
+            //                        break;
+            //                    default:
+            //                        output.append(" N: ");
+            //                        output.append(sinResult->varBytes);
+            //                        output.append(QString(" (%1) ").arg(sinResult->varValue));
+            //                        break;
+            //                    }
+            //                }
+            //                output.append('\n');
+            //            }
+        }
+        i++;
+    }
+
+    qDebug() << output;
 }
