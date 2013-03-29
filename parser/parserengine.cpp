@@ -11,7 +11,7 @@ ParserEngine::ParserEngine(QObject *parent) :
     vecIndex=0;
     repeatIndex=0;
     validList=false;
-    listComplete=true;
+    listComplete = false;
 
     // Look for an array of bytes that can contain +/-, spaces, and decimal points.
     numRegex.setPattern("( *[-+]? *\\d+\\.?\\d*)|( *[-+]? *\\d*\\.?\\d+)| +| *[+-]| *[+-] +| *[+-]? *\\.");
@@ -25,26 +25,61 @@ void ParserEngine::setVariables(QList<ComplexVariable*> *newVars)
 
 void ParserEngine::parseData(QByteArray dataIn)
 {
+    quint16 i=0;
     if(!dataIn.isEmpty() && validList==true)
     {
-        foreach(char ch,dataIn)
+        while(dataIn.size()>0)
         {
-//            buffer.append(ch);
-            switch(checkByte(ch))
+            switch(checkByte(dataIn.at(i)))
             {
             case BYTE_INVALID:
                 // Eliminate left-most byte from buffer and try again.
+                dataIn = dataIn.right(dataIn.size()-1);
+                i=0;
+                break;
+            case BYTE_COMPLETES:
+                dataIn = dataIn.right(dataIn.size()-i-1);
+                i=0;
                 break;
             default:
+                if(listComplete)
+                {
+                    listComplete=false;
+                    dataIn = dataIn.right(dataIn.size()-i-1);
+                    i=0;
+                }
+                else
+                {
+                    i++;
+                    if(i==dataIn.size())
+                        dataIn.clear();
+                }
                 break;
             }
         }
+
     }
+
+
+    // Working set: need buffer to account for false starts
+    //    if(!dataIn.isEmpty() && validList==true)
+    //    {
+
+    //        foreach(char ch,dataIn)
+    //        {
+    //            switch(checkByte(ch))
+    //            {
+    //            case BYTE_INVALID:
+    //                // Eliminate left-most byte from buffer and try again.
+    //                break;
+    //            default:
+    //                break;
+    //            }
+    //        }
+    //    }
 }
 
 // CheckByte receives a single byte, and allocates it to the corresponding variable.
-// Each allocation function will return a qualifier based on how the new byte
-// fits in with the previously collected data.
 
 byteDecision ParserEngine::checkByte(char onebyte)
 {
@@ -104,6 +139,7 @@ byteDecision ParserEngine::checkByte(char onebyte)
             {
             case VALID_CHAR:
                 // Case 1
+                return BYTE_HANDLED;
                 break;
             case INVALID_OK:
                 // Case 2
@@ -243,6 +279,7 @@ void ParserEngine::resetVariables()
             SingleVector sv;
 
             SingleResult *sr = new SingleResult;
+            sr->varType=targetVars->at(i)->type;
             sv.vector.append(sr);
             repVec.vectors.append(sv);
             break;
