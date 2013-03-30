@@ -28,7 +28,7 @@ void ParserEngine::parseData(QByteArray dataIn)
     quint16 i=0;
     if(!dataIn.isEmpty() && validList==true)
     {
-        while(dataIn.size()>0)
+         while(dataIn.size()>0)
         {
             switch(checkByte(dataIn.at(i)))
             {
@@ -80,7 +80,6 @@ void ParserEngine::parseData(QByteArray dataIn)
 }
 
 // CheckByte receives a single byte, and allocates it to the corresponding variable.
-
 byteDecision ParserEngine::checkByte(char onebyte)
 {
 
@@ -821,7 +820,7 @@ int ParserEngine::assignNumber(char newChar)
                 QByteArray checkArray;
                 checkArray.append(masterList.at(varIndex).vectors[0].vector[0]->varBytes);
                 checkArray.append(newChar);
-                if(numRegex.indexIn(checkArray)==0)
+                if(numRegex.indexIn(checkArray)==0 && numRegex.matchedLength()==checkArray.size())
                 {
                     // Case 1
                     masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
@@ -896,9 +895,10 @@ int ParserEngine::assignNumber(char newChar)
                 QByteArray checkArray;
                 checkArray.append(masterList.at(varIndex).vectors[0].vector[0]->varBytes);
                 checkArray.append(newChar);
-                if(numRegex.indexIn(checkArray)==0)
+                if(numRegex.indexIn(checkArray)==0 && numRegex.matchedLength()==checkArray.size())
                 {
                     // Case 1
+                    // Modify to check that the matched regex length equals the length in checkarray
                     masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
                     return VALID_CHAR;
                 }
@@ -1007,4 +1007,3 @@ void ParserEngine::clearVariables()
     }
     //    masterList.at(1).
 }
-
