@@ -30,6 +30,7 @@ void ParserEngine::parseData(QByteArray dataIn)
     {
          while(dataIn.size()>0)
         {
+             // Loop while there is data in the incoming buffer.
             switch(checkByte(dataIn.at(i)))
             {
             case BYTE_INVALID:
@@ -37,19 +38,20 @@ void ParserEngine::parseData(QByteArray dataIn)
                 dataIn = dataIn.right(dataIn.size()-1);
                 i=0;
                 break;
-            case BYTE_COMPLETES:
-                dataIn = dataIn.right(dataIn.size()-i-1);
-                i=0;
-                break;
             default:
+                // The new byte was handled without any problems.
                 if(listComplete)
                 {
+                    // The listComplete flag is true, so the part of the buffer
+                    // known to be fully parsed is removed.
                     listComplete=false;
                     dataIn = dataIn.right(dataIn.size()-i-1);
                     i=0;
                 }
                 else
                 {
+                    // Move to the next byte in the buffer. Finish looping
+                    // if the end of the buffer is reached.
                     i++;
                     if(i==dataIn.size())
                         dataIn.clear();
@@ -59,24 +61,6 @@ void ParserEngine::parseData(QByteArray dataIn)
         }
 
     }
-
-
-    // Working set: need buffer to account for false starts
-    //    if(!dataIn.isEmpty() && validList==true)
-    //    {
-
-    //        foreach(char ch,dataIn)
-    //        {
-    //            switch(checkByte(ch))
-    //            {
-    //            case BYTE_INVALID:
-    //                // Eliminate left-most byte from buffer and try again.
-    //                break;
-    //            default:
-    //                break;
-    //            }
-    //        }
-    //    }
 }
 
 // CheckByte receives a single byte, and allocates it to the corresponding variable.
@@ -84,8 +68,6 @@ byteDecision ParserEngine::checkByte(char onebyte)
 {
 
     byteDecision dec=BYTE_HANDLED;
-
-    //    bool handled=false;
 
     if(targetVars->at(varIndex)->type!=VECTYPE)
     {
@@ -284,7 +266,6 @@ void ParserEngine::resetVariables()
             break;
         }
         masterList.append(repVec);
-        //        masterList->append(srlist);
     }
 
 }
@@ -862,7 +843,7 @@ int ParserEngine::assignNumber(char newChar)
                 QByteArray checkArray;
                 checkArray.append(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes);
                 checkArray.append(newChar);
-                if(numRegex.indexIn(checkArray)==0)
+                if(numRegex.indexIn(checkArray)==0 && numRegex.matchedLength()==checkArray.size())
                 {
                     // Case 1
                     masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
