@@ -988,4 +988,3 @@ void ParserEngine::clearVariables()
     }
     //    masterList.at(1).
 }
-
