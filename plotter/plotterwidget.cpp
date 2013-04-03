@@ -8,6 +8,8 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     parserWidget = new ParserWidget;
     parserEngine = new ParserEngine;
 
+    customPlot = new QCustomPlot;
+    customPlot->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     //    widgetNameLabel = new QLabel("Profiles");
     //    QFont font = widgetNameLabel->font();
     //    font.setPointSize(font.pointSize()+4);
@@ -28,7 +30,7 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     parserBox->addItem("Parser 001");
 
     tableWidget = new QTableWidget(this);
-    tableWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
+    tableWidget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     tableWidget->setColumnCount(2);
     QStringList tableHeaders;
@@ -51,8 +53,9 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     //    hv->setSectionResizeMode(QHeaderView::Fixed);
 
 
-    plotFrame = new QFrame;
-    plotFrame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+//    plotFrame = new QFrame;
+//    plotFrame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
 
     //    topLayout = new QHBoxLayout;
     //    topLayout->addWidget(widgetNameLabel);
@@ -64,8 +67,8 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     contentLayout = new QHBoxLayout;
     contentLayout->addWidget(tableWidget);
-    contentLayout->addWidget(plotFrame);
-
+//    contentLayout->addWidget(plotFrame);
+contentLayout->addWidget(customPlot);
 
     mainLayout = new QVBoxLayout(this);
     //    mainLayout->addLayout(topLayout);

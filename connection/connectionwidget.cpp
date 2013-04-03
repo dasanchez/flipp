@@ -17,14 +17,10 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
 
     setupUI();
 
-//    toggleType();
-//    toggleType();
-//    addressEdit->setText("COM3");
-//    addressChanged("COM3");
-
     // Data connection Signals
     connect(typeButton,SIGNAL(clicked()),this,SLOT(toggleType()));
     connect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged(QString)));
+    connect(serialPortCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(addressChanged(QString)));
     connect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
     connect(connectButton,SIGNAL(clicked()),this,SLOT(toggleConnection()));
     connect(dataConnection,SIGNAL(connectionStatus(connectionState)),this,SLOT(connectionChanged(connectionState)));
@@ -144,20 +140,24 @@ void ConnectionWidget::toggleType()
     case UDP:
         dataConnection->setType(SERIAL);
         typeButton->setIcon(QIcon(comIconPixmap));
+        addressEdit->setVisible(false);
+        serialPortCombo->setVisible(true);
         addressLabel->setText("Port");
         portLabel->setText("Baud");
+         addressChanged(serialPortCombo->currentText());
         break;
     case SERIAL:
         dataConnection->setType(TCP);
         typeButton->setIcon(QIcon(tcpIconPixmap));
+        serialPortCombo->setVisible(false);
+        addressEdit->setVisible(true);
         addressLabel->setText("Address");
         portLabel->setText("Port");
+        addressChanged(addressEdit->text());
         break;
     default:
         dataConnection->setType(UDP);
         typeButton->setIcon(QIcon(udpIconPixmap));
-        addressLabel->setText("Address");
-        portLabel->setText("Port");
         break;
     }
 }
@@ -297,6 +297,19 @@ void ConnectionWidget::setupUI()
     addressEdit->setMinimumWidth(80);
     addressEdit->setFixedHeight(24);
     addressEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    serialPortCombo = new QComboBox;
+    serialPortCombo->setItemDelegate(new QStyledItemDelegate);
+    serialPortCombo->setMinimumWidth(100);
+    // Populate with available serial ports
+    QList<QSerialPortInfo> spinfo = QSerialPortInfo::availablePorts();
+    QStringList portNames;
+    foreach(QSerialPortInfo info,spinfo)
+    {
+        portNames.append(info.portName());
+    }
+    serialPortCombo->addItems(portNames);
+    serialPortCombo->setVisible(false);
+
     portEdit = new QLineEdit("50500");
     portEdit->setToolTip("Enter an IP port or baud rate");
     portEdit->setMinimumWidth(60);
@@ -328,6 +341,7 @@ void ConnectionWidget::setupUI()
     controlLayout->addWidget(typeButton);
     controlLayout->addWidget(addressLabel);
     controlLayout->addWidget(addressEdit);
+    controlLayout->addWidget(serialPortCombo);
     controlLayout->addWidget(portLabel);
     controlLayout->addWidget(portEdit);
 
