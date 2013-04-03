@@ -12,10 +12,9 @@
 #include <QFrame>
 #include <QPalette>
 #include <QTimer>
+#include <QStyledItemDelegate>
 
 #include <connection/qdataconnection.h>
-//#include "qdataconnection.h"
-//#include "terminalwidget.h"
 
 class ConnectionWidget : public QWidget
 {
@@ -50,6 +49,7 @@ private:
 
     // Connection
     QDataConnection *dataConnection;
+    QComboBox *serialPortCombo;
     QLabel *addressLabel;
     QLabel *portLabel;
     QPushButton *typeButton;
