@@ -34,22 +34,14 @@ signals:
     void plotterConnectionRequest(QString);
     void plotterParserRequest(QString);
 private:
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> ff207a794edead187fff1ac9cec268d4669ddff7
     //    QLabel *widgetNameLabel;
     //    QPushButton *newProfileButton;
     QComboBox *connectionBox;
     QComboBox *parserBox;
     QTableWidget *tableWidget;
     //    QFrame *plotFrame;
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> ff207a794edead187fff1ac9cec268d4669ddff7
     //    QHBoxLayout *topLayout;
     QHBoxLayout *dataSourceLayout;
     QHBoxLayout *contentLayout;
@@ -58,15 +50,8 @@ private:
     ConnectionWidget *connectionWidget;
     ParserWidget *parserWidget;
     ParserEngine *parserEngine;
-<<<<<<< HEAD
 
-    QCustomPlot *customPlot;
-
-=======
-    
-    QCustomPlot *customPlot;
-    
->>>>>>> ff207a794edead187fff1ac9cec268d4669ddff7
+    QCustomPlot *customPlot;    
     quint8 calcRowCount();
     
 private slots:
