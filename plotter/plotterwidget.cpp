@@ -32,12 +32,14 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     tableWidget = new QTableWidget(this);
     tableWidget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    tableWidget->setColumnCount(2);
+    tableWidget->setColumnCount(3);
     QStringList tableHeaders;
     tableHeaders.append("Field");
+    tableHeaders.append("Plot");
     tableHeaders.append("Value");
     tableWidget->setHorizontalHeaderLabels(tableHeaders);
     tableWidget->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Expanding);
+    tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
     //    tableWidget->setMaximumWidth(300);
 
     QHeaderView *hv = tableWidget->horizontalHeader();
@@ -46,16 +48,14 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     hv->setSectionsClickable(false);
     hv->setFixedHeight(24);
 
-
     //    hv->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed);
     hv = tableWidget->verticalHeader();
     hv->setSectionsClickable(false);
     //    hv->setSectionResizeMode(QHeaderView::Fixed);
 
 
-//    plotFrame = new QFrame;
-//    plotFrame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
+    //    plotFrame = new QFrame;
+    //    plotFrame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     //    topLayout = new QHBoxLayout;
     //    topLayout->addWidget(widgetNameLabel);
@@ -67,8 +67,8 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     contentLayout = new QHBoxLayout;
     contentLayout->addWidget(tableWidget);
-//    contentLayout->addWidget(plotFrame);
-contentLayout->addWidget(customPlot);
+    //    contentLayout->addWidget(plotFrame);
+    contentLayout->addWidget(customPlot);
 
     mainLayout = new QVBoxLayout(this);
     //    mainLayout->addLayout(topLayout);
@@ -176,7 +176,13 @@ void PlotterWidget::populateParserTable()
                 item2->setTextAlignment(Qt::AlignBottom);
                 item2->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
                 item2->setFlags(Qt::NoItemFlags);
-                tableWidget->setItem(i,1,item2);
+                tableWidget->setItem(i,2,item2);
+                // Checkbox
+                QTableWidgetItem *checkboxItem = new QTableWidgetItem("Plot");
+                checkboxItem->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
+                //checkboxItem->setFlags(checkboxItem->flags() | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+                tableWidget->setItem(i,1,checkboxItem);
+                checkboxItem->setCheckState(Qt::Unchecked);
                 i++;
 
             }
@@ -191,7 +197,13 @@ void PlotterWidget::populateParserTable()
             item2->setTextAlignment(Qt::AlignBottom);
             item2->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
             item2->setFlags(Qt::NoItemFlags);
-            tableWidget->setItem(i,1,item2);
+            tableWidget->setItem(i,2,item2);
+            // Checkbox
+            QTableWidgetItem *checkboxItem = new QTableWidgetItem("");
+            //checkboxItem->setFlags(checkboxItem->flags() | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+            checkboxItem->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+            tableWidget->setItem(i,1,checkboxItem);
+            checkboxItem->setCheckState(Qt::Unchecked);
             i++;
         }
     }
@@ -237,14 +249,14 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
             if(repVector.vectors.at(0).vector.at(0)->varType==BYTTYPE)
             {
                 item->setText(repVector.vectors.at(0).vector.at(0)->varBytes);
-//                tableWidget->set
-//                tableWidget->setItem(i,1,repVector.vectors.at(0).vector.at(0)->varBytes);
+                //                tableWidget->set
+                //                tableWidget->setItem(i,1,repVector.vectors.at(0).vector.at(0)->varBytes);
             }
             else
             {
                 // Number variable
                 item->setText(QString("%1").arg(repVector.vectors.at(0).vector.at(0)->varValue));
-//                tableWidget->setItem(i,1,QString("%1").arg(repVector.vectors.at(0).vector.at(0)->varValue));
+                //                tableWidget->setItem(i,1,QString("%1").arg(repVector.vectors.at(0).vector.at(0)->varValue));
             }
 
         }
@@ -252,7 +264,7 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
         {
             // Vector
             item->setText("OK");
-//            tableWidget->setItem(i,1,"OK");
+            //            tableWidget->setItem(i,1,"OK");
 
             //            foreach(SingleVector sinVector, repVector.vectors)
             //            {
