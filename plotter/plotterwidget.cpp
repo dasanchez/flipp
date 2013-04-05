@@ -44,15 +44,16 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     QHeaderView *hv = tableWidget->horizontalHeader();
     hv->setStretchLastSection(true);
-    hv->setSectionResizeMode(1,QHeaderView::Fixed);
+//    hv->setSectionResizeMode(2,QHeaderView::Fixed);
     hv->setSectionsClickable(false);
     hv->setFixedHeight(24);
+//    hv->setFixedWidth(40);
+    hv->setSectionResizeMode(1,QHeaderView::ResizeToContents);
 
     //    hv->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed);
     hv = tableWidget->verticalHeader();
     hv->setSectionsClickable(false);
     //    hv->setSectionResizeMode(QHeaderView::Fixed);
-
 
     //    plotFrame = new QFrame;
     //    plotFrame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -178,11 +179,16 @@ void PlotterWidget::populateParserTable()
                 item2->setFlags(Qt::NoItemFlags);
                 tableWidget->setItem(i,2,item2);
                 // Checkbox
-                QTableWidgetItem *checkboxItem = new QTableWidgetItem("Plot");
-                checkboxItem->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
-                //checkboxItem->setFlags(checkboxItem->flags() | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
-                tableWidget->setItem(i,1,checkboxItem);
-                checkboxItem->setCheckState(Qt::Unchecked);
+                QWidget *container = new QWidget;
+                QHBoxLayout *layout = new QHBoxLayout;
+                layout->setSpacing(0);
+                layout->setMargin(0);
+                QCheckBox *checkBox = new QCheckBox;
+                layout->addStretch(1);
+                layout->addWidget(checkBox);
+                layout->addStretch(1);
+                container->setLayout(layout);
+                tableWidget->setCellWidget(i,1,container);
                 i++;
 
             }
@@ -199,11 +205,16 @@ void PlotterWidget::populateParserTable()
             item2->setFlags(Qt::NoItemFlags);
             tableWidget->setItem(i,2,item2);
             // Checkbox
-            QTableWidgetItem *checkboxItem = new QTableWidgetItem("");
-            //checkboxItem->setFlags(checkboxItem->flags() | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
-            checkboxItem->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
-            tableWidget->setItem(i,1,checkboxItem);
-            checkboxItem->setCheckState(Qt::Unchecked);
+            QWidget *container = new QWidget;
+            QHBoxLayout *layout = new QHBoxLayout;
+            layout->setSpacing(0);
+            layout->setMargin(0);
+            QCheckBox *checkBox = new QCheckBox;
+            layout->addStretch(1);
+            layout->addWidget(checkBox);
+            layout->addStretch(1);
+            container->setLayout(layout);
+            tableWidget->setCellWidget(i,1,container);
             i++;
         }
     }
