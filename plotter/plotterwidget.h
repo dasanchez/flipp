@@ -40,7 +40,6 @@ private:
     QComboBox *connectionBox;
     QComboBox *parserBox;
     QTableWidget *tableWidget;
-    //    QFrame *plotFrame;
 
     //    QHBoxLayout *topLayout;
     QHBoxLayout *dataSourceLayout;

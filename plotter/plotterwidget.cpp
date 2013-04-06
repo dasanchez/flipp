@@ -44,19 +44,12 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     QHeaderView *hv = tableWidget->horizontalHeader();
     hv->setStretchLastSection(true);
-//    hv->setSectionResizeMode(2,QHeaderView::Fixed);
     hv->setSectionsClickable(false);
     hv->setFixedHeight(24);
-//    hv->setFixedWidth(40);
     hv->setSectionResizeMode(1,QHeaderView::ResizeToContents);
 
-    //    hv->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed);
     hv = tableWidget->verticalHeader();
     hv->setSectionsClickable(false);
-    //    hv->setSectionResizeMode(QHeaderView::Fixed);
-
-    //    plotFrame = new QFrame;
-    //    plotFrame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     //    topLayout = new QHBoxLayout;
     //    topLayout->addWidget(widgetNameLabel);
@@ -68,7 +61,6 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     contentLayout = new QHBoxLayout;
     contentLayout->addWidget(tableWidget);
-    //    contentLayout->addWidget(plotFrame);
     contentLayout->addWidget(customPlot);
 
     mainLayout = new QVBoxLayout(this);
