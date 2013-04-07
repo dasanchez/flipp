@@ -74,7 +74,7 @@ void TerminalListWidget::terminalRemoved()
     }
 }
 
-void TerminalListWidget::updateConnections(QStringList connectionNames)
+void TerminalListWidget::updateConnections(QStringList *connectionNames)
 {
     nameList = connectionNames;
     foreach(TerminalWidget *terminal,terminalList)

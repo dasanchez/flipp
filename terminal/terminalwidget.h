@@ -27,7 +27,7 @@ public:
 
 public slots:
     void dataReceived(QByteArray);
-    void updateConnections(QStringList);
+    void updateConnections(QStringList *);
     void assignConnection(ConnectionWidget *);
 signals:
     void sendData(QByteArray);

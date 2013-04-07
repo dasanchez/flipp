@@ -4,20 +4,14 @@
 PlotterWidget::PlotterWidget(QWidget *parent)
     : QWidget(parent)
 {
+     delIconPixmap = QPixmap(":/images/delete_icon.png");
+
     connectionWidget = new ConnectionWidget;
     parserWidget = new ParserWidget;
     parserEngine = new ParserEngine;
 
     customPlot = new QCustomPlot;
     customPlot->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    //    widgetNameLabel = new QLabel("Profiles");
-    //    QFont font = widgetNameLabel->font();
-    //    font.setPointSize(font.pointSize()+4);
-    //    widgetNameLabel->setFont(font);
-
-    //    newProfileButton = new QPushButton("New");
-    //    newProfileButton->setFixedHeight(24);
-    //    newProfileButton->setFixedWidth(100);
 
     connectionBox = new QComboBox;
     connectionBox->setItemDelegate(new QStyledItemDelegate);
@@ -28,6 +22,11 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     parserBox->setItemDelegate(new QStyledItemDelegate);
     parserBox->setFixedHeight(24);
     parserBox->addItem("Parser 001");
+
+    removeButton = new QPushButton;
+    removeButton->setFixedHeight(24);
+    removeButton->setFixedWidth(24);
+    removeButton->setIcon(QIcon(delIconPixmap));
 
     tableWidget = new QTableWidget(this);
     tableWidget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
@@ -58,6 +57,7 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     dataSourceLayout = new QHBoxLayout;
     dataSourceLayout->addWidget(connectionBox);
     dataSourceLayout->addWidget(parserBox);
+    dataSourceLayout->addWidget(removeButton);
 
     contentLayout = new QHBoxLayout;
     contentLayout->addWidget(tableWidget);
@@ -73,6 +73,7 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
+    connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removePlotter()));
     connect(parserEngine,SIGNAL(dataParsed(QList<RepeatedVector>)),this,SLOT(parsedDataReady(QList<RepeatedVector>)));
 
     //    setFixedWidth(410);
@@ -84,10 +85,10 @@ PlotterWidget::~PlotterWidget()
 
 }
 
-void PlotterWidget::updateConnections(QStringList connectionNames)
+void PlotterWidget::updateConnections(QStringList *connectionNames)
 {
     connectionBox->clear();
-    connectionBox->addItems(connectionNames);
+    connectionBox->addItems(*connectionNames);
     //    int index = connectionBox->findText(connectionWidget->getName());
     //    if(index>=0)
     //        connectionBox->setCurrentIndex(index);

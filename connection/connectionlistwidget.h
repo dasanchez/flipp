@@ -20,12 +20,12 @@ public:
     ConnectionListWidget(QWidget *parent = 0);
     ~ConnectionListWidget();
     QList<ConnectionWidget*> connectionList;
-    QStringList nameList;
+    QStringList *nameList;
     void sendData(quint8, QByteArray);
 public slots:
         void newConnection(void);
 signals:
-    void connectionListChanged(QStringList);
+    void connectionListChanged(QStringList*);
     void dataReceived(quint8, QByteArray);
 
 private:

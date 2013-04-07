@@ -9,7 +9,7 @@
 #include <connection/connectionlistwidget.h>
 #include <terminal/terminallistwidget.h>
 #include <parser/parserlistwidget.h>
-#include <plotter/plotterwidget.h>
+#include <plotter/plotterlistwidget.h>
 
 class Flipp : public QMainWindow
 {
@@ -23,21 +23,21 @@ private:
     ConnectionListWidget *connections;
     TerminalListWidget *terminals;
     ParserListWidget *parsers;
-    PlotterWidget *plotter;
+    PlotterListWidget *plotters;
     // Dock Widgets:
-        QDockWidget *connectionDock;
-        QDockWidget *parserDock;
-        QDockWidget *terminalDock;
-//    QHBoxLayout *mainLayout;
-        // Actions:
-        QAction *exitAct;
+    QDockWidget *connectionDock;
+    QDockWidget *parserDock;
+    QDockWidget *terminalDock;
+    //    QHBoxLayout *mainLayout;
+    // Actions:
+    QAction *exitAct;
 
-        void createDocks();
-        void createMenus();
+    void createDocks();
+    void createMenus();
 private slots:
     void handleTerminalRequest(TerminalWidget*,QString);
-    void handlePlotterConnectionRequest(QString);
-    void handlePlotterParserRequest(QString);
+    void handlePlotterConnectionRequest(PlotterWidget*,QString);
+    void handlePlotterParserRequest(PlotterWidget*,QString);
 
 };
 

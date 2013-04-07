@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     parser/variablewidget.cpp \
     parser/parserwidget.cpp \
     plotter/plotterwidget.cpp \
-    plotter/qcustomplot.cpp
+    plotter/qcustomplot.cpp \
+    plotter/plotterlistwidget.cpp
 
 HEADERS  += flipp.h \
     livelistwidget/livelistwidget.h \
@@ -43,7 +44,8 @@ HEADERS  += flipp.h \
     parser/variablewidget.h \
     parser/parserwidget.h \
     plotter/plotterwidget.h \
-    plotter/qcustomplot.h
+    plotter/qcustomplot.h \
+    plotter/plotterlistwidget.h
 
 RESOURCES += \
     resources.qrc

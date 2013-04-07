@@ -26,22 +26,21 @@ public:
     ~PlotterWidget();
     
 public slots:
-    void updateConnections(QStringList);
+    void updateConnections(QStringList*);
     void updateParsers(QStringList*);
     void assignConnection(ConnectionWidget *);
     void assignParser(ParserWidget *);
 signals:
     void plotterConnectionRequest(QString);
     void plotterParserRequest(QString);
+    void removePlotter();
 private:
-
-    //    QLabel *widgetNameLabel;
-    //    QPushButton *newProfileButton;
     QComboBox *connectionBox;
     QComboBox *parserBox;
+    QPushButton *removeButton;
+    QPixmap delIconPixmap;
     QTableWidget *tableWidget;
 
-    //    QHBoxLayout *topLayout;
     QHBoxLayout *dataSourceLayout;
     QHBoxLayout *contentLayout;
     QVBoxLayout *mainLayout;

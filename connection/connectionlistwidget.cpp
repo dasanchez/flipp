@@ -4,6 +4,7 @@
 ConnectionListWidget::ConnectionListWidget(QWidget *parent)
     : QWidget(parent)
 {
+    nameList = new QStringList;
 
     widgetNameLabel = new QLabel("Connections");
     QFont font = widgetNameLabel->font();
@@ -73,10 +74,10 @@ void ConnectionListWidget::newConnection()
 
 void ConnectionListWidget::updateList()
 {
-    nameList.clear();
+    nameList->clear();
     foreach(ConnectionWidget *connection,connectionList)
     {
-        nameList.append(connection->getName());
+        nameList->append(connection->getName());
     }
     emit connectionListChanged(nameList);
 }

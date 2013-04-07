@@ -10,7 +10,6 @@
 #include <QSplitter>
 #include <QList>
 
-#include <livelistwidget/livelistwidget.h>
 #include <terminal/terminalwidget.h>
 
 class TerminalListWidget : public QWidget
@@ -23,7 +22,7 @@ public:
 signals:
     void terminalRequest(TerminalWidget*,QString);
 public slots:
-    void updateConnections(QStringList);
+    void updateConnections(QStringList*);
     void newTerminal(void);
 
 private:
@@ -37,7 +36,7 @@ private:
     QScrollArea *scrollArea;
     QVBoxLayout *scrollAreaVLayout;
     QWidget *saWidgetContents;
-    QStringList nameList;
+    QStringList *nameList;
 
 private slots:
 
