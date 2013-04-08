@@ -1,16 +1,24 @@
 #include "plotterwidget.h"
 
-
 PlotterWidget::PlotterWidget(QWidget *parent)
     : QWidget(parent)
 {
-     delIconPixmap = QPixmap(":/images/delete_icon.png");
+    delIconPixmap = QPixmap(":/images/delete_icon.png");
+    //    keys.append(0);
+    //    keys = new QVector<double>;
+    //     valuesList = new QList<QVector<double> *>;
+    for(quint8 i=0;i<100;i++)
+    {
+        keys.append(i);
+    }
 
     connectionWidget = new ConnectionWidget;
     parserWidget = new ParserWidget;
     parserEngine = new ParserEngine;
 
     customPlot = new QCustomPlot;
+    customPlot->xAxis->setRange(0,100);
+    customPlot->yAxis->setRange(41985,42015);
     customPlot->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     connectionBox = new QComboBox;
@@ -39,7 +47,6 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     tableWidget->setHorizontalHeaderLabels(tableHeaders);
     tableWidget->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Expanding);
     tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
-    //    tableWidget->setMaximumWidth(300);
 
     QHeaderView *hv = tableWidget->horizontalHeader();
     hv->setStretchLastSection(true);
@@ -49,10 +56,6 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     hv = tableWidget->verticalHeader();
     hv->setSectionsClickable(false);
-
-    //    topLayout = new QHBoxLayout;
-    //    topLayout->addWidget(widgetNameLabel);
-    //    topLayout->addWidget(newProfileButton);
 
     dataSourceLayout = new QHBoxLayout;
     dataSourceLayout->addWidget(connectionBox);
@@ -64,9 +67,7 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     contentLayout->addWidget(customPlot);
 
     mainLayout = new QVBoxLayout(this);
-    //    mainLayout->addLayout(topLayout);
     mainLayout->addLayout(dataSourceLayout);
-    //    mainLayout->addWidget(tableWidget);
     mainLayout->addLayout(contentLayout);
 
     this->setLayout(mainLayout);
@@ -83,6 +84,9 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 PlotterWidget::~PlotterWidget()
 {
 
+    //    keys.clear();
+    //    delete keys;
+    //customPlot->deleteLater();
 }
 
 void PlotterWidget::updateConnections(QStringList *connectionNames)
@@ -114,8 +118,6 @@ void PlotterWidget::changeConnection(QString connection)
 void PlotterWidget::assignConnection(ConnectionWidget *connWidget)
 {
     connectionWidget=connWidget;
-    //    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
-    //    connect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
     connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
 }
@@ -134,9 +136,12 @@ void PlotterWidget::assignParser(ParserWidget *parser)
 {
     parserWidget = parser;
     connect(parserWidget,SIGNAL(updateVariableList()),this,SLOT(populateParserTable()));
+    connect(parserWidget,SIGNAL(updateVariableList()),this,SLOT(populatePlotArea()));
     connect(parserWidget,SIGNAL(deleteParser()),this,SLOT(detachParser()));
-    // Populate QTableWidget
+
+    // Populate QTableWidget and QCustomPlot
     populateParserTable();
+    populatePlotArea();
 }
 
 void PlotterWidget::detachParser()
@@ -219,6 +224,34 @@ void PlotterWidget::populateParserTable()
     qDebug() << *check;
 }
 
+void PlotterWidget::populatePlotArea()
+{
+    // Setup value vector
+    valuesList.clear();
+
+    // Add a layer for each number value
+    customPlot->clearGraphs();
+    foreach(ComplexVariable *var,*parserWidget->variableList)
+    {
+        if(var->type==NUMTYPE)
+        {
+            // Added number variable
+            //                        customPlot->addGraph();
+            QVector<double> valvec;
+            for(quint8 i=0;i<100;i++)
+            {
+                valvec.append(0);
+            }
+            valuesList.append(valvec);
+            // Add a graph for each number value
+            customPlot->addGraph();
+
+
+//            customPlot->graph(customPlot->graphCount()-1)->setData(keys,valvec);
+        }
+    }
+}
+
 quint8 PlotterWidget::calcRowCount()
 {
     // Calculate the total number of rows to use based on the total amount of variables.
@@ -243,24 +276,31 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
     QString output;
     output.append("List found:\n");
     int i=0;
+    int numberCount=0;
 
     foreach(RepeatedVector repVector, parsedData)
     {
-        QTableWidgetItem *item = tableWidget->item(i,1);
+        QTableWidgetItem *item = tableWidget->item(i,2);
         if(repVector.vectors.size()<2)
         {
             // Single variable
             if(repVector.vectors.at(0).vector.at(0)->varType==BYTTYPE)
             {
                 item->setText(repVector.vectors.at(0).vector.at(0)->varBytes);
-                //                tableWidget->set
-                //                tableWidget->setItem(i,1,repVector.vectors.at(0).vector.at(0)->varBytes);
             }
             else
             {
                 // Number variable
-                item->setText(QString("%1").arg(repVector.vectors.at(0).vector.at(0)->varValue));
-                //                tableWidget->setItem(i,1,QString("%1").arg(repVector.vectors.at(0).vector.at(0)->varValue));
+                double numVal = repVector.vectors.at(0).vector.at(0)->varValue;
+                item->setText(QString("%1").arg(numVal));
+
+                // Append data point to plot
+                valuesList[numberCount].append(numVal);
+                valuesList[numberCount].remove(0);
+//                valuesList.at(numberCount).append(v)
+                customPlot->graph(numberCount)->setData(keys,valuesList.at(numberCount));
+                customPlot->replot();
+                numberCount++;
             }
 
         }

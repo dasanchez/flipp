@@ -103,7 +103,11 @@ void Flipp::createDocks()
                                 QDockWidget::DockWidgetMovable|
                                 QDockWidget::DockWidgetFloatable);
     terminalDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    addDockWidget(Qt::LeftDockWidgetArea,parserDock);
+//    addDockWidget(Qt::LeftDockWidgetArea,parserDock);
+    addDockWidget(Qt::TopDockWidgetArea,parserDock);
+
+    tabifyDockWidget(connectionDock,terminalDock);
+    tabifyDockWidget(terminalDock,parserDock);
 
         setTabPosition(Qt::AllDockWidgetAreas,QTabWidget::North);
 }

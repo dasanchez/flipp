@@ -2,8 +2,10 @@
 #define PLOTTERWIDGET_H
 
 #include <QWidget>
+#include <QDebug>
 #include <QPushButton>
 #include <QLabel>
+#include <QVector>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QScrollArea>
@@ -48,8 +50,11 @@ private:
     ConnectionWidget *connectionWidget;
     ParserWidget *parserWidget;
     ParserEngine *parserEngine;
+    QCustomPlot *customPlot;
 
-    QCustomPlot *customPlot;    
+    QVector<double> keys;
+    QList<QVector<double> > valuesList;
+
     quint8 calcRowCount();
     
 private slots:
@@ -58,6 +63,7 @@ private slots:
     void changeParser(QString);
     void detachParser(void);
     void populateParserTable();
+    void populatePlotArea();
     void parsedDataReady(QList<RepeatedVector> parsedData);
     //     void variableListChanged();
 };
