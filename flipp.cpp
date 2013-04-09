@@ -20,6 +20,7 @@ Flipp::Flipp(QWidget *parent)
     parsers->newParser();
     terminals->terminalList.at(0)->assignConnection(connections->connectionList.at(0));
     plotters->newPlotter();
+    plotters->plotterList.at(0)->assignConnection(connections->connectionList.at(0));
     plotters->plotterList.at(0)->assignParser(parsers->parserList->at(0));
 
     setCentralWidget(plotters);

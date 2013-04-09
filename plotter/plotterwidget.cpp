@@ -151,7 +151,7 @@ void PlotterWidget::detachParser()
 
 void PlotterWidget::populateParserTable()
 {
-    qDebug() << "populate table";
+    //    qDebug() << "populate table";
     //    tableWidget->clear();
     quint8 i=0;
     tableWidget->setRowCount(calcRowCount());
@@ -220,8 +220,11 @@ void PlotterWidget::populateParserTable()
     // Set up parser engine with the new parser properties
     parserEngine->setVariables(parserWidget->variableList);
     QByteArray *check = new QByteArray;
-    parserEngine->isValid(check);
-    qDebug() << *check;
+    if(!parserEngine->isValid(check))
+    {
+        qDebug() << *check;
+    }
+
 }
 
 void PlotterWidget::populatePlotArea()
@@ -247,7 +250,7 @@ void PlotterWidget::populatePlotArea()
             customPlot->addGraph();
 
 
-//            customPlot->graph(customPlot->graphCount()-1)->setData(keys,valvec);
+            //            customPlot->graph(customPlot->graphCount()-1)->setData(keys,valvec);
         }
     }
 }
@@ -297,7 +300,7 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
                 // Append data point to plot
                 valuesList[numberCount].append(numVal);
                 valuesList[numberCount].remove(0);
-//                valuesList.at(numberCount).append(v)
+                //                valuesList.at(numberCount).append(v)
                 customPlot->graph(numberCount)->setData(keys,valuesList.at(numberCount));
                 customPlot->replot();
                 numberCount++;
@@ -333,5 +336,5 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
         i++;
     }
 
-    qDebug() << output;
+    //    qDebug() << output;
 }

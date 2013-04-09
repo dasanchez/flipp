@@ -960,7 +960,7 @@ void ParserEngine::variableComplete()
     {
         listComplete=true;
         emit dataParsed(masterList);
-        qDebug() << "Full list caught";
+//        qDebug() << "Full list caught";
         clearVariables();
 
     }
@@ -986,5 +986,4 @@ void ParserEngine::clearVariables()
             }
         }
     }
-    //    masterList.at(1).
 }
