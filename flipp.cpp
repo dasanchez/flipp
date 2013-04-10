@@ -8,6 +8,8 @@ Flipp::Flipp(QWidget *parent)
     parsers = new ParserListWidget(this);
     plotters = new PlotterListWidget(this);
 
+    QSettings settings("dasanchez","flipp");
+
     connect(connections,SIGNAL(connectionListChanged(QStringList*)),terminals,SLOT(updateConnections(QStringList*)));
     connect(connections,SIGNAL(connectionListChanged(QStringList*)),plotters,SLOT(updateConnections(QStringList*)));
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));

@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QDockWidget>
 #include <QMenuBar>
+#include <QSettings>
 #include <connection/connectionlistwidget.h>
 #include <terminal/terminallistwidget.h>
 #include <parser/parserlistwidget.h>

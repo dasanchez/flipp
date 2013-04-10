@@ -300,7 +300,6 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
                 // Append data point to plot
                 valuesList[numberCount].append(numVal);
                 valuesList[numberCount].remove(0);
-                //                valuesList.at(numberCount).append(v)
                 customPlot->graph(numberCount)->setData(keys,valuesList.at(numberCount));
                 customPlot->replot();
                 numberCount++;

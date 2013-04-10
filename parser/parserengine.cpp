@@ -76,7 +76,7 @@ byteDecision ParserEngine::checkByte(char onebyte)
             // Assign non-number to array
             // Possible responses:
             // 1. Byte was handled without errors.
-            // 2. Byte was demeed invalid, try next variable
+            // 2. Byte was de   meed invalid, try next variable
             // 3. Byte was deemed invalid, eliminate current buffer
             switch(assignNonNumber(onebyte))
             {
@@ -954,6 +954,7 @@ void ParserEngine::variableComplete()
     else
     {
         // For BYTTYPE and NUMTYPE, always increase variable index
+//          qDebug() << "Full list caught";
         varIndex++;
     }
     if(varIndex==targetVars->size())
