@@ -12,6 +12,7 @@ ParserEngine::ParserEngine(QObject *parent) :
     repeatIndex=0;
     validList=false;
     listComplete = false;
+    packetRemains = false;
 
     // Look for an array of bytes that can contain +/-, spaces, and decimal points.
     numRegex.setPattern("( *[-+]? *\\d+\\.?\\d*)|( *[-+]? *\\d*\\.?\\d+)| +| *[+-]| *[+-] +| *[+-]? *\\.");
@@ -28,15 +29,23 @@ void ParserEngine::parseData(QByteArray dataIn)
     quint16 i=0;
     if(!dataIn.isEmpty() && validList==true)
     {
-         while(dataIn.size()>0)
+        while(dataIn.size()>0)
         {
-             // Loop while there is data in the incoming buffer.
-            switch(checkByte(dataIn.at(i)))
+            char ch = dataIn.at(i);
+            // Loop while there is data in the incoming buffer.
+            switch(checkByte(ch))
             {
             case BYTE_INVALID:
                 // Eliminate left-most byte from buffer and try again.
-                dataIn = dataIn.right(dataIn.size()-1);
-                i=0;
+                if(packetRemains)
+                {
+                    packetRemains=false;
+                }
+                else
+                {
+                    dataIn = dataIn.right(dataIn.size()-1);
+                    i=0;
+                }
                 break;
             default:
                 // The new byte was handled without any problems.
@@ -45,7 +54,7 @@ void ParserEngine::parseData(QByteArray dataIn)
                     // The listComplete flag is true, so the part of the buffer
                     // known to be fully parsed is removed.
                     listComplete=false;
-                    dataIn = dataIn.right(dataIn.size()-i-1);
+                    dataIn = dataIn.right(dataIn.size()-i);
                     i=0;
                 }
                 else
@@ -54,7 +63,13 @@ void ParserEngine::parseData(QByteArray dataIn)
                     // if the end of the buffer is reached.
                     i++;
                     if(i==dataIn.size())
+                    {
                         dataIn.clear();
+                        if(vecIndex!=0 || varIndex!=0)
+                        {
+                            packetRemains=true;
+                        }
+                    }
                 }
                 break;
             }
@@ -954,7 +969,7 @@ void ParserEngine::variableComplete()
     else
     {
         // For BYTTYPE and NUMTYPE, always increase variable index
-//          qDebug() << "Full list caught";
+        //          qDebug() << "Full list caught";
         varIndex++;
     }
     if(varIndex==targetVars->size())

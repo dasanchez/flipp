@@ -35,6 +35,20 @@ signals:
 public slots:
     void setNameValid(bool);
     void dataTx(QByteArray);
+
+    void toggleView(void);
+    void signalData(void);
+    void animateDataIcon(void);
+    void remove();
+    void togglePropertyFields(bool);
+    void toggleType();
+    // Data connection
+    void typeChanged(QString newType);
+    void addressChanged(QString);
+    void portChanged(QString);
+    void toggleConnection(void);
+    void connectionChanged(connectionState);
+    void errorReceived(QString);
     
 private:
     void setupUI();
@@ -83,20 +97,7 @@ private:
     QPixmap connOnIconPixmap;
     QPixmap inOutIconPixmap;
 
-private slots:
-    void toggleView(void);
-    void signalData(void);
-    void animateDataIcon(void);
-    void remove();
-    void togglePropertyFields(bool);
-    void toggleType();
-    // Data connection
-    void typeChanged(QString newType);
-    void addressChanged(QString);
-    void portChanged(QString);
-    void toggleConnection(void);
-    void connectionChanged(connectionState);
-    void errorReceived(QString);
+
 };
 
 #endif // CONNECTIONWIDGET_H

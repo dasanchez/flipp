@@ -78,6 +78,7 @@ private:
     quint8 repeatIndex;
     bool validList;
     bool listComplete;
+    bool packetRemains;
     QRegExp numRegex;
     // Look for an array of bytes that can contain +/-, spaces, and decimal points.
 

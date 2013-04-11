@@ -24,6 +24,12 @@ public:
     void sendData(quint8, QByteArray);
 public slots:
         void newConnection(void);
+
+        void nameChanged(void);
+        void connectionRemoved(void);
+        void itemRemoved(int row);
+        void sizeChanged(QSize);
+        void resorted(int src, int dest, QListWidgetItem* item);
 signals:
     void connectionListChanged(QStringList*);
     void dataReceived(quint8, QByteArray);
@@ -41,12 +47,7 @@ private:
     void checkAllNames(void);
     void updateList(void);
 
-private slots:
-    void nameChanged(void);
-    void connectionRemoved(void);
-    void itemRemoved(int row);
-    void sizeChanged(QSize);
-    void resorted(int src, int dest, QListWidgetItem* item);
+
 };
 
 #endif // CONNECTIONWIDGET_H
