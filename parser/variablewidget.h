@@ -64,13 +64,7 @@ private:
     QPixmap lessIconPixmap;
     QPixmap deleteIconPixmap;
 
-    int currentType;
-    bool matched;
-    bool fixed;
-    bool hexed;
-    bool isExpanded;
 
-    QList<VectorItemWidget*> *itemList;
 
     void setupUI();
     QString char2hex(QString characters);
@@ -80,6 +74,15 @@ private:
 public:
     explicit VariableWidget(QWidget *parent = 0);
     ComplexVariable *variable;
+
+    int currentType;
+    bool matched;
+    bool fixed;
+    bool hexed;
+    bool isExpanded;
+
+    QList<VectorItemWidget*> *itemList;
+
 
 signals:
     void nameChange(QString);

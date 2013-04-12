@@ -13,7 +13,6 @@
 #include <QStyledItemDelegate>
 #include <terminal/qterminaledit.h>
 #include <connection/connectionwidget.h>
-//#include "connectionwidget.h"
 
 class ConnectionWidget;
 
@@ -25,10 +24,22 @@ public:
     TerminalWidget(QWidget *parent = 0);
     ~TerminalWidget();
 
+    bool paused;
+    bool echoing;
+    bool hexPacket;
+
 public slots:
     void dataReceived(QByteArray);
     void updateConnections(QStringList *);
     void assignConnection(ConnectionWidget *);
+
+    void asciiTermToggled(bool);
+    void hexTermToggled(bool);
+    void toggleEcho();
+    void togglePacketFormat();
+    void changeConnection(QString);
+    void detachConnection(void);
+    void togglePause();
 signals:
     void sendData(QByteArray);
     void widgetRemoved(void);
@@ -41,9 +52,7 @@ private:
     QRegExp hexRegex;
     QString hex2char(QString);
     QString char2hex(QString);
-    bool paused;
-    bool echoing;
-    bool hexPacket;
+
 
     ConnectionWidget *connectionWidget;
 
@@ -83,16 +92,10 @@ private:
 
 private slots:
     void textEntered(QString, bool);
-    void toggleEcho();
-    void togglePacketFormat();
     void resizeTerminals(void);
-    void asciiTermToggled(bool);
-    void hexTermToggled(bool);
     void sendPacket(void);
     void remove(void);
-    void changeConnection(QString);
-    void detachConnection(void);
-    void togglePause();
+
 };
 
 #endif // TERMINALWIDGET_H

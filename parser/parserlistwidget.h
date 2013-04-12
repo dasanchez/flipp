@@ -24,6 +24,10 @@ public slots:
 
     void newParser();
 
+    void checkAllNames(void);
+    void updateList(void);
+    QString newParserName(void);
+
 private slots:
     void itemRemoved(int row);
     void sizeChanged(QSize);
@@ -41,9 +45,6 @@ private:
     QVBoxLayout *scrollAreaVLayout;
     QWidget *saWidgetContents;
 
-    QString newParserName(void);
-    void checkAllNames(void);
-     void updateList(void);
 private slots:
     void nameChanged(void);
 };

@@ -19,11 +19,14 @@ public:
     TerminalListWidget(QWidget *parent = 0);
     ~TerminalListWidget();
     QList<TerminalWidget*> terminalList;
+    QStringList *nameList;
 signals:
     void terminalRequest(TerminalWidget*,QString);
 public slots:
     void updateConnections(QStringList*);
     void newTerminal(void);
+
+    void terminalConnectionRequest(QString);
 
 private:
     QVBoxLayout *mainLayout;
@@ -36,12 +39,12 @@ private:
     QScrollArea *scrollArea;
     QVBoxLayout *scrollAreaVLayout;
     QWidget *saWidgetContents;
-    QStringList *nameList;
+
 
 private slots:
 
     void terminalRemoved(void);
-    void terminalConnectionRequest(QString);
+
     void sizeChanged(QSize);
 };
 

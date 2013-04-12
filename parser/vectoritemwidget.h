@@ -50,10 +50,7 @@ private:
     QPixmap hexoffIconPixmap;
     QPixmap deleteIconPixmap;
 
-    int currentType;
-    bool matched;
-    bool fixed;
-    bool hexed;
+
     QRegExp hexRegex;
 
     QString char2hex(QString characters);
@@ -63,6 +60,10 @@ private:
 public:
     explicit VectorItemWidget(QWidget *parent = 0);
     BaseVariable *variable;
+    int currentType;
+    bool matched;
+    bool fixed;
+    bool hexed;
 
 signals:
     void nameChange(QString);

@@ -19,6 +19,10 @@ public:
     QString getName();
     bool hasValidName(void);
     void setName(QString);
+
+
+    QList<VariableWidget*> *vwList;
+     QString parserName;
 signals:
     void updateVariableList();
     void changeSize(QSize);
@@ -39,9 +43,7 @@ private:
     QPushButton *expandButton;
     QPushButton *deleteButton;
 
-    QList<VariableWidget*> *vwList;
     LiveListWidget *lw;
-    QString parserName;
 
     bool validName;
     bool expanded;
