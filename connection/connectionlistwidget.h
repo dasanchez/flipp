@@ -24,6 +24,7 @@ public:
     void sendData(quint8, QByteArray);
 public slots:
         void newConnection(void);
+        void addConnection(ConnectionWidget *);
 
         void nameChanged(void);
         void connectionRemoved(void);

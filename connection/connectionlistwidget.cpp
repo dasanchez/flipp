@@ -72,6 +72,20 @@ void ConnectionListWidget::newConnection()
     updateList();
 }
 
+void ConnectionListWidget::addConnection(ConnectionWidget *cw)
+{
+    connectionList.append(cw);
+    QListWidgetItem *item = new QListWidgetItem;
+    listWidget->addItem(item);
+    listWidget->setItemWidget(item,cw);
+    item->setSizeHint(cw->sizeHint());
+
+    connect(cw,SIGNAL(nameChange()),this,SLOT(nameChanged()));
+    connect(cw,SIGNAL(widgetRemoved()),this,SLOT(connectionRemoved()));
+    connect(cw,SIGNAL(sizeChange(QSize)),this,SLOT(sizeChanged(QSize)));
+    updateList();
+}
+
 void ConnectionListWidget::updateList()
 {
     nameList->clear();

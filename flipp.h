@@ -35,6 +35,8 @@ private:
 
     void createDocks();
     void createMenus();
+    void restoreSettings();
+    void saveSettings();
 private slots:
     void handleTerminalRequest(TerminalWidget*,QString);
     void handlePlotterConnectionRequest(PlotterWidget*,QString);

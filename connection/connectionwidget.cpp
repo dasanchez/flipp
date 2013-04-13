@@ -132,6 +132,44 @@ void ConnectionWidget::setName(QString newName)
     connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
 }
 
+void ConnectionWidget::setType(int newType)
+{
+    switch(newType)
+    {
+    case TCP:
+        dataConnection->setType(TCP);
+        typeButton->setIcon(QIcon(tcpIconPixmap));
+        serialPortCombo->setVisible(false);
+        addressEdit->setVisible(true);
+        addressLabel->setText("Address");
+        portLabel->setText("Port");
+        addressChanged(addressEdit->text());
+        break;
+    case UDP:
+        dataConnection->setType(UDP);
+        typeButton->setIcon(QIcon(udpIconPixmap));
+        serialPortCombo->setVisible(false);
+        addressEdit->setVisible(true);
+        addressLabel->setText("Address");
+        portLabel->setText("Port");
+        addressChanged(addressEdit->text());
+        break;
+    case SERIAL:
+        dataConnection->setType(SERIAL);
+        typeButton->setIcon(QIcon(comIconPixmap));
+        addressEdit->setVisible(false);
+        serialPortCombo->setVisible(true);
+        addressLabel->setText("Port");
+        portLabel->setText("Baud");
+        addressChanged(serialPortCombo->currentText());
+        break;
+    default:
+        break;
+    }
+}
+
+//void ConnectionWidget::setAddress
+
 void ConnectionWidget::toggleType()
 {
     switch(dataConnection->getType())
@@ -144,7 +182,7 @@ void ConnectionWidget::toggleType()
         serialPortCombo->setVisible(true);
         addressLabel->setText("Port");
         portLabel->setText("Baud");
-         addressChanged(serialPortCombo->currentText());
+        addressChanged(serialPortCombo->currentText());
         break;
     case SERIAL:
         dataConnection->setType(TCP);
@@ -184,15 +222,55 @@ void ConnectionWidget::typeChanged(QString newType)
     }
 }
 
+void ConnectionWidget::setIPAddress(QString address)
+{
+    disconnect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged));
+    addressEdit->setText(address);
+    connect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged));
+    dataConnection->setAddress_Port(address);
+}
+
+void ConnectionWidget::setSerialPort(QString port)
+{
+    disconnect(serialPortCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(addressChanged(QString)));
+    // Check if combo box has the port requested
+    int index = serialPortCombo->findText(port,Qt::MatchFixedString);
+    if(index>=0)
+    {
+        serialPortCombo->setCurrentIndex(index);
+        dataConnection->setAddress_Port(serialPortCombo->currentText());
+    }
+    else
+    {
+        serialPortCombo->setCurrentIndex(0);
+        dataConnection->setAddress_Port(serialPortCombo->currentText());
+    }
+    connect(serialPortCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(addressChanged(QString)));
+}
+
 void ConnectionWidget::addressChanged(QString newAddress)
 {
     dataConnection->setAddress_Port(newAddress);
 }
 
+void ConnectionWidget::setIPPort(QString ipPort)
+{
+    disconnect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
+    portChanged(ipPort);
+    connect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
+}
+
+void ConnectionWidget::setSerialBaud(QString serBaud)
+{
+    disconnect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
+    portChanged(serBaud);
+    connect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
+}
+
 void ConnectionWidget::portChanged(QString newPort)
 {
-    QString r = "\\D";
-    newPort = newPort.remove(QRegExp(r));
+    //    QString r = "\\D";
+    //    newPort = newPort.remove(QRegExp(r));
     portEdit->setText(newPort);
     dataConnection->setPort_Baud(newPort.toLong());
 }
@@ -288,7 +366,7 @@ void ConnectionWidget::setupUI()
     portLabel->setAlignment(Qt::AlignCenter);
     typeButton = new QPushButton;
     typeButton->setToolTip("Toggle between TCP, UDP, and COM connection");
-    typeButton->setFixedHeight(24);
+    typeButton->setFixedWidth(30);
     typeButton->setFixedHeight(24);
     typeButton->setIcon(QIcon(tcpIconPixmap));
     typeButton->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);

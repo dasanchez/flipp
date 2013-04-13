@@ -24,6 +24,11 @@ public:
     ~ConnectionWidget();
     QString getName(void);
     void setName(QString);
+    void setType(int);
+    void setIPAddress(QString);
+    void setIPPort(QString);
+    void setSerialPort(QString);
+    void setSerialBaud(QString);
     bool nameIsValid(void);
 
 signals:

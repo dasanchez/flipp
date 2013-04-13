@@ -17,12 +17,14 @@ Flipp::Flipp(QWidget *parent)
     connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
     connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
 
-    connections->newConnection();
+    restoreSettings();
+
+//    connections->newConnection();
     terminals->newTerminal();
     parsers->newParser();
-    terminals->terminalList.at(0)->assignConnection(connections->connectionList.at(0));
+//    terminals->terminalList.at(0)->assignConnection(connections->connectionList.at(0));
     plotters->newPlotter();
-    plotters->plotterList.at(0)->assignConnection(connections->connectionList.at(0));
+//    plotters->plotterList.at(0)->assignConnection(connections->connectionList.at(0));
     plotters->plotterList.at(0)->assignParser(parsers->parserList->at(0));
 
     setCentralWidget(plotters);
@@ -128,4 +130,33 @@ void Flipp::createMenus()
     viewMenu->addAction(terminalDock->toggleViewAction());
     viewMenu->addAction(parserDock->toggleViewAction());
 //  viewMenu->addAction(plotsetsDock->toggleViewAction());
+}
+
+void Flipp::restoreSettings()
+{
+// Read settings file
+
+    // Restore connection widgets
+    ConnectionWidget *cw = new ConnectionWidget;
+    cw->setName("Connection 001");
+
+    // Test IP connection
+//    cw->setType(TCP);
+//    cw->setIPAddress("127.0.0.1");
+//    cw->setIPPort("50500");
+
+    // Test serial connection
+    cw->setType(SERIAL);
+    cw->setSerialPort("COM3");
+    cw->setSerialBaud("115200");
+
+    connections->addConnection(cw);
+
+    // Restore terminals
+
+}
+
+void Flipp::saveSettings()
+{
+saveState(0);
 }
