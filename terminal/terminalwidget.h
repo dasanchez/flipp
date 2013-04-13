@@ -14,6 +14,10 @@
 #include <terminal/qterminaledit.h>
 #include <connection/connectionwidget.h>
 
+#define BOTH_VIEWS 0
+#define ASCII_ONLY 1
+#define HEX_ONLY 2
+
 class ConnectionWidget;
 
 class TerminalWidget : public QWidget
@@ -23,6 +27,11 @@ class TerminalWidget : public QWidget
 public:
     TerminalWidget(QWidget *parent = 0);
     ~TerminalWidget();
+
+    void setViews(int);
+    void setEcho(bool);
+    void setPause(bool);
+    void setPacketHexFormat(bool);
 
     bool paused;
     bool echoing;
@@ -89,6 +98,9 @@ private:
     QPixmap hexIconPixmap;
     QPixmap sendIconPixmap;
 
+    void updateEchoButton();
+    void updatePauseButton();
+    void updatePacketButton();
 
 private slots:
     void textEntered(QString, bool);

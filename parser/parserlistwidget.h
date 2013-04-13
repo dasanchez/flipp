@@ -23,6 +23,7 @@ signals:
 public slots:
 
     void newParser();
+    void addParser(ParserWidget *);
 
     void checkAllNames(void);
     void updateList(void);

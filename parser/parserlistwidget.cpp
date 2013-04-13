@@ -93,6 +93,17 @@ void ParserListWidget::newParser()
     updateList();
 }
 
+void ParserListWidget::addParser(ParserWidget *paw)
+{
+    parserList->append(paw);
+    splitter->addWidget(paw);
+    connect(paw,SIGNAL(nameChange()),this,SLOT(nameChanged()));
+    connect(paw,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
+    connect(paw,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
+    updateList();
+}
+
+
 QString ParserListWidget::newParserName()
 {
     QString newName;

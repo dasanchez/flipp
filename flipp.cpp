@@ -19,12 +19,12 @@ Flipp::Flipp(QWidget *parent)
 
     restoreSettings();
 
-//    connections->newConnection();
-    terminals->newTerminal();
-    parsers->newParser();
-//    terminals->terminalList.at(0)->assignConnection(connections->connectionList.at(0));
+    //    connections->newConnection();
+    //    terminals->newTerminal();
+//    parsers->newParser();
+    //    terminals->terminalList.at(0)->assignConnection(connections->connectionList.at(0));
     plotters->newPlotter();
-//    plotters->plotterList.at(0)->assignConnection(connections->connectionList.at(0));
+    //    plotters->plotterList.at(0)->assignConnection(connections->connectionList.at(0));
     plotters->plotterList.at(0)->assignParser(parsers->parserList->at(0));
 
     setCentralWidget(plotters);
@@ -37,7 +37,7 @@ Flipp::Flipp(QWidget *parent)
     //     this->setWindowFlags(Qt::CustomizeWindowHint); //Set window with no title bar
     //this->setWindowFlags(Qt::FramelessWindowHint); //Set a frameless window
 
-//    QFile qss(":/styles/flipp.css");
+    //    QFile qss(":/styles/flipp.css");
     QFile qss("../flipp/styles/flipp.css");
     qss.open(QFile::ReadOnly);
     setStyleSheet(qss.readAll());
@@ -46,7 +46,7 @@ Flipp::Flipp(QWidget *parent)
 
 Flipp::~Flipp()
 {
-    
+
 }
 
 void Flipp::handleTerminalRequest(TerminalWidget *terminal,QString name)
@@ -67,7 +67,7 @@ void Flipp::handlePlotterConnectionRequest(PlotterWidget *plotter,QString name)
         if(connection->getName()==name)
         {
             plotter->assignConnection(connection);
-//            qDebug() << tr("Connection assigned");
+            //            qDebug() << tr("Connection assigned");
         }
     }
 }
@@ -79,7 +79,7 @@ void Flipp::handlePlotterParserRequest(PlotterWidget *plotter,QString name)
         if(parser->getName()==name)
         {
             plotter->assignParser(parser);
-//            qDebug() << tr("Parser assigned");
+            //            qDebug() << tr("Parser assigned");
         }
     }
 }
@@ -97,24 +97,24 @@ void Flipp::createDocks()
     terminalDock = new QDockWidget(tr("Terminal list"));
     terminalDock->setWidget(terminals);
     terminalDock->setFeatures(QDockWidget::DockWidgetClosable|
-                                QDockWidget::DockWidgetMovable|
-                                QDockWidget::DockWidgetFloatable);
+                              QDockWidget::DockWidgetMovable|
+                              QDockWidget::DockWidgetFloatable);
     terminalDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     addDockWidget(Qt::TopDockWidgetArea,terminalDock);
 
     parserDock = new QDockWidget(tr("Parser list"));
     parserDock->setWidget(parsers);
     terminalDock->setFeatures(QDockWidget::DockWidgetClosable|
-                                QDockWidget::DockWidgetMovable|
-                                QDockWidget::DockWidgetFloatable);
+                              QDockWidget::DockWidgetMovable|
+                              QDockWidget::DockWidgetFloatable);
     terminalDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-//    addDockWidget(Qt::LeftDockWidgetArea,parserDock);
+    //    addDockWidget(Qt::LeftDockWidgetArea,parserDock);
     addDockWidget(Qt::TopDockWidgetArea,parserDock);
 
     tabifyDockWidget(connectionDock,terminalDock);
     tabifyDockWidget(terminalDock,parserDock);
 
-        setTabPosition(Qt::AllDockWidgetAreas,QTabWidget::North);
+    setTabPosition(Qt::AllDockWidgetAreas,QTabWidget::North);
 }
 
 void Flipp::createMenus()
@@ -122,41 +122,71 @@ void Flipp::createMenus()
 
     QMenu *fileMenu = menuBar()->addMenu(tr("File"));
     exitAct = new QAction(tr("E&xit"), this);
-         exitAct->setStatusTip(tr("Exit the application"));
-         connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
+    exitAct->setStatusTip(tr("Exit the application"));
+    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
     fileMenu->addAction(exitAct);
     QMenu *viewMenu = menuBar()->addMenu(tr("View"));
     viewMenu->addAction(connectionDock->toggleViewAction());
     viewMenu->addAction(terminalDock->toggleViewAction());
     viewMenu->addAction(parserDock->toggleViewAction());
-//  viewMenu->addAction(plotsetsDock->toggleViewAction());
+    //  viewMenu->addAction(plotsetsDock->toggleViewAction());
 }
 
 void Flipp::restoreSettings()
 {
-// Read settings file
+    // Read settings file
+    QStringList *connectionNames = new QStringList;
+
 
     // Restore connection widgets
     ConnectionWidget *cw = new ConnectionWidget;
     cw->setName("Connection 001");
+    connectionNames->append(cw->getName());
 
-    // Test IP connection
-//    cw->setType(TCP);
-//    cw->setIPAddress("127.0.0.1");
-//    cw->setIPPort("50500");
+    // IP connection
+    cw->setType(TCP);
+    cw->setIPAddress("127.0.0.1");
+    cw->setIPPort("50500");
 
-    // Test serial connection
-    cw->setType(SERIAL);
-    cw->setSerialPort("COM3");
-    cw->setSerialBaud("115200");
+    // Serial connection
+    //    cw->setType(SERIAL);
+    //    cw->setSerialPort("COM3");
+    //    cw->setSerialBaud("115200");
 
+    // Build connection list
     connections->addConnection(cw);
 
     // Restore terminals
+    TerminalWidget *tw = new TerminalWidget;
+
+    // Set UI elements
+    tw->updateConnections(connectionNames);
+    tw->setViews(HEX_ONLY);
+    tw->setEcho(true);
+    tw->setPacketHexFormat(true);
+
+    // Assign connection
+    tw->assignConnection(cw);
+
+    // Build terminal list
+    terminals->addTerminal(tw);
+
+    // Restore parsers
+    ParserWidget *paw = new ParserWidget;
+    paw->setName("Parser 001");
+
+    // Set UI view
+
+    // Add variables
+
+    // Build parser list
+    parsers->addParser(paw);
+
+
 
 }
 
 void Flipp::saveSettings()
 {
-saveState(0);
+    saveState(0);
 }

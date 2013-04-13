@@ -25,6 +25,7 @@ signals:
 public slots:
     void updateConnections(QStringList*);
     void newTerminal(void);
+    void addTerminal(TerminalWidget *);
 
     void terminalConnectionRequest(QString);
 

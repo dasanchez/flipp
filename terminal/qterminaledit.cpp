@@ -27,6 +27,11 @@ void QTerminalEdit::toggleEcho()
     echoBytes = !echoBytes;
 }
 
+void QTerminalEdit::setEcho(bool echoOn)
+{
+    echoBytes = echoOn;
+}
+
 bool QTerminalEdit::willEcho(void)
 {
     return echoBytes;

@@ -14,6 +14,7 @@ public:
     void appendText(QByteArray);
     void appendText(QByteArray, bool);
     bool willEcho(void);
+    void setEcho(bool);
 signals:
     void textEntered(QString,bool);
 public slots:

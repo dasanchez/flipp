@@ -61,6 +61,16 @@ void TerminalListWidget::newTerminal()
     connect(termWidget,SIGNAL(terminalConnectionRequest(QString)),this,SLOT(terminalConnectionRequest(QString)));
 }
 
+void TerminalListWidget::addTerminal(TerminalWidget *tw)
+{
+
+    terminalList.append(tw);
+    connect(tw,SIGNAL(widgetRemoved()),this,SLOT(terminalRemoved()));
+    splitter->addWidget(tw);
+
+    connect(tw,SIGNAL(terminalConnectionRequest(QString)),this,SLOT(terminalConnectionRequest(QString)));
+}
+
 void TerminalListWidget::terminalRemoved()
 {
     TerminalWidget* term = qobject_cast<TerminalWidget *>(QObject::sender());

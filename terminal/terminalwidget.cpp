@@ -28,8 +28,8 @@ TerminalWidget::TerminalWidget(QWidget *parent) :
     connect(hexButton,SIGNAL(toggled(bool)),this,SLOT(hexTermToggled(bool)));
     connect(asciiButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
     connect(hexButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
-    connect(echoButton,SIGNAL(clicked()),asciiTerminal,SLOT(toggleEcho()));
-    connect(echoButton,SIGNAL(clicked()),hexTerminal,SLOT(toggleEcho()));
+    //    connect(echoButton,SIGNAL(clicked()),asciiTerminal,SLOT(toggleEcho()));
+    //    connect(echoButton,SIGNAL(clicked()),hexTerminal,SLOT(toggleEcho()));
     connect(echoButton,SIGNAL(clicked()),this,SLOT(toggleEcho()));
     connect(pauseButton,SIGNAL(clicked()),this,SLOT(togglePause()));
     connect(clearButton,SIGNAL(clicked()),asciiTerminal,SLOT(clear()));
@@ -45,9 +45,8 @@ TerminalWidget::~TerminalWidget()
 
 }
 
-void TerminalWidget::toggleEcho()
+void TerminalWidget::updateEchoButton()
 {
-    echoing = !echoing;
     if(echoing)
     {
         echoButton->setIcon(QIcon(echoOnIconPixmap));
@@ -56,6 +55,73 @@ void TerminalWidget::toggleEcho()
     {
         echoButton->setIcon(QIcon(echoOffIconPixmap));
     }
+}
+
+void TerminalWidget::setEcho(bool echoOn)
+{
+    echoing=echoOn;
+    asciiTerminal->setEcho(echoing);
+    hexTerminal->setEcho(echoing);
+    updateEchoButton();
+}
+
+void TerminalWidget::toggleEcho()
+{
+    echoing = !echoing;
+    asciiTerminal->setEcho(echoing);
+    hexTerminal->setEcho(echoing);
+    updateEchoButton();
+}
+
+void TerminalWidget::updatePauseButton()
+{
+    if(paused)
+    {
+        pauseButton->setIcon(QIcon(pauseIconPixmap));
+    }
+    else
+    {
+        pauseButton->setIcon(QIcon(playIconPixmap));
+    }
+}
+
+void TerminalWidget::setPause(bool pauseOn)
+{
+    paused=pauseOn;
+    updatePauseButton();
+}
+
+void TerminalWidget::togglePause()
+{
+    paused=!paused;
+    updatePauseButton();
+}
+
+void TerminalWidget::updatePacketButton()
+{
+    if(hexPacket)
+    {
+        packetEdit->setText(char2hex(packetEdit->text()));
+        hexPacketButton->setIcon(QIcon(hexIconPixmap));
+    }
+    else
+    {
+
+        packetEdit->setText(hex2char(packetEdit->text()));
+        hexPacketButton->setIcon(QIcon(ascIconPixmap));
+    }
+}
+
+void TerminalWidget::setPacketHexFormat(bool hexFormat)
+{
+    hexPacket = hexFormat;
+    updatePacketButton();
+}
+
+void TerminalWidget::togglePacketFormat()
+{
+    hexPacket = !hexPacket;
+    updatePacketButton();
 }
 
 void TerminalWidget::changeConnection(QString connection)
@@ -137,6 +203,47 @@ void TerminalWidget::textEntered(QString newText, bool isHex)
 
 }
 
+void TerminalWidget::setViews(int views)
+{
+    disconnect(asciiButton,SIGNAL(toggled(bool)),this,SLOT(asciiTermToggled(bool)));
+    disconnect(hexButton,SIGNAL(toggled(bool)),this,SLOT(hexTermToggled(bool)));
+    disconnect(asciiButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
+    disconnect(hexButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
+
+    switch(views)
+    {
+    case BOTH_VIEWS:
+        asciiButton->setChecked(true);
+        hexButton->setChecked(true);
+        asciiButton->setDisabled(false);
+        hexButton->setDisabled(false);
+        asciiTerminal->setVisible(true);
+        hexTerminal->setVisible(true);
+        break;
+    case ASCII_ONLY:
+        asciiButton->setChecked(true);
+        hexButton->setChecked(false);
+        asciiButton->setDisabled(true);
+        asciiTerminal->setVisible(true);
+        hexTerminal->setVisible(false);
+        break;
+    case HEX_ONLY:
+        asciiButton->setChecked(false);
+        hexButton->setChecked(true);
+        hexButton->setDisabled(true);
+        asciiTerminal->setVisible(false);
+        hexTerminal->setVisible(true);
+        break;
+    default:
+        break;
+    }
+    connect(asciiButton,SIGNAL(toggled(bool)),this,SLOT(asciiTermToggled(bool)));
+    connect(hexButton,SIGNAL(toggled(bool)),this,SLOT(hexTermToggled(bool)));
+    connect(asciiButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
+    connect(hexButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
+
+}
+
 void TerminalWidget::asciiTermToggled(bool on)
 {
     if(on)
@@ -165,42 +272,12 @@ void TerminalWidget::hexTermToggled(bool on)
     }
 }
 
-void TerminalWidget::togglePacketFormat()
-{
-    hexPacket = !hexPacket;
-    if(hexPacket)
-    {
-        packetEdit->setText(char2hex(packetEdit->text()));
-        hexPacketButton->setIcon(QIcon(hexIconPixmap));
-    }
-    else
-    {
-
-        packetEdit->setText(hex2char(packetEdit->text()));
-        hexPacketButton->setIcon(QIcon(ascIconPixmap));
-    }
-}
-
-
 void TerminalWidget::dataReceived(QByteArray dataIn)
 {
     if(!paused)
     {
         asciiTerminal->appendText(dataIn);
         hexTerminal->appendText(dataIn);
-    }
-}
-
-void TerminalWidget::togglePause()
-{
-    paused=!paused;
-    if(paused)
-    {
-        pauseButton->setIcon(QIcon(pauseIconPixmap));
-    }
-    else
-    {
-        pauseButton->setIcon(QIcon(playIconPixmap));
     }
 }
 
