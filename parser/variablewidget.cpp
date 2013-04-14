@@ -32,6 +32,119 @@ void VariableWidget::nameChanged(QString newName)
     emit nameChange(newName);
 }
 
+void VariableWidget::setName(QString newName)
+{
+    disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameChanged(QString)));
+    nameEdit->setText(newName);
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameChanged(QString)));
+
+    variable->name = newName;
+    emit variableChanged();
+    emit nameChange(newName);
+}
+
+void VariableWidget::setType(int newType)
+{
+    switch(newType)
+    {
+    case BYTTYPE:
+        setByte();
+        break;
+    case NUMTYPE:
+        setNumber();
+        break;
+    default:
+        setVector();
+        break;
+    }
+    emit variableChanged();
+    emit typeChange(variable->type);
+}
+
+void VariableWidget::setFixed(bool fixedOn)
+{
+    QIcon lengthIcon;
+    fixed = fixedOn;
+    if(fixed)
+    {
+        lengthIcon=fixlenIconPixmap;
+    }
+    else
+    {
+        lengthIcon=varlenIconPixmap;
+    }
+    lengthButton->setIcon(lengthIcon);
+    variable->fixed=fixed;
+    emit variableChanged();
+    emit lengthToggle(fixed);
+}
+
+void VariableWidget::setLength(int newLength)
+{
+    variable->length=newLength;
+    disconnect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
+    lengthSpin->setValue(newLength);
+    connect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
+
+    emit variableChanged();
+    emit lengthChange(newLength);
+}
+
+void VariableWidget::setMatched(bool matchOn)
+{
+    QIcon matchIcon;
+    matched=matchOn;
+
+    if(matched)
+    {
+        matchIcon=matchonIconPixmap;
+    }
+    else
+    {
+        matchIcon=matchoffIconPixmap;
+    }
+    matchButton->setIcon(matchIcon);
+    variable->match=matched;
+    emit variableChanged();
+    emit matchToggle(matched);
+}
+
+void VariableWidget::setMatchBytes(QByteArray newMatch)
+{
+    QByteArray characters;
+    variable->matchBytes.clear();
+
+    if(hexed)
+    {
+        // Change all hex data back to ascii representation
+
+        hexRegex.indexIn(newMatch);
+        QString temp = hexRegex.cap();
+
+        // Remove all spaces from string
+        temp=temp.simplified();
+        temp = temp.replace(' ',"");
+
+        // Use a QByteArray to convert
+        characters.append(temp);
+        characters = QByteArray::fromHex(characters);
+
+    }
+    else
+    {
+        characters.append(newMatch);
+    }
+    disconnect(matchEdit,SIGNAL(textChanged(QString)),this,SLOT(changeMatch(QString)));
+    if(hexed)
+        matchEdit->setText(char2hex(characters));
+    else
+        matchEdit->setText(characters);
+    connect(matchEdit,SIGNAL(textChanged(QString)),this,SLOT(changeMatch(QString)));
+    variable->matchBytes.append(characters);
+    emit variableChanged();
+    emit matchChange(characters);
+}
+
 void VariableWidget::toggleType()
 {
     switch(currentType)

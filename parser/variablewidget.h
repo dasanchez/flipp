@@ -64,8 +64,6 @@ private:
     QPixmap lessIconPixmap;
     QPixmap deleteIconPixmap;
 
-
-
     void setupUI();
     QString char2hex(QString characters);
     QString hex2char(QString hexChars);
@@ -81,8 +79,13 @@ public:
     bool hexed;
     bool isExpanded;
 
+    void setName(QString);
+    void setType(int);
+    void setFixed(bool);
+    void setLength(int);
+    void setMatched(bool);
+    void setMatchBytes(QByteArray);
     QList<VectorItemWidget*> *itemList;
-
 
 signals:
     void nameChange(QString);

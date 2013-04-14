@@ -29,6 +29,7 @@ public:
     void setIPPort(QString);
     void setSerialPort(QString);
     void setSerialBaud(QString);
+    void setExpanded(bool);
     bool nameIsValid(void);
 
 signals:

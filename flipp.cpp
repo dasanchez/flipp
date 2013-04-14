@@ -8,7 +8,7 @@ Flipp::Flipp(QWidget *parent)
     parsers = new ParserListWidget(this);
     plotters = new PlotterListWidget(this);
 
-    QSettings settings("dasanchez","flipp");
+//    QSettings settings("dasanchez","flipp");
 
     connect(connections,SIGNAL(connectionListChanged(QStringList*)),terminals,SLOT(updateConnections(QStringList*)));
     connect(connections,SIGNAL(connectionListChanged(QStringList*)),plotters,SLOT(updateConnections(QStringList*)));
@@ -25,7 +25,7 @@ Flipp::Flipp(QWidget *parent)
     //    terminals->terminalList.at(0)->assignConnection(connections->connectionList.at(0));
     plotters->newPlotter();
     //    plotters->plotterList.at(0)->assignConnection(connections->connectionList.at(0));
-    plotters->plotterList.at(0)->assignParser(parsers->parserList->at(0));
+//    plotters->plotterList.at(0)->assignParser(parsers->parserList->at(0));
 
     setCentralWidget(plotters);
 
@@ -136,11 +136,11 @@ void Flipp::restoreSettings()
 {
     // Read settings file
     QStringList *connectionNames = new QStringList;
-
+    QStringList *parserNames = new QStringList;
 
     // Restore connection widgets
     ConnectionWidget *cw = new ConnectionWidget;
-    cw->setName("Connection 001");
+    cw->setName("Time & GPS");
     connectionNames->append(cw->getName());
 
     // IP connection
@@ -153,31 +153,84 @@ void Flipp::restoreSettings()
     //    cw->setSerialPort("COM3");
     //    cw->setSerialBaud("115200");
 
+    // View
+    cw->setExpanded(false);
+
+
     // Build connection list
     connections->addConnection(cw);
 
     // Restore terminals
     TerminalWidget *tw = new TerminalWidget;
 
-    // Set UI elements
+    // Assign connection
+    tw->assignConnection(cw);
+
+    // View
     tw->updateConnections(connectionNames);
     tw->setViews(HEX_ONLY);
     tw->setEcho(true);
     tw->setPacketHexFormat(true);
-
-    // Assign connection
-    tw->assignConnection(cw);
 
     // Build terminal list
     terminals->addTerminal(tw);
 
     // Restore parsers
     ParserWidget *paw = new ParserWidget;
-    paw->setName("Parser 001");
-
-    // Set UI view
+    paw->setName("Time");
+    parserNames->append(paw->getName());
 
     // Add variables
+    VariableWidget *varw01 = new VariableWidget;
+    varw01->setName("Hours");
+    varw01->setType(NUMTYPE);
+    varw01->setFixed(true);
+    varw01->setLength(2);
+
+    VariableWidget *varw02 = new VariableWidget;
+    varw02->setName("First colon");
+    varw02->setType(BYTTYPE);
+    varw02->setMatched(true);
+    varw02->setMatchBytes(":");
+
+    VariableWidget *varw03 = new VariableWidget;
+    varw03->setName("Minutes");
+    varw03->setType(NUMTYPE);
+    varw03->setFixed(true);
+    varw03->setLength(2);
+
+    VariableWidget *varw04 = new VariableWidget;
+    varw04->setName("Second colon");
+    varw04->setType(BYTTYPE);
+    varw04->setMatched(true);
+    varw04->setMatchBytes(":");
+
+    VariableWidget *varw05 = new VariableWidget;
+    varw05->setName("Seconds");
+    varw05->setType(NUMTYPE);
+    varw05->setFixed(false);
+
+    VariableWidget *varw06 = new VariableWidget;
+    varw06->setName("End byte");
+    varw06->setType(BYTTYPE);
+    varw06->setFixed(true);
+    varw06->setLength(1);
+
+    paw->addVariableWidget(varw01);
+    paw->addVariableWidget(varw02);
+    paw->addVariableWidget(varw03);
+    paw->addVariableWidget(varw04);
+    paw->addVariableWidget(varw05);
+    paw->addVariableWidget(varw06);
+
+
+
+//            cvar->name = "Hours";
+//    cvar->type = BYTTYPE;
+//    cvar->fixed = true;
+//    cvar->length = 2;
+
+    // View
 
     // Build parser list
     parsers->addParser(paw);

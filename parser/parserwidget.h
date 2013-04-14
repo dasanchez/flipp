@@ -19,10 +19,9 @@ public:
     QString getName();
     bool hasValidName(void);
     void setName(QString);
-
-
     QList<VariableWidget*> *vwList;
-     QString parserName;
+    QString parserName;
+
 signals:
     void updateVariableList();
     void changeSize(QSize);
@@ -30,6 +29,9 @@ signals:
     void nameChange(void);
 public slots:
     void setNameValid(bool);
+    void newVariable();
+    void addVariableWidget(VariableWidget *);
+    void remVariable();
 private:
     QHBoxLayout *controlLayout;
 
@@ -49,29 +51,28 @@ private:
     bool expanded;
 
     // Assets
-   QPixmap addByteIconPixmap;
-   QPixmap addNumberIconPixmap;
-   QPixmap addVectorIconPixmap;
-   QPixmap moreIconPixmap;
-   QPixmap lessIconPixmap;
-   QPixmap delIconPixmap;
+    QPixmap addByteIconPixmap;
+    QPixmap addNumberIconPixmap;
+    QPixmap addVectorIconPixmap;
+    QPixmap moreIconPixmap;
+    QPixmap lessIconPixmap;
+    QPixmap delIconPixmap;
 private slots:
     // Widget handling
-    void addVariable();
-    void remVariable();
+
     void resorted(int,int,QListWidgetItem*);
     void itemRemoved(int);
     void itemSize(QSize);
     void toggleExpand();
 
     // Variable data
-//    void nameChanged(QString);
-//    void typeChanged(int);
-//    void lengthToggled(bool);
-//    void lengthChanged(int);
-//    void matchToggled(bool);
-//    void matchChanged(QString);
-//    void repeatChanged(int);
+    //    void nameChanged(QString);
+    //    void typeChanged(int);
+    //    void lengthToggled(bool);
+    //    void lengthChanged(int);
+    //    void matchToggled(bool);
+    //    void matchChanged(QString);
+    //    void repeatChanged(int);
 
     void variableListChanged();
     // Testing operation

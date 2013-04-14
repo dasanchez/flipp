@@ -42,11 +42,11 @@ ParserWidget::ParserWidget(QWidget *parent) :
     variableList = new QList<ComplexVariable*>;
     lw = new LiveListWidget(this);
 
-    for(quint8 i =0;i<1;i++)
-    {
-        addVariable();
+//    for(quint8 i =0;i<1;i++)
+//    {
+//        addVariable();
 
-    }
+//    }
 
     controlLayout = new QHBoxLayout;
     controlLayout->addWidget(nameEdit);
@@ -65,9 +65,9 @@ ParserWidget::ParserWidget(QWidget *parent) :
     setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
 
     connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
-    connect(addByteButton,SIGNAL(clicked()),this,SLOT(addVariable()));
-    connect(addNumberButton,SIGNAL(clicked()),this,SLOT(addVariable()));
-    connect(addVectorButton,SIGNAL(clicked()),this,SLOT(addVariable()));
+    connect(addByteButton,SIGNAL(clicked()),this,SLOT(newVariable()));
+    connect(addNumberButton,SIGNAL(clicked()),this,SLOT(newVariable()));
+    connect(addVectorButton,SIGNAL(clicked()),this,SLOT(newVariable()));
     connect(expandButton,SIGNAL(clicked()),this,SLOT(toggleExpand()));
     connect(deleteButton,SIGNAL(clicked()),this,SIGNAL(deleteParser()));
     connect(lw,SIGNAL(itemMoved(int,int,QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
@@ -136,7 +136,7 @@ void ParserWidget::variableListChanged()
 }
 
 
-void ParserWidget::addVariable()
+void ParserWidget::newVariable()
 {
     QPushButton *senderButton = static_cast<QPushButton*>(QObject::sender());
     VariableWidget *vw = new VariableWidget(lw);
@@ -168,7 +168,28 @@ void ParserWidget::addVariable()
     connect(vw,SIGNAL(deleteVar()),this,SLOT(remVariable()));
     connect(vw,SIGNAL(variableChanged()),this,SLOT(variableListChanged()));
     variableListChanged();
+}
 
+void ParserWidget::addVariableWidget(VariableWidget *vw)
+{
+    vwList->append(vw);
+    variableList->append(vw->variable);
+    QListWidgetItem *item = new QListWidgetItem(lw);
+    lw->addItem(item);
+    item->setSizeHint(vw->sizeHint());
+    lw->setItemWidget(item,vw);
+
+    //    connect(vw,SIGNAL(nameChange(QString)),this,SLOT(nameChanged(QString)));
+    //    connect(vw,SIGNAL(typeChange(int)),this,SLOT(typeChanged(int)));
+    //    connect(vw,SIGNAL(lengthToggle(bool)),this,SLOT(lengthToggled(bool)));
+    //    connect(vw,SIGNAL(lengthChange(int)),this,SLOT(lengthChanged(int)));
+    //    connect(vw,SIGNAL(matchToggle(bool)),this,SLOT(matchToggled(bool)));
+    //    connect(vw,SIGNAL(matchChange(QString)),this,SLOT(matchChanged(QString)));
+    //    connect(vw,SIGNAL(repeatChange(int)),this,SLOT(repeatChanged(int)));
+    connect(vw,SIGNAL(sizeToggled(QSize)),this,SLOT(itemSize(QSize)));
+    connect(vw,SIGNAL(deleteVar()),this,SLOT(remVariable()));
+    connect(vw,SIGNAL(variableChanged()),this,SLOT(variableListChanged()));
+    variableListChanged();
 }
 
 void ParserWidget::remVariable()
@@ -289,9 +310,9 @@ void ParserWidget::printList()
                 outString.append("match: no");
             }
         }
-        qDebug() << outString;
+//        qDebug() << outString;
     }
-    qDebug() << "===";
+//    qDebug() << "===";
 }
 
 

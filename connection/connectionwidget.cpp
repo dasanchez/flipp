@@ -139,8 +139,11 @@ void ConnectionWidget::setType(int newType)
     case TCP:
         dataConnection->setType(TCP);
         typeButton->setIcon(QIcon(tcpIconPixmap));
-        serialPortCombo->setVisible(false);
-        addressEdit->setVisible(true);
+        if(isExpanded)
+        {
+            serialPortCombo->setVisible(false);
+            addressEdit->setVisible(true);
+        }
         addressLabel->setText("Address");
         portLabel->setText("Port");
         addressChanged(addressEdit->text());
@@ -148,8 +151,11 @@ void ConnectionWidget::setType(int newType)
     case UDP:
         dataConnection->setType(UDP);
         typeButton->setIcon(QIcon(udpIconPixmap));
-        serialPortCombo->setVisible(false);
-        addressEdit->setVisible(true);
+        if(isExpanded)
+        {
+            serialPortCombo->setVisible(false);
+            addressEdit->setVisible(true);
+        }
         addressLabel->setText("Address");
         portLabel->setText("Port");
         addressChanged(addressEdit->text());
@@ -157,8 +163,11 @@ void ConnectionWidget::setType(int newType)
     case SERIAL:
         dataConnection->setType(SERIAL);
         typeButton->setIcon(QIcon(comIconPixmap));
-        addressEdit->setVisible(false);
-        serialPortCombo->setVisible(true);
+        if(isExpanded)
+        {
+            addressEdit->setVisible(false);
+            serialPortCombo->setVisible(true);
+        }
         addressLabel->setText("Port");
         portLabel->setText("Baud");
         addressChanged(serialPortCombo->currentText());
@@ -178,8 +187,11 @@ void ConnectionWidget::toggleType()
     case UDP:
         dataConnection->setType(SERIAL);
         typeButton->setIcon(QIcon(comIconPixmap));
-        addressEdit->setVisible(false);
-        serialPortCombo->setVisible(true);
+        if(isExpanded)
+        {
+            addressEdit->setVisible(false);
+            serialPortCombo->setVisible(true);
+        }
         addressLabel->setText("Port");
         portLabel->setText("Baud");
         addressChanged(serialPortCombo->currentText());
@@ -187,8 +199,11 @@ void ConnectionWidget::toggleType()
     case SERIAL:
         dataConnection->setType(TCP);
         typeButton->setIcon(QIcon(tcpIconPixmap));
-        serialPortCombo->setVisible(false);
-        addressEdit->setVisible(true);
+        if(isExpanded)
+        {
+            serialPortCombo->setVisible(false);
+            addressEdit->setVisible(true);
+        }
         addressLabel->setText("Address");
         portLabel->setText("Port");
         addressChanged(addressEdit->text());
@@ -224,9 +239,9 @@ void ConnectionWidget::typeChanged(QString newType)
 
 void ConnectionWidget::setIPAddress(QString address)
 {
-    disconnect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged));
+    disconnect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged(QString)));
     addressEdit->setText(address);
-    connect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged));
+    connect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged(QString)));
     dataConnection->setAddress_Port(address);
 }
 
@@ -324,7 +339,31 @@ void ConnectionWidget::togglePropertyFields(bool enabled)
     typeButton->setEnabled(enabled);
     addressEdit->setEnabled(enabled);
     portEdit->setEnabled(enabled);
+}
 
+void ConnectionWidget::setExpanded(bool expand)
+{
+    isExpanded=expand;
+    typeButton->setVisible(isExpanded);
+    addressLabel->setVisible(isExpanded);
+    addressEdit->setVisible(isExpanded);
+    portLabel->setVisible(isExpanded);
+    portEdit->setVisible(isExpanded);
+
+    mainLayout->removeItem(bottomLayout);
+    if(isExpanded)
+    {
+        mainLayout->addLayout(controlLayout);
+        viewButton->setIcon(QIcon(moreIconPixmap));
+    }
+    else
+    {
+        mainLayout->removeItem(controlLayout);
+        viewButton->setIcon(QIcon(lessIconPixmap));
+    }
+    mainLayout->addLayout(bottomLayout);
+
+    emit sizeChange(this->sizeHint());
 
 }
 
