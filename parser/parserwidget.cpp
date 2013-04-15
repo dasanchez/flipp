@@ -45,7 +45,6 @@ ParserWidget::ParserWidget(QWidget *parent) :
 //    for(quint8 i =0;i<1;i++)
 //    {
 //        addVariable();
-
 //    }
 
     controlLayout = new QHBoxLayout;

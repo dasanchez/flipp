@@ -223,7 +223,56 @@ void Flipp::restoreSettings()
     paw->addVariableWidget(varw05);
     paw->addVariableWidget(varw06);
 
+    ParserWidget *paw02 = new ParserWidget;
+    paw02->setName("GPS");
+    parserNames->append(paw02->getName());
 
+    VariableWidget *varw11 = new VariableWidget;
+    varw11->setName("GPS start");
+    varw11->setType(BYTTYPE);
+    varw11->setMatched(true);
+    varw11->setMatchBytes("GPGGA,N|");
+
+    VariableWidget *varw12 = new VariableWidget;
+    varw12->setName("Coords");
+    varw12->setType(NUMTYPE);
+    varw12->setFixed(false);
+
+    VariableWidget *varw13 = new VariableWidget;
+    varw13->setName("delimiter");
+    varw13->setType(BYTTYPE);
+    varw13->setMatched(true);
+    varw13->setMatchBytes("|");
+
+    VariableWidget *varw14 = new VariableWidget;
+    varw14->setName("Coords");
+    varw14->setType(NUMTYPE);
+    varw14->setFixed(false);
+
+    VariableWidget *varw15 = new VariableWidget;
+    varw15->setName("delimiter");
+    varw15->setType(BYTTYPE);
+    varw15->setMatched(true);
+    varw15->setMatchBytes("|");
+
+    VariableWidget *varw16 = new VariableWidget;
+    varw16->setName("Coords");
+    varw16->setType(NUMTYPE);
+    varw16->setFixed(false);
+
+    VariableWidget *varw17 = new VariableWidget;
+    varw17->setName("end delimiter");
+    varw17->setType(BYTTYPE);
+    varw17->setFixed(true);
+    varw17->setLength(1);
+
+    paw02->addVariableWidget(varw11);
+    paw02->addVariableWidget(varw12);
+    paw02->addVariableWidget(varw13);
+    paw02->addVariableWidget(varw14);
+    paw02->addVariableWidget(varw15);
+    paw02->addVariableWidget(varw16);
+    paw02->addVariableWidget(varw17);
 
 //            cvar->name = "Hours";
 //    cvar->type = BYTTYPE;
@@ -234,7 +283,7 @@ void Flipp::restoreSettings()
 
     // Build parser list
     parsers->addParser(paw);
-
+    parsers->addParser(paw02);
 
 
 }

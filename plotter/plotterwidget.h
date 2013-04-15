@@ -37,8 +37,11 @@ signals:
     void plotterParserRequest(QString);
     void removePlotter();
 private:
+    QLabel *connectionLabel;
     QComboBox *connectionBox;
+    QLabel *parserLabel;
     QComboBox *parserBox;
+    QPushButton *toggleTableButton;
     QPushButton *removeButton;
     QPixmap delIconPixmap;
     QTableWidget *tableWidget;

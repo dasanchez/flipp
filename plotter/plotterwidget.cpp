@@ -18,13 +18,21 @@ PlotterWidget::PlotterWidget(QWidget *parent)
 
     customPlot = new QCustomPlot;
     customPlot->xAxis->setRange(0,100);
-    customPlot->yAxis->setRange(41985,42015);
+    customPlot->yAxis->setRange(0,100000);
+
+//    customPlot->setColor(QColor("black"));
     customPlot->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+    connectionLabel = new QLabel("Connection");
+    connectionLabel->setFixedHeight(24);
 
     connectionBox = new QComboBox;
     connectionBox->setItemDelegate(new QStyledItemDelegate);
     connectionBox->setFixedHeight(24);
     connectionBox->addItem("Connection 001");
+
+    parserLabel = new QLabel("Parser");
+    parserLabel->setFixedHeight(24);
 
     parserBox = new QComboBox;
     parserBox->setItemDelegate(new QStyledItemDelegate);
@@ -58,7 +66,9 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     hv->setSectionsClickable(false);
 
     dataSourceLayout = new QHBoxLayout;
+    dataSourceLayout->addWidget(connectionLabel);
     dataSourceLayout->addWidget(connectionBox);
+    dataSourceLayout->addWidget(parserLabel);
     dataSourceLayout->addWidget(parserBox);
     dataSourceLayout->addWidget(removeButton);
 
@@ -110,8 +120,6 @@ void PlotterWidget::updateParsers(QStringList *parserNames)
 
 void PlotterWidget::changeConnection(QString connection)
 {
-    //    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
-    //    disconnect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
     emit plotterConnectionRequest(connection);
 }
 
@@ -129,12 +137,15 @@ void PlotterWidget::detachConnection()
 
 void PlotterWidget::changeParser(QString parserName)
 {
+
     emit plotterParserRequest(parserName);
 }
 
 void PlotterWidget::assignParser(ParserWidget *parser)
 {
     parserWidget = parser;
+
+
     connect(parserWidget,SIGNAL(updateVariableList()),this,SLOT(populateParserTable()));
     connect(parserWidget,SIGNAL(updateVariableList()),this,SLOT(populatePlotArea()));
     connect(parserWidget,SIGNAL(deleteParser()),this,SLOT(detachParser()));
@@ -248,6 +259,15 @@ void PlotterWidget::populatePlotArea()
             valuesList.append(valvec);
             // Add a graph for each number value
             customPlot->addGraph();
+            QBrush brush;
+            brush.setColor(QColor("red"));
+            QPen pen;
+            pen.setWidth(2);
+            pen.setColor(QColor(255,0,0));
+//            customPlot->graph(customPlot->graphCount()-1)->setAntialiased(true);
+//            customPlot->graph(customPlot->graphCount()-1)->setBrush(brush);
+//            customPlot->graph(customPlot->graphCount()-1)->setPen(pen);
+//            customPlot->graph(customPlot->graphCount()-1)->setBrush(QBrush("red",Qt::DashLine));
 
 
             //            customPlot->graph(customPlot->graphCount()-1)->setData(keys,valvec);
