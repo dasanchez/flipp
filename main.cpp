@@ -7,5 +7,8 @@ int main(int argc, char *argv[])
     Flipp w;
     w.showMaximized();
     
+    QCoreApplication::setOrganizationName("daSanchez");
+    QCoreApplication::setApplicationName("flipp");
+
     return a.exec();
 }

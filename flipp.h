@@ -33,6 +33,10 @@ private:
     // Actions:
     QAction *exitAct;
 
+    // Settings
+//    QSettings *settings;
+QString m_sSettingsFile;
+
     void createDocks();
     void createMenus();
     void restoreSettings();

@@ -8,7 +8,13 @@ Flipp::Flipp(QWidget *parent)
     parsers = new ParserListWidget(this);
     plotters = new PlotterListWidget(this);
 
-//    QSettings settings("dasanchez","flipp");
+//    m_sSettingsFile = QString("C:\\Users\\Dante\\My Projects\\Programming\\flipp-build-Desktop_Qt_5_0_1_MinGW_32bit-Debug\\").left + ":/demosettings.ini";
+m_sSettingsFile = QApplication::applicationDirPath() + "/lastSettings.flp";
+qDebug() << m_sSettingsFile;
+    QSettings settings(m_sSettingsFile,QSettings::IniFormat);
+
+    settings.setValue("Conn01","GPS & time");
+    settings.sync();
 
     connect(connections,SIGNAL(connectionListChanged(QStringList*)),terminals,SLOT(updateConnections(QStringList*)));
     connect(connections,SIGNAL(connectionListChanged(QStringList*)),plotters,SLOT(updateConnections(QStringList*)));
@@ -134,6 +140,9 @@ void Flipp::createMenus()
 
 void Flipp::restoreSettings()
 {
+    QSettings settings(m_sSettingsFile,QSettings::IniFormat);
+    qDebug() << settings.value("Conn01").toString();
+
     // Read settings file
     QStringList *connectionNames = new QStringList;
     QStringList *parserNames = new QStringList;
