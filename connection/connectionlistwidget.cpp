@@ -4,7 +4,7 @@
 ConnectionListWidget::ConnectionListWidget(QWidget *parent)
     : QWidget(parent)
 {
-    nameList = new QStringList;
+//    nameList = new QStringList;
 
     widgetNameLabel = new QLabel("Connections");
     QFont font = widgetNameLabel->font();
@@ -86,12 +86,41 @@ void ConnectionListWidget::addConnection(ConnectionWidget *cw)
     updateList();
 }
 
+void ConnectionListWidget::addConnection(QString name, int connType, QString address, QString port)
+{
+    ConnectionWidget *connWidget = new ConnectionWidget;
+    connWidget->setName(name);
+    connWidget->setType(connType);
+    if(connType==SERIAL)
+    {
+        connWidget->setSerialPort(address);
+        connWidget->setSerialBaud(port);
+    }
+    else
+    {
+        connWidget->setIPAddress(address);
+        connWidget->setIPPort(port);
+    }
+    connectionList.append(connWidget);
+
+    QListWidgetItem *item = new QListWidgetItem;
+    listWidget->addItem(item);
+    listWidget->setItemWidget(item,connWidget);
+    item->setSizeHint(connWidget->sizeHint());
+
+    connect(connWidget,SIGNAL(nameChange()),this,SLOT(nameChanged()));
+    connect(connWidget,SIGNAL(widgetRemoved()),this,SLOT(connectionRemoved()));
+    connect(connWidget,SIGNAL(sizeChange(QSize)),this,SLOT(sizeChanged(QSize)));
+    updateList();
+}
+
+
 void ConnectionListWidget::updateList()
 {
-    nameList->clear();
+    nameList.clear();
     foreach(ConnectionWidget *connection,connectionList)
     {
-        nameList->append(connection->getName());
+        nameList.append(connection->getName());
     }
     emit connectionListChanged(nameList);
 }

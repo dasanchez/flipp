@@ -19,11 +19,11 @@ public:
     TerminalListWidget(QWidget *parent = 0);
     ~TerminalListWidget();
     QList<TerminalWidget*> terminalList;
-    QStringList *nameList;
+    QStringList nameList;
 signals:
     void terminalRequest(TerminalWidget*,QString);
 public slots:
-    void updateConnections(QStringList*);
+    void updateConnections(QStringList);
     void newTerminal(void);
     void addTerminal(TerminalWidget *);
 

@@ -28,7 +28,7 @@ public:
     ~PlotterWidget();
     
 public slots:
-    void updateConnections(QStringList*);
+    void updateConnections(QStringList);
     void updateParsers(QStringList*);
     void assignConnection(ConnectionWidget *);
     void assignParser(ParserWidget *);

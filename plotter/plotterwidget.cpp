@@ -99,10 +99,10 @@ PlotterWidget::~PlotterWidget()
     //customPlot->deleteLater();
 }
 
-void PlotterWidget::updateConnections(QStringList *connectionNames)
+void PlotterWidget::updateConnections(QStringList connectionNames)
 {
     connectionBox->clear();
-    connectionBox->addItems(*connectionNames);
+    connectionBox->addItems(connectionNames);
     //    int index = connectionBox->findText(connectionWidget->getName());
     //    if(index>=0)
     //        connectionBox->setCurrentIndex(index);

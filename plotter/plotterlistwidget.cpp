@@ -66,7 +66,7 @@ void PlotterListWidget::plotterRemoved()
     plotter->deleteLater();
 }
 
-void PlotterListWidget::updateConnections(QStringList *connectionNames)
+void PlotterListWidget::updateConnections(QStringList connectionNames)
 {
     connectionNamesList = connectionNames;
     foreach(PlotterWidget *plotter,plotterList)

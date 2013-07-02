@@ -8,50 +8,13 @@ Flipp::Flipp(QWidget *parent)
     parsers = new ParserListWidget(this);
     plotters = new PlotterListWidget(this);
 
-    //    m_sSettingsFile = QString("C:\\Users\\Dante\\My Projects\\Programming\\flipp-build-Desktop_Qt_5_0_1_MinGW_32bit-Debug\\").left + ":/demosettings.ini";
     m_sSettingsFile = QApplication::applicationDirPath() + "/lastSettings.flp";
-    qDebug() << m_sSettingsFile;
+    //    qDebug() << m_sSettingsFile;
+    initSettings();
 
-    // Set initial settings
-    QSettings settings(m_sSettingsFile,QSettings::IniFormat);
-    settings.clear();
 
-    settings.beginGroup("Connections");
-    settings.beginGroup("GPS & Time");
-    settings.setValue("Type",TCP);
-    settings.setValue("Address","127.0.0.1");
-    settings.setValue("Port","50500");
-    settings.endGroup();
-    settings.endGroup();
-
-    settings.beginGroup("Terminals");
-    settings.beginGroup("01");
-    settings.setValue("Connection","GPS & time");
-    settings.setValue("Echo",true);
-    settings.endGroup();
-    settings.endGroup();
-
-    settings.beginGroup("Parsers");
-    settings.beginGroup("GPS");
-    settings.beginGroup("GPS start delimiter");
-    settings.setValue("Type",BYTTYPE);
-    settings.setValue("Fixed",false);
-    settings.setValue("Matched",true);
-    settings.setValue("Match bytes","GPGGA,N|");
-    settings.endGroup();
-    settings.endGroup();
-    settings.endGroup();
-
-    settings.sync();
-
-    qDebug() << settings.childGroups();
-    settings.beginGroup("Parsers");
-    qDebug() << settings.childGroups();
-    settings.endGroup();
-    qDebug() << settings.value("Connections/01").toString();
-
-    connect(connections,SIGNAL(connectionListChanged(QStringList*)),terminals,SLOT(updateConnections(QStringList*)));
-    connect(connections,SIGNAL(connectionListChanged(QStringList*)),plotters,SLOT(updateConnections(QStringList*)));
+    connect(connections,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
+    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
     connect(parsers,SIGNAL(parserListChanged(QStringList*)),plotters,SLOT(updateParsers(QStringList*)));
     connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
@@ -59,14 +22,7 @@ Flipp::Flipp(QWidget *parent)
 
     restoreSettings();
 
-    //    connections->newConnection();
-    //    terminals->newTerminal();
-    //    parsers->newParser();
-    //    terminals->terminalList.at(0)->assignConnection(connections->connectionList.at(0));
     plotters->newPlotter();
-    //    plotters->plotterList.at(0)->assignConnection(connections->connectionList.at(0));
-    //    plotters->plotterList.at(0)->assignParser(parsers->parserList->at(0));
-
     setCentralWidget(plotters);
 
     createDocks();
@@ -74,16 +30,13 @@ Flipp::Flipp(QWidget *parent)
 
     this->setWindowTitle(tr("f l i p p"));
 
-    //     this->setWindowFlags(Qt::CustomizeWindowHint); //Set window with no title bar
-    //this->setWindowFlags(Qt::FramelessWindowHint); //Set a frameless window
-
     //    QFile qss(":/styles/flipp.css");
     QFile qss("../flipp/styles/flipp.css");
     qss.open(QFile::ReadOnly);
     setStyleSheet(qss.readAll());
     qss.close();
 
-    emit exit(0);
+    //    emit exit(0);
 }
 
 Flipp::~Flipp()
@@ -174,42 +127,98 @@ void Flipp::createMenus()
     //  viewMenu->addAction(plotsetsDock->toggleViewAction());
 }
 
+void Flipp::initSettings()
+{
+    //    saveState(0);
+    // Set initial settings
+    QSettings settings(m_sSettingsFile,QSettings::IniFormat);
+    settings.clear();
+
+    settings.beginGroup("Connections");
+
+    settings.beginGroup("GPS & Time");
+    settings.setValue("Type",TCP);
+    settings.setValue("Address","127.0.0.1");
+    settings.setValue("Port","50500");
+    settings.endGroup();
+
+    settings.beginGroup("Dummy serial");
+    settings.setValue("Type",SERIAL);
+    settings.setValue("Address","COM2");
+    settings.setValue("Port","115200");
+    settings.endGroup();
+
+    settings.endGroup();
+
+    settings.beginGroup("Terminals");
+    settings.beginGroup("01");
+    settings.setValue("Connection","GPS & time");
+    settings.setValue("Echo",true);
+    settings.endGroup();
+    settings.endGroup();
+
+    settings.beginGroup("Parsers");
+    settings.beginGroup("GPS");
+    settings.beginGroup("GPS start delimiter");
+    settings.setValue("Type",BYTTYPE);
+    settings.setValue("Fixed",false);
+    settings.setValue("Matched",true);
+    settings.setValue("Match bytes","GPGGA,N|");
+    settings.endGroup();
+    settings.endGroup();
+    settings.endGroup();
+
+    settings.sync();
+
+//    qDebug() << settings.childGroups();
+//    settings.beginGroup("Parsers");
+//    qDebug() << settings.childGroups();
+//    settings.endGroup();
+//    qDebug() << settings.value("Connections/GPS & Time/Address").toString();
+
+}
+
 void Flipp::restoreSettings()
 {
-    //    QSettings settings(m_sSettingsFile,QSettings::IniFormat);
-    //    qDebug() << settings.value("Conn01").toString();
-
     // Read settings file
-    QStringList *connectionNames = new QStringList;
+    QSettings settings(m_sSettingsFile,QSettings::IniFormat);
+
+    QStringList connectionNames;
     QStringList *parserNames = new QStringList;
 
+    QString val;
+
     // Restore connection widgets
-    ConnectionWidget *cw = new ConnectionWidget;
-    cw->setName("Time & GPS");
-    connectionNames->append(cw->getName());
+    settings.beginGroup("Connections");
+    connectionNames = settings.childGroups();
+    foreach(QString connectionName,settings.childGroups())
+    {
+        int connType;
+        QString address;
+        QString port;
 
-    // IP connection
-    cw->setType(TCP);
-    cw->setIPAddress("127.0.0.1");
-    cw->setIPPort("50500");
+        val.clear();
+        val.append(connectionName);
+        val.append("/Type");
+        connType = settings.value(val).toString().toInt();
 
-    // Serial connection
-    //    cw->setType(SERIAL);
-    //    cw->setSerialPort("COM3");
-    //    cw->setSerialBaud("115200");
+        val.clear();
+        val.append(connectionName);
+        val.append("/Address");
+        address.append(settings.value(val).toString());
 
-    // View
-    cw->setExpanded(false);
+        val.clear();
+        val.append(connectionName);
+        val.append("/Port");
+        port.append(settings.value(val).toString());
 
-
-    // Build connection list
-    connections->addConnection(cw);
+//        qDebug() << connectionName << connType << address << port;
+        connections->addConnection(connectionName,connType,address,port);
+    }
+    settings.endGroup();
 
     // Restore terminals
     TerminalWidget *tw = new TerminalWidget;
-
-    // Assign connection
-    tw->assignConnection(cw);
 
     // View
     tw->updateConnections(connectionNames);
@@ -219,6 +228,7 @@ void Flipp::restoreSettings()
 
     // Build terminal list
     terminals->addTerminal(tw);
+
 
     // Restore parsers
     ParserWidget *paw = new ParserWidget;
@@ -330,10 +340,4 @@ void Flipp::restoreSettings()
     parsers->addParser(paw);
     parsers->addParser(paw02);
 
-
-}
-
-void Flipp::saveSettings()
-{
-    saveState(0);
 }

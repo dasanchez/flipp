@@ -17,14 +17,14 @@ public:
     ~PlotterListWidget();
     QList<PlotterWidget*> plotterList;
     QStringList *parserNamesList;
-    QStringList *connectionNamesList;
+    QStringList connectionNamesList;
 signals:
     void plotterConnectionRequest(PlotterWidget*,QString);
     void plotterParserRequest(PlotterWidget*,QString);
     
 public slots:
     void newPlotter(void);
-    void updateConnections(QStringList*);
+    void updateConnections(QStringList);
     void updateParsers(QStringList*);
 
     void plotterRequestedConnection(QString);

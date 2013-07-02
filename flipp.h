@@ -34,13 +34,14 @@ private:
     QAction *exitAct;
 
     // Settings
-//    QSettings *settings;
-QString m_sSettingsFile;
+    //    QSettings *settings;
+    QString m_sSettingsFile;
 
     void createDocks();
     void createMenus();
+    void initSettings();
     void restoreSettings();
-    void saveSettings();
+
 private slots:
     void handleTerminalRequest(TerminalWidget*,QString);
     void handlePlotterConnectionRequest(PlotterWidget*,QString);
