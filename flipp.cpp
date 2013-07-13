@@ -10,7 +10,7 @@ Flipp::Flipp(QWidget *parent)
 
     m_sSettingsFile = QApplication::applicationDirPath() + "/lastSettings.flp";
     //    qDebug() << m_sSettingsFile;
-    initSettings();
+    //    initSettings();
 
 
     connect(connections,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
@@ -22,7 +22,7 @@ Flipp::Flipp(QWidget *parent)
 
     restoreSettings();
 
-    plotters->newPlotter();
+    //    plotters->newPlotter();
     setCentralWidget(plotters);
 
     createDocks();
@@ -116,10 +116,17 @@ void Flipp::createMenus()
 {
 
     QMenu *fileMenu = menuBar()->addMenu(tr("File"));
+
+    saveAct = new QAction(tr("&Save"),this);
+    saveAct->setStatusTip(tr("Save current settings"));
+    connect(saveAct,SIGNAL(triggered()),this,SLOT(saveSettings()));
+    fileMenu->addAction(saveAct);
+
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
     fileMenu->addAction(exitAct);
+
     QMenu *viewMenu = menuBar()->addMenu(tr("View"));
     viewMenu->addAction(connectionDock->toggleViewAction());
     viewMenu->addAction(terminalDock->toggleViewAction());
@@ -133,7 +140,7 @@ void Flipp::initSettings()
     // Set initial settings
     QSettings settings(m_sSettingsFile,QSettings::IniFormat);
     settings.clear();
-
+    // CONNECTIONS
     settings.beginGroup("Connections");
 
     settings.beginGroup("GPS & Time");
@@ -150,41 +157,58 @@ void Flipp::initSettings()
 
     settings.endGroup();
 
+    // TERMINALS
+
     settings.beginGroup("Terminals");
+
     settings.beginGroup("01");
     settings.setValue("Connection","GPS & time");
     settings.setValue("Echo",true);
     settings.endGroup();
+
     settings.endGroup();
 
+    // PARSERS
+
     settings.beginGroup("Parsers");
+
+    // VARIABLE WIDGETS
     settings.beginGroup("GPS");
+
     settings.beginGroup("GPS start delimiter");
     settings.setValue("Type",BYTTYPE);
     settings.setValue("Fixed",false);
     settings.setValue("Matched",true);
     settings.setValue("Match bytes","GPGGA,N|");
     settings.endGroup();
+
+    settings.beginGroup("GPS Latitude");
+    settings.setValue("Type",NUMTYPE);
+    settings.setValue("Fixed",false);
     settings.endGroup();
+
+    settings.endGroup();
+
     settings.endGroup();
 
     settings.sync();
-
-//    qDebug() << settings.childGroups();
-//    settings.beginGroup("Parsers");
-//    qDebug() << settings.childGroups();
-//    settings.endGroup();
-//    qDebug() << settings.value("Connections/GPS & Time/Address").toString();
-
 }
 
 void Flipp::restoreSettings()
 {
     // Read settings file
+    if(m_sSettingsFile.isEmpty())
+    {
+        initSettings();
+        return;
+    }
+
     QSettings settings(m_sSettingsFile,QSettings::IniFormat);
 
     QStringList connectionNames;
-    QStringList *parserNames = new QStringList;
+    QStringList terminalNames;
+    QStringList parserNames;
+    //    QStringList *parserNames = new QStringList;
 
     QString val;
 
@@ -212,132 +236,204 @@ void Flipp::restoreSettings()
         val.append("/Port");
         port.append(settings.value(val).toString());
 
-//        qDebug() << connectionName << connType << address << port;
         connections->addConnection(connectionName,connType,address,port);
     }
     settings.endGroup();
 
-    // Restore terminals
-    TerminalWidget *tw = new TerminalWidget;
+    // Restore terminal widgets
+    settings.beginGroup("Terminals");
+    terminalNames = settings.childGroups();
+    foreach(QString terminalName,terminalNames)
+    {
+        TerminalWidget *tw = new TerminalWidget;
+        tw->updateConnections(connectionNames);
+        tw->setViews(BOTH_VIEWS);
+        tw->setEcho(true);
+        tw->setPacketHexFormat(true);
+        // Set connection
 
-    // View
-    tw->updateConnections(connectionNames);
-    tw->setViews(HEX_ONLY);
-    tw->setEcho(true);
-    tw->setPacketHexFormat(true);
-
-    // Build terminal list
-    terminals->addTerminal(tw);
+        // Add terminal widget to terminal list
+        terminals->addTerminal(tw);
+    }
+    settings.endGroup();
 
 
-    // Restore parsers
-    ParserWidget *paw = new ParserWidget;
-    paw->setName("Time");
-    parserNames->append(paw->getName());
+    // Restore parser widgets
+    settings.beginGroup("Parsers");
+    parserNames = settings.childGroups();
+    foreach(QString parserName,parserNames)
+    {
+        ParserWidget *pw = new ParserWidget;
+        pw->setName(parserName);
+        parserNames.append(pw->getName());
+        settings.beginGroup(parserName);
+        QStringList complexVariables = settings.childGroups();
+        // Restore variable widgets
+        foreach(QString complexVariable,complexVariables)
+        {
+            VariableWidget *vw = new VariableWidget;
+            vw->setName(complexVariable);
+            settings.beginGroup(complexVariable);
+            vw->setType(settings.value("Type").toInt());
+            vw->setFixed(settings.value("Fixed").toBool());
+            vw->setMatched(settings.value("Matched").toBool());
+            settings.endGroup();
+            pw->addVariableWidget(vw);
+        }
 
-    // Add variables
-    VariableWidget *varw01 = new VariableWidget;
-    varw01->setName("Hours");
-    varw01->setType(NUMTYPE);
-    varw01->setFixed(true);
-    varw01->setLength(2);
+        settings.endGroup();
+        parsers->addParser(pw);
+    }
+    settings.endGroup();
 
-    VariableWidget *varw02 = new VariableWidget;
-    varw02->setName("First colon");
-    varw02->setType(BYTTYPE);
-    varw02->setMatched(true);
-    varw02->setMatchBytes(":");
+    //    ParserWidget *paw = new ParserWidget;
+    //    paw->setName("Time");
+    //    parserNames->append(paw->getName());
 
-    VariableWidget *varw03 = new VariableWidget;
-    varw03->setName("Minutes");
-    varw03->setType(NUMTYPE);
-    varw03->setFixed(true);
-    varw03->setLength(2);
+    //    // Add variables
+    //    VariableWidget *varw01 = new VariableWidget;
+    //    varw01->setName("Hours");
+    //    varw01->setType(NUMTYPE);
+    //    varw01->setFixed(true);
+    //    varw01->setLength(2);
 
-    VariableWidget *varw04 = new VariableWidget;
-    varw04->setName("Second colon");
-    varw04->setType(BYTTYPE);
-    varw04->setMatched(true);
-    varw04->setMatchBytes(":");
+    //    VariableWidget *varw02 = new VariableWidget;
+    //    varw02->setName("First colon");
+    //    varw02->setType(BYTTYPE);
+    //    varw02->setMatched(true);
+    //    varw02->setMatchBytes(":");
 
-    VariableWidget *varw05 = new VariableWidget;
-    varw05->setName("Seconds");
-    varw05->setType(NUMTYPE);
-    varw05->setFixed(false);
+    //    VariableWidget *varw03 = new VariableWidget;
+    //    varw03->setName("Minutes");
+    //    varw03->setType(NUMTYPE);
+    //    varw03->setFixed(true);
+    //    varw03->setLength(2);
 
-    VariableWidget *varw06 = new VariableWidget;
-    varw06->setName("End byte");
-    varw06->setType(BYTTYPE);
-    varw06->setFixed(true);
-    varw06->setLength(1);
+    //    VariableWidget *varw04 = new VariableWidget;
+    //    varw04->setName("Second colon");
+    //    varw04->setType(BYTTYPE);
+    //    varw04->setMatched(true);
+    //    varw04->setMatchBytes(":");
 
-    paw->addVariableWidget(varw01);
-    paw->addVariableWidget(varw02);
-    paw->addVariableWidget(varw03);
-    paw->addVariableWidget(varw04);
-    paw->addVariableWidget(varw05);
-    paw->addVariableWidget(varw06);
+    //    VariableWidget *varw05 = new VariableWidget;
+    //    varw05->setName("Seconds");
+    //    varw05->setType(NUMTYPE);
+    //    varw05->setFixed(false);
 
-    ParserWidget *paw02 = new ParserWidget;
-    paw02->setName("GPS");
-    parserNames->append(paw02->getName());
+    //    VariableWidget *varw06 = new VariableWidget;
+    //    varw06->setName("End byte");
+    //    varw06->setType(BYTTYPE);
+    //    varw06->setFixed(true);
+    //    varw06->setLength(1);
 
-    VariableWidget *varw11 = new VariableWidget;
-    varw11->setName("GPS start");
-    varw11->setType(BYTTYPE);
-    varw11->setMatched(true);
-    varw11->setMatchBytes("GPGGA,N|");
+    //    paw->addVariableWidget(varw01);
+    //    paw->addVariableWidget(varw02);
+    //    paw->addVariableWidget(varw03);
+    //    paw->addVariableWidget(varw04);
+    //    paw->addVariableWidget(varw05);
+    //    paw->addVariableWidget(varw06);
 
-    VariableWidget *varw12 = new VariableWidget;
-    varw12->setName("Coords");
-    varw12->setType(NUMTYPE);
-    varw12->setFixed(false);
+    //    ParserWidget *paw02 = new ParserWidget;
+    //    paw02->setName("GPS");
+    //    parserNames->append(paw02->getName());
 
-    VariableWidget *varw13 = new VariableWidget;
-    varw13->setName("delimiter");
-    varw13->setType(BYTTYPE);
-    varw13->setMatched(true);
-    varw13->setMatchBytes("|");
+    //    VariableWidget *varw11 = new VariableWidget;
+    //    varw11->setName("GPS start");
+    //    varw11->setType(BYTTYPE);
+    //    varw11->setMatched(true);
+    //    varw11->setMatchBytes("GPGGA,N|");
 
-    VariableWidget *varw14 = new VariableWidget;
-    varw14->setName("Coords");
-    varw14->setType(NUMTYPE);
-    varw14->setFixed(false);
+    //    VariableWidget *varw12 = new VariableWidget;
+    //    varw12->setName("Coords");
+    //    varw12->setType(NUMTYPE);
+    //    varw12->setFixed(false);
 
-    VariableWidget *varw15 = new VariableWidget;
-    varw15->setName("delimiter");
-    varw15->setType(BYTTYPE);
-    varw15->setMatched(true);
-    varw15->setMatchBytes("|");
+    //    VariableWidget *varw13 = new VariableWidget;
+    //    varw13->setName("delimiter");
+    //    varw13->setType(BYTTYPE);
+    //    varw13->setMatched(true);
+    //    varw13->setMatchBytes("|");
 
-    VariableWidget *varw16 = new VariableWidget;
-    varw16->setName("Coords");
-    varw16->setType(NUMTYPE);
-    varw16->setFixed(false);
+    //    VariableWidget *varw14 = new VariableWidget;
+    //    varw14->setName("Coords");
+    //    varw14->setType(NUMTYPE);
+    //    varw14->setFixed(false);
 
-    VariableWidget *varw17 = new VariableWidget;
-    varw17->setName("end delimiter");
-    varw17->setType(BYTTYPE);
-    varw17->setFixed(true);
-    varw17->setLength(1);
+    //    VariableWidget *varw15 = new VariableWidget;
+    //    varw15->setName("delimiter");
+    //    varw15->setType(BYTTYPE);
+    //    varw15->setMatched(true);
+    //    varw15->setMatchBytes("|");
 
-    paw02->addVariableWidget(varw11);
-    paw02->addVariableWidget(varw12);
-    paw02->addVariableWidget(varw13);
-    paw02->addVariableWidget(varw14);
-    paw02->addVariableWidget(varw15);
-    paw02->addVariableWidget(varw16);
-    paw02->addVariableWidget(varw17);
+    //    VariableWidget *varw16 = new VariableWidget;
+    //    varw16->setName("Coords");
+    //    varw16->setType(NUMTYPE);
+    //    varw16->setFixed(false);
 
-    //            cvar->name = "Hours";
-    //    cvar->type = BYTTYPE;
-    //    cvar->fixed = true;
-    //    cvar->length = 2;
+    //    VariableWidget *varw17 = new VariableWidget;
+    //    varw17->setName("end delimiter");
+    //    varw17->setType(BYTTYPE);
+    //    varw17->setFixed(true);
+    //    varw17->setLength(1);
+
+    //    paw02->addVariableWidget(varw11);
+    //    paw02->addVariableWidget(varw12);
+    //    paw02->addVariableWidget(varw13);
+    //    paw02->addVariableWidget(varw14);
+    //    paw02->addVariableWidget(varw15);
+    //    paw02->addVariableWidget(varw16);
+    //    paw02->addVariableWidget(varw17);
+
 
     // View
 
     // Build parser list
-    parsers->addParser(paw);
-    parsers->addParser(paw02);
+    //    parsers->addParser(paw);
+    //    parsers->addParser(paw02);
 
+}
+
+void Flipp::saveSettings()
+{
+    // Read settings file
+    QSettings settings(m_sSettingsFile,QSettings::IniFormat);
+    settings.clear();
+
+    // Connections
+    settings.beginGroup("Connections");
+
+    foreach(ConnectionWidget *connection,connections->connectionList)
+    {
+        settings.beginGroup(connection->getName());
+        quint8 vartype = connection->getType();
+        settings.setValue("Type",vartype);
+
+        if(vartype==SERIAL)
+        {
+            settings.setValue("Address",connection->getSerialPort());
+            settings.setValue("Port",connection->getBaudRate());
+        }
+        else
+        {
+            settings.setValue("Address",connection->getIPAddress());
+            settings.setValue("Port",connection->getIPPort());
+        }
+        settings.endGroup();
+
+    }
+    settings.endGroup();
+
+    // Terminals
+//    settings.beginGroup("Terminals");
+
+//    foreach(TerminalWidget *terminal,terminals->terminalList)
+//    {
+//        settings.beginGroup(terminal->getName);
+//    }
+
+//    settings.endGroup();
+
+
+
+    settings.sync();
 }

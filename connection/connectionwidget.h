@@ -23,6 +23,11 @@ public:
     ConnectionWidget(QWidget *parent = 0);
     ~ConnectionWidget();
     QString getName(void);
+    int getType(void);
+    QString getIPAddress(void);
+    quint32 getIPPort(void);
+    QString getSerialPort(void);
+    quint32 getBaudRate(void);
     void setName(QString);
     void setType(int);
     void setIPAddress(QString);

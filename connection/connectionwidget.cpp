@@ -47,6 +47,31 @@ QString ConnectionWidget::getName()
     return nameEdit->text();
 }
 
+int ConnectionWidget::getType()
+{
+    return dataConnection->getType();
+}
+
+QString ConnectionWidget::getIPAddress()
+{
+    return dataConnection->getAddress_Port();
+}
+
+quint32 ConnectionWidget::getIPPort()
+{
+    return dataConnection->getPort_Baud();
+}
+
+QString ConnectionWidget::getSerialPort()
+{
+    return dataConnection->getAddress_Port();
+}
+
+quint32 ConnectionWidget::getBaudRate()
+{
+    return dataConnection->getPort_Baud();
+}
+
 bool ConnectionWidget::nameIsValid(void)
 {
     return validName;

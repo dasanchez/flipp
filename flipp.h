@@ -32,6 +32,7 @@ private:
     //    QHBoxLayout *mainLayout;
     // Actions:
     QAction *exitAct;
+    QAction *saveAct;
 
     // Settings
     //    QSettings *settings;
@@ -46,6 +47,8 @@ private slots:
     void handleTerminalRequest(TerminalWidget*,QString);
     void handlePlotterConnectionRequest(PlotterWidget*,QString);
     void handlePlotterParserRequest(PlotterWidget*,QString);
+    void saveSettings();
+
 
 };
 
