@@ -30,6 +30,10 @@ Flipp::Flipp(QWidget *parent)
 
     this->setWindowTitle(tr("f l i p p"));
 
+    // Shortcuts
+    //    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Ctrl+S", "File|Save")));
+
+
     //    QFile qss(":/styles/flipp.css");
     QFile qss("../flipp/styles/flipp.css");
     qss.open(QFile::ReadOnly);
@@ -159,14 +163,18 @@ void Flipp::initSettings()
 
     // TERMINALS
 
-    settings.beginGroup("Terminals");
+    settings.beginWriteArray("Terminals");
 
-    settings.beginGroup("01");
-    settings.setValue("Connection","GPS & time");
+    settings.setArrayIndex(0);
+    settings.setValue("Connection","GPS & Time");
     settings.setValue("Echo",true);
-    settings.endGroup();
 
-    settings.endGroup();
+    //    settings.beginGroup("01");
+    //    settings.setValue("Connection","GPS & time");
+    //    settings.setValue("Echo",true);
+    //    settings.endGroup();
+
+    settings.endArray();
 
     // PARSERS
 
@@ -241,22 +249,23 @@ void Flipp::restoreSettings()
     settings.endGroup();
 
     // Restore terminal widgets
-    settings.beginGroup("Terminals");
-    terminalNames = settings.childGroups();
-    foreach(QString terminalName,terminalNames)
+    int terminalCount = settings.beginReadArray("Terminals");
+    for(int i=0;i<terminalCount;i++)
     {
+        settings.setArrayIndex(i);
         TerminalWidget *tw = new TerminalWidget;
-        tw->updateConnections(connectionNames);
-        tw->setViews(BOTH_VIEWS);
-        tw->setEcho(true);
-        tw->setPacketHexFormat(true);
-        // Set connection
+
+        // Set views
 
         // Add terminal widget to terminal list
         terminals->addTerminal(tw);
-    }
-    settings.endGroup();
 
+        // Set connections
+        tw->updateConnections(connectionNames);
+        tw->changeConnection(settings.value("Connection").toString());
+    }
+
+    settings.endArray();
 
     // Restore parser widgets
     settings.beginGroup("Parsers");
@@ -267,122 +276,47 @@ void Flipp::restoreSettings()
         pw->setName(parserName);
         parserNames.append(pw->getName());
         settings.beginGroup(parserName);
-        QStringList complexVariables = settings.childGroups();
-        // Restore variable widgets
-        foreach(QString complexVariable,complexVariables)
+        int varSize = settings.beginReadArray("Complex");
+        for(int i=0;i<varSize;i++)
         {
+            settings.setArrayIndex(i);
             VariableWidget *vw = new VariableWidget;
-            vw->setName(complexVariable);
-            settings.beginGroup(complexVariable);
+            vw->setName(settings.value("Name").toString());
             vw->setType(settings.value("Type").toInt());
-            vw->setFixed(settings.value("Fixed").toBool());
-            vw->setMatched(settings.value("Matched").toBool());
-            settings.endGroup();
+            if(settings.value("Type").toInt()==VECTYPE)
+            {
+                vw->setRepeat(settings.value("Repeat").toInt());
+                int vecSize = settings.beginReadArray("Base");
+                for(int j=0;j<vecSize;j++)
+                {
+                    settings.setArrayIndex(j);
+                    BaseVariable *bv = new BaseVariable;
+                    bv->name = settings.value("Name").toString();
+                    bv->type = settings.value("Type").toInt();
+                    bv->fixed = settings.value("Fixed").toBool();
+                    if(bv->fixed)
+                    {
+                        bv->length = settings.value("Length").toInt();
+                    }
+                    bv->match = settings.value("Match").toBool();
+                    if(bv->match)
+                    {
+                        bv->matchBytes = settings.value("MBytes").toByteArray();
+                    }
+                    vw->variable->vector->append(bv);
+                }
+                settings.endArray();
+            }
             pw->addVariableWidget(vw);
         }
+
+
+        settings.endArray();
 
         settings.endGroup();
         parsers->addParser(pw);
     }
     settings.endGroup();
-
-    //    ParserWidget *paw = new ParserWidget;
-    //    paw->setName("Time");
-    //    parserNames->append(paw->getName());
-
-    //    // Add variables
-    //    VariableWidget *varw01 = new VariableWidget;
-    //    varw01->setName("Hours");
-    //    varw01->setType(NUMTYPE);
-    //    varw01->setFixed(true);
-    //    varw01->setLength(2);
-
-    //    VariableWidget *varw02 = new VariableWidget;
-    //    varw02->setName("First colon");
-    //    varw02->setType(BYTTYPE);
-    //    varw02->setMatched(true);
-    //    varw02->setMatchBytes(":");
-
-    //    VariableWidget *varw03 = new VariableWidget;
-    //    varw03->setName("Minutes");
-    //    varw03->setType(NUMTYPE);
-    //    varw03->setFixed(true);
-    //    varw03->setLength(2);
-
-    //    VariableWidget *varw04 = new VariableWidget;
-    //    varw04->setName("Second colon");
-    //    varw04->setType(BYTTYPE);
-    //    varw04->setMatched(true);
-    //    varw04->setMatchBytes(":");
-
-    //    VariableWidget *varw05 = new VariableWidget;
-    //    varw05->setName("Seconds");
-    //    varw05->setType(NUMTYPE);
-    //    varw05->setFixed(false);
-
-    //    VariableWidget *varw06 = new VariableWidget;
-    //    varw06->setName("End byte");
-    //    varw06->setType(BYTTYPE);
-    //    varw06->setFixed(true);
-    //    varw06->setLength(1);
-
-    //    paw->addVariableWidget(varw01);
-    //    paw->addVariableWidget(varw02);
-    //    paw->addVariableWidget(varw03);
-    //    paw->addVariableWidget(varw04);
-    //    paw->addVariableWidget(varw05);
-    //    paw->addVariableWidget(varw06);
-
-    //    ParserWidget *paw02 = new ParserWidget;
-    //    paw02->setName("GPS");
-    //    parserNames->append(paw02->getName());
-
-    //    VariableWidget *varw11 = new VariableWidget;
-    //    varw11->setName("GPS start");
-    //    varw11->setType(BYTTYPE);
-    //    varw11->setMatched(true);
-    //    varw11->setMatchBytes("GPGGA,N|");
-
-    //    VariableWidget *varw12 = new VariableWidget;
-    //    varw12->setName("Coords");
-    //    varw12->setType(NUMTYPE);
-    //    varw12->setFixed(false);
-
-    //    VariableWidget *varw13 = new VariableWidget;
-    //    varw13->setName("delimiter");
-    //    varw13->setType(BYTTYPE);
-    //    varw13->setMatched(true);
-    //    varw13->setMatchBytes("|");
-
-    //    VariableWidget *varw14 = new VariableWidget;
-    //    varw14->setName("Coords");
-    //    varw14->setType(NUMTYPE);
-    //    varw14->setFixed(false);
-
-    //    VariableWidget *varw15 = new VariableWidget;
-    //    varw15->setName("delimiter");
-    //    varw15->setType(BYTTYPE);
-    //    varw15->setMatched(true);
-    //    varw15->setMatchBytes("|");
-
-    //    VariableWidget *varw16 = new VariableWidget;
-    //    varw16->setName("Coords");
-    //    varw16->setType(NUMTYPE);
-    //    varw16->setFixed(false);
-
-    //    VariableWidget *varw17 = new VariableWidget;
-    //    varw17->setName("end delimiter");
-    //    varw17->setType(BYTTYPE);
-    //    varw17->setFixed(true);
-    //    varw17->setLength(1);
-
-    //    paw02->addVariableWidget(varw11);
-    //    paw02->addVariableWidget(varw12);
-    //    paw02->addVariableWidget(varw13);
-    //    paw02->addVariableWidget(varw14);
-    //    paw02->addVariableWidget(varw15);
-    //    paw02->addVariableWidget(varw16);
-    //    paw02->addVariableWidget(varw17);
 
 
     // View
@@ -424,16 +358,59 @@ void Flipp::saveSettings()
     settings.endGroup();
 
     // Terminals
-//    settings.beginGroup("Terminals");
+    settings.beginWriteArray("Terminals");
 
-//    foreach(TerminalWidget *terminal,terminals->terminalList)
-//    {
-//        settings.beginGroup(terminal->getName);
-//    }
+    for(int i=0;i<terminals->terminalList.size();i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue("Connection",terminals->terminalList.at(i)->currentConnection());
+    }
+    settings.endArray();
 
-//    settings.endGroup();
+    // Parsers
+    settings.beginGroup("Parsers");
+    foreach(ParserWidget *pw, *parsers->parserList)
+    {
+        settings.beginGroup(pw->getName());
 
+        // Save an array of variable widgets
 
+        settings.beginWriteArray("Complex");
+        for(int i=0;i<pw->variableList->size();i++)
+        {
+            settings.setArrayIndex(i);
+            settings.setValue("Name",pw->variableList->at(i)->name);
+            settings.setValue("Type",pw->variableList->at(i)->type);
+            if(pw->variableList->at(i)->type==VECTYPE)
+            {
+                settings.setValue("Repeat",pw->variableList->at(i)->repeat);
+                // Save an array of base variables
+                settings.beginWriteArray("Base");
+                for(int j=0;j<pw->variableList->at(i)->vector->size();j++)
+                {
+                    settings.setArrayIndex(j);
+                    settings.setValue("Name",pw->variableList->at(i)->vector->at(j)->name);
+                    settings.setValue("Type",pw->variableList->at(i)->vector->at(j)->type);
+                    settings.setValue("Fixed",pw->variableList->at(i)->vector->at(j)->fixed);
+                    if(pw->variableList->at(i)->vector->at(j)->fixed)
+                    {
+                        settings.setValue("Length",pw->variableList->at(i)->vector->at(j)->length);
+                    }
+                    settings.setValue("Match",pw->variableList->at(i)->vector->at(j)->match);
+                    if(pw->variableList->at(i)->vector->at(j)->match)
+                    {
+                        settings.setValue("MBytes",pw->variableList->at(i)->vector->at(j)->matchBytes);
+                    }
+
+                }
+                settings.endArray();
+            }
+        }
+
+        settings.endArray();
+        settings.endGroup();
+    }
+    settings.endGroup();
 
     settings.sync();
 }

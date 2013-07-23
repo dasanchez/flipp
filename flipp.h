@@ -7,6 +7,7 @@
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QSettings>
+#include <QShortcut>
 #include <connection/connectionlistwidget.h>
 #include <terminal/terminallistwidget.h>
 #include <parser/parserlistwidget.h>

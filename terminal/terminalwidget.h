@@ -32,6 +32,7 @@ public:
     void setEcho(bool);
     void setPause(bool);
     void setPacketHexFormat(bool);
+    QString currentConnection();
 
     bool paused;
     bool echoing;

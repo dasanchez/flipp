@@ -91,6 +91,11 @@ void TerminalWidget::setPause(bool pauseOn)
     updatePauseButton();
 }
 
+QString TerminalWidget::currentConnection()
+{
+    return connectionBox->currentText();
+}
+
 void TerminalWidget::togglePause()
 {
     paused=!paused;
@@ -126,6 +131,10 @@ void TerminalWidget::togglePacketFormat()
 
 void TerminalWidget::changeConnection(QString connection)
 {
+    disconnect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
+    connectionBox->setCurrentText(connection);
+    connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
+
     disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
     disconnect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
     emit terminalConnectionRequest(connection);

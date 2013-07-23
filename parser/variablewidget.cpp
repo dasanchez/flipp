@@ -32,6 +32,11 @@ void VariableWidget::nameChanged(QString newName)
     emit nameChange(newName);
 }
 
+QString VariableWidget::getName()
+{
+    return variable->name;
+}
+
 void VariableWidget::setName(QString newName)
 {
     disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameChanged(QString)));
@@ -143,6 +148,19 @@ void VariableWidget::setMatchBytes(QByteArray newMatch)
     variable->matchBytes.append(characters);
     emit variableChanged();
     emit matchChange(characters);
+}
+
+void VariableWidget::setRepeat(int newRepeat)
+{
+
+    disconnect(repeatSpin,SIGNAL(valueChanged(int)),this,SLOT(changeRepeat(int)));
+    repeatSpin->setValue(newRepeat);
+    connect(repeatSpin,SIGNAL(valueChanged(int)),this,SLOT(changeRepeat(int)));
+
+    variable->repeat=newRepeat;
+
+    emit variableChanged();
+    emit repeatChange(newRepeat);
 }
 
 void VariableWidget::toggleType()

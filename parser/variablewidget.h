@@ -79,12 +79,14 @@ public:
     bool hexed;
     bool isExpanded;
 
+    QString getName();
     void setName(QString);
     void setType(int);
     void setFixed(bool);
     void setLength(int);
     void setMatched(bool);
     void setMatchBytes(QByteArray);
+    void setRepeat(int);
     QList<VectorItemWidget*> *itemList;
 
 signals:
