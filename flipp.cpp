@@ -281,6 +281,7 @@ void Flipp::restoreSettings()
         {
             settings.setArrayIndex(i);
             VariableWidget *vw = new VariableWidget;
+//            vw->itemList->clear();
             vw->setName(settings.value("Name").toString());
             vw->setType(settings.value("Type").toInt());
             if(settings.value("Type").toInt()==VECTYPE)
@@ -290,22 +291,51 @@ void Flipp::restoreSettings()
                 for(int j=0;j<vecSize;j++)
                 {
                     settings.setArrayIndex(j);
+
+                    // Get variable features and initialize each vector item with them:
                     BaseVariable *bv = new BaseVariable;
                     bv->name = settings.value("Name").toString();
-                    bv->type = settings.value("Type").toInt();
-                    bv->fixed = settings.value("Fixed").toBool();
-                    if(bv->fixed)
+                    if(settings.value("Fixed").toBool())
                     {
+                        bv->fixed = true;
                         bv->length = settings.value("Length").toInt();
                     }
-                    bv->match = settings.value("Match").toBool();
-                    if(bv->match)
+                    else
                     {
-                        bv->matchBytes = settings.value("MBytes").toByteArray();
+                        bv->fixed = false;
                     }
-                    vw->variable->vector->append(bv);
+
+                    if(settings.value("Type").toInt()==NUMTYPE)
+                    {
+                        bv->type = NUMTYPE;
+
+                    }
+                    else
+                    {
+                        bv->type = BYTTYPE;
+                        if(settings.value("Match").toBool())
+                        {
+                            bv->match = true;
+                            bv->matchBytes = settings.value("MBytes").toByteArray();
+                        }
+                    }
+                    vw->addVectorVariable(bv);
+//                    vw->variable->vector->append(bv);
                 }
                 settings.endArray();
+            }
+            else
+            {
+                vw->setFixed(settings.value("Fixed").toBool());
+                if(vw->fixed)
+                {
+                    vw->setLength(settings.value("Length").toInt());
+                }
+                vw->setMatched(settings.value("Match").toBool());
+                if(vw->matched)
+                {
+                    vw->setMatchBytes(settings.value("MBytes").toByteArray());
+                }
             }
             pw->addVariableWidget(vw);
         }
@@ -389,6 +419,8 @@ void Flipp::saveSettings()
                 for(int j=0;j<pw->variableList->at(i)->vector->size();j++)
                 {
                     settings.setArrayIndex(j);
+//                    if(settings.va)
+
                     settings.setValue("Name",pw->variableList->at(i)->vector->at(j)->name);
                     settings.setValue("Type",pw->variableList->at(i)->vector->at(j)->type);
                     settings.setValue("Fixed",pw->variableList->at(i)->vector->at(j)->fixed);
@@ -399,11 +431,26 @@ void Flipp::saveSettings()
                     settings.setValue("Match",pw->variableList->at(i)->vector->at(j)->match);
                     if(pw->variableList->at(i)->vector->at(j)->match)
                     {
+                        qDebug() << pw->variableList->at(i)->vector->at(j)->matchBytes;
                         settings.setValue("MBytes",pw->variableList->at(i)->vector->at(j)->matchBytes);
                     }
 
                 }
                 settings.endArray();
+            }
+            else
+            {
+                // Save an individual complex variable
+                settings.setValue("Fixed",pw->variableList->at(i)->fixed);
+                if(pw->variableList->at(i)->fixed)
+                {
+                    settings.setValue("Length",pw->variableList->at(i)->length);
+                }
+                settings.setValue("Match",pw->variableList->at(i)->match);
+                if(pw->variableList->at(i)->match)
+                {
+                    settings.setValue("MBytes",pw->variableList->at(i)->matchBytes);
+                }
             }
         }
 

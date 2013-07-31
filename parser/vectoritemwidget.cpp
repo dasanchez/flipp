@@ -20,6 +20,75 @@ VectorItemWidget::VectorItemWidget(QWidget *parent) :
     variable->matchBytes.clear();
 }
 
+void VectorItemWidget::setName(QString newName)
+{
+    variable->name = newName;
+    disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(changeName(QString)));
+    nameEdit->setText(newName);
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(changeName(QString)));
+}
+
+void VectorItemWidget::setType(int newType)
+{
+    variable->type = newType;
+    if(newType == BYTTYPE)
+        setByte();
+    else
+        setNumber();
+}
+
+void VectorItemWidget::setFixed(bool newFixed)
+{
+    QIcon lengthIcon;
+    variable->fixed = newFixed;
+    fixed = newFixed;
+
+    if(fixed)
+    {
+        lengthIcon=fixlenIconPixmap;
+    }
+    else
+    {
+        lengthIcon=varlenIconPixmap;
+    }
+    lengthButton->setIcon(lengthIcon);
+}
+
+void VectorItemWidget::setLength(int newLength)
+{
+    variable->length = newLength;
+    disconnect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
+    lengthSpin->setValue(newLength);
+    connect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
+}
+
+void VectorItemWidget::setMatch(bool newMatched)
+{
+   QIcon matchIcon;
+    variable->match = newMatched;
+    matched = newMatched;
+    if(matched)
+    {
+        matchIcon=matchonIconPixmap;
+    }
+    else
+    {
+        matchIcon=matchoffIconPixmap;
+    }
+    matchButton->setIcon(matchIcon);
+}
+
+void VectorItemWidget::setMatchBytes(QByteArray newBytes)
+{
+    variable->matchBytes = newBytes;
+
+    disconnect(matchEdit,SIGNAL(textChanged(QString)),this,SLOT(changeMatch(QString)));
+    matchEdit->setText(newBytes);
+    disconnect(matchEdit,SIGNAL(textChanged(QString)),this,SLOT(changeMatch(QString)));
+
+}
+
+
 void VectorItemWidget::changeName(QString newName)
 {
     variable->name = newName;
@@ -39,7 +108,7 @@ void VectorItemWidget::toggleType()
         setByte();
         break;
     }
-emit variableChanged();
+    emit variableChanged();
     emit typeChange(currentType);
 }
 
@@ -174,6 +243,7 @@ void VectorItemWidget::changeMatch(QString newMatch)
 {
     QByteArray characters;
     variable->matchBytes.clear();
+    qDebug() << newMatch;
 
     if(hexed)
     {

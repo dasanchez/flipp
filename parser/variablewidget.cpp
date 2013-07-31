@@ -439,6 +439,48 @@ void VariableWidget::addVectorByte()
     emit variableChanged();
 }
 
+void VariableWidget::addVectorVariable(BaseVariable *bvar)
+{
+    QListWidgetItem *item = new QListWidgetItem;
+    VectorItemWidget *iw = new VectorItemWidget(this);
+    vectorItemList->addItem(item);
+    item->setSizeHint(iw->sizeHint());
+    vectorItemList->setItemWidget(item,iw);
+    iw->variable = bvar;
+    iw->setName(bvar->name);
+    iw->setType(bvar->type);
+    iw->setFixed(bvar->fixed);
+    iw->setLength(bvar->length);
+    iw->setMatch(bvar->match);
+    iw->setMatchBytes(bvar->matchBytes);
+    itemList->append(iw);
+
+//    iw->variable->name = bvar->name;
+//    qDebug() << iw->variable->name;
+    variable->vector->append(bvar);
+    connect(iw,SIGNAL(deleteVar()),this,SLOT(vectorItemRemoved()));
+    connect(iw,SIGNAL(nameChange(QString)),this,SLOT(vectorItemNameChanged(QString)));
+    connect(iw,SIGNAL(variableChanged()),this,SIGNAL(variableChanged()));
+    emit variableChanged();
+}
+
+//void VariableWidget::addVectorByte(QString varName, bool fixed, int length, bool matched, QByteArray mbytes)
+//{
+//    QListWidgetItem *item = new QListWidgetItem;
+//    VectorItemWidget *iw = new VectorItemWidget(this);
+//    vectorItemList->addItem(item);
+//    item->setSizeHint(iw->sizeHint());
+//    vectorItemList->setItemWidget(item,iw);
+//    itemList->append(iw);
+//    BaseVariable *bv = iw->variable;
+//    bv->name = varName;
+//    bv->fixed = fixed;
+//    bv->length = length;
+//    bv->match = matched;
+//    bv->matchBytes = mbytes;
+//    variable->vector->append(bv);
+//}
+
 void VariableWidget::addVectorNumber()
 {
     QListWidgetItem *item = new QListWidgetItem;
@@ -453,6 +495,11 @@ void VariableWidget::addVectorNumber()
     connect(iw,SIGNAL(variableChanged()),this,SIGNAL(variableChanged()));
     emit variableChanged();
 }
+
+//void VariableWidget::addVectorNumber(QString varName, bool fixed, int length)
+//{
+
+//}
 
 void VariableWidget::vectorItemResorted(int src,int dest,QListWidgetItem* item)
 {
@@ -650,7 +697,7 @@ void VariableWidget::setupUI()
     vectorItemList->setVisible(false);
     vectorItemList->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Maximum);
 
-    addVectorByte();
+//    addVectorByte();
 
     vectorListLayout = new QHBoxLayout;
     vectorListLayout->addSpacing(10);

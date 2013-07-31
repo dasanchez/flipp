@@ -64,6 +64,13 @@ public:
     bool matched;
     bool fixed;
     bool hexed;
+    void setName(QString);
+    void setType(int);
+    void setFixed(bool);
+    void setLength(int);
+    void setMatch(bool);
+    void setMatchBytes(QByteArray);
+
 
 signals:
     void nameChange(QString);
