@@ -26,12 +26,20 @@ class PlotterWidget : public QWidget
 public:
     PlotterWidget(QWidget *parent = 0);
     ~PlotterWidget();
-    
+    QString currentConnection();
+    QString currentParser();
+
 public slots:
     void updateConnections(QStringList);
-    void updateParsers(QStringList*);
+    void updateParsers(QStringList);
     void assignConnection(ConnectionWidget *);
     void assignParser(ParserWidget *);
+    void changeConnection(QString);
+    void changeParser(QString);
+        void setXRange(double);
+        void setYMin(QString);
+        void setYMax(QString);
+
 signals:
     void plotterConnectionRequest(QString);
     void plotterParserRequest(QString);
@@ -46,6 +54,14 @@ private:
     QPixmap delIconPixmap;
     QTableWidget *tableWidget;
 
+    // Plot settings
+    QLabel *xRangeLabel;
+    QDoubleSpinBox *xRangeSpin;
+    QLabel *yMinLabel;
+    QLabel *yMaxLabel;
+    QSpinBox *yMinSpin;
+    QSpinBox *yMaxSpin;
+
     QHBoxLayout *dataSourceLayout;
     QHBoxLayout *contentLayout;
     QVBoxLayout *mainLayout;
@@ -55,19 +71,26 @@ private:
     ParserEngine *parserEngine;
     QCustomPlot *customPlot;
 
+    double xMax;
+    double yMin;
+    double yMax;
     QVector<double> keys;
     QList<QVector<double> > valuesList;
 
     quint8 calcRowCount();
+    void adjustXRange();
+
+    void setupUI();
     
 private slots:
-    void changeConnection(QString);
+//    void changeConnection(QString);
     void detachConnection(void);
-    void changeParser(QString);
+//    void changeParser(QString);
     void detachParser(void);
     void populateParserTable();
     void populatePlotArea();
     void parsedDataReady(QList<RepeatedVector> parsedData);
+
     //     void variableListChanged();
 };
 

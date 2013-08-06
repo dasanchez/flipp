@@ -16,11 +16,10 @@ Flipp::Flipp(QWidget *parent)
     connect(connections,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
     connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
-    connect(parsers,SIGNAL(parserListChanged(QStringList*)),plotters,SLOT(updateParsers(QStringList*)));
+    connect(parsers,SIGNAL(parserListChanged(QStringList)),plotters,SLOT(updateParsers(QStringList)));
     connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
     connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
 
-    restoreSettings();
 
     //    plotters->newPlotter();
     setCentralWidget(plotters);
@@ -28,11 +27,16 @@ Flipp::Flipp(QWidget *parent)
     createDocks();
     createMenus();
 
+    restoreSettings();
+
+
     this->setWindowTitle(tr("f l i p p"));
 
     // Shortcuts
-    //    QShortcut *shortcut = new QShortcut(QKeySequence(tr("Ctrl+S", "File|Save")));
-
+//        QShortcut *shortcut = new QShortcut(QKeySequence(tr("Ctrl+S", "File|Save")));
+//        QShortcut *shortcut = new QShortcut(QKeySequence(tr("Ctrl+O", "File|Open")),
+//                                 this);
+//        shortcut->
 
     //    QFile qss(":/styles/flipp.css");
     QFile qss("../flipp/styles/flipp.css");
@@ -66,7 +70,6 @@ void Flipp::handlePlotterConnectionRequest(PlotterWidget *plotter,QString name)
         if(connection->getName()==name)
         {
             plotter->assignConnection(connection);
-            //            qDebug() << tr("Connection assigned");
         }
     }
 }
@@ -78,7 +81,6 @@ void Flipp::handlePlotterParserRequest(PlotterWidget *plotter,QString name)
         if(parser->getName()==name)
         {
             plotter->assignParser(parser);
-            //            qDebug() << tr("Parser assigned");
         }
     }
 }
@@ -86,14 +88,17 @@ void Flipp::handlePlotterParserRequest(PlotterWidget *plotter,QString name)
 void Flipp::createDocks()
 {
     connectionDock = new QDockWidget(tr("Connection list"));
+    connectionDock->setObjectName("Connections_Dock");
     connectionDock->setWidget(connections);
     connectionDock->setFeatures(QDockWidget::DockWidgetClosable|
                                 QDockWidget::DockWidgetMovable|
                                 QDockWidget::DockWidgetFloatable);
     connectionDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+
     addDockWidget(Qt::TopDockWidgetArea,connectionDock);
 
     terminalDock = new QDockWidget(tr("Terminal list"));
+    terminalDock->setObjectName("Terminals_Dock");
     terminalDock->setWidget(terminals);
     terminalDock->setFeatures(QDockWidget::DockWidgetClosable|
                               QDockWidget::DockWidgetMovable|
@@ -102,16 +107,13 @@ void Flipp::createDocks()
     addDockWidget(Qt::TopDockWidgetArea,terminalDock);
 
     parserDock = new QDockWidget(tr("Parser list"));
+    parserDock->setObjectName("Parsers_Dock");
     parserDock->setWidget(parsers);
-    terminalDock->setFeatures(QDockWidget::DockWidgetClosable|
-                              QDockWidget::DockWidgetMovable|
-                              QDockWidget::DockWidgetFloatable);
-    terminalDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    //    addDockWidget(Qt::LeftDockWidgetArea,parserDock);
+    parserDock->setFeatures(QDockWidget::DockWidgetClosable|
+                            QDockWidget::DockWidgetMovable|
+                            QDockWidget::DockWidgetFloatable);
+    parserDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     addDockWidget(Qt::TopDockWidgetArea,parserDock);
-
-    tabifyDockWidget(connectionDock,terminalDock);
-    tabifyDockWidget(terminalDock,parserDock);
 
     setTabPosition(Qt::AllDockWidgetAreas,QTabWidget::North);
 }
@@ -122,6 +124,7 @@ void Flipp::createMenus()
     QMenu *fileMenu = menuBar()->addMenu(tr("File"));
 
     saveAct = new QAction(tr("&Save"),this);
+    saveAct->setShortcut(QKeySequence(tr("Ctrl+s")));
     saveAct->setStatusTip(tr("Save current settings"));
     connect(saveAct,SIGNAL(triggered()),this,SLOT(saveSettings()));
     fileMenu->addAction(saveAct);
@@ -132,10 +135,25 @@ void Flipp::createMenus()
     fileMenu->addAction(exitAct);
 
     QMenu *viewMenu = menuBar()->addMenu(tr("View"));
+
+    dockAct = new QAction(tr("&Dock Windows"),this);
+    dockAct->setShortcut(QKeySequence(tr("Ctrl+d")));
+    connect(dockAct,SIGNAL(triggered()),this,SLOT(dockWidgets()));
+    viewMenu->addAction(dockAct);
+
+    connectionDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+Q")));
     viewMenu->addAction(connectionDock->toggleViewAction());
+    terminalDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+W")));
     viewMenu->addAction(terminalDock->toggleViewAction());
+    parserDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+E")));
     viewMenu->addAction(parserDock->toggleViewAction());
-    //  viewMenu->addAction(plotsetsDock->toggleViewAction());
+}
+
+void Flipp::dockWidgets()
+{
+    connectionDock->setFloating(false);
+    terminalDock->setFloating(false);
+    parserDock->setFloating(false);
 }
 
 void Flipp::initSettings()
@@ -145,21 +163,13 @@ void Flipp::initSettings()
     QSettings settings(m_sSettingsFile,QSettings::IniFormat);
     settings.clear();
     // CONNECTIONS
-    settings.beginGroup("Connections");
-
-    settings.beginGroup("GPS & Time");
+    settings.beginWriteArray("Connections");
+    settings.setArrayIndex(0);
+    settings.setValue("Name","GPS & Time");
     settings.setValue("Type",TCP);
     settings.setValue("Address","127.0.0.1");
     settings.setValue("Port","50500");
-    settings.endGroup();
-
-    settings.beginGroup("Dummy serial");
-    settings.setValue("Type",SERIAL);
-    settings.setValue("Address","COM2");
-    settings.setValue("Port","115200");
-    settings.endGroup();
-
-    settings.endGroup();
+    settings.endArray();
 
     // TERMINALS
 
@@ -168,11 +178,6 @@ void Flipp::initSettings()
     settings.setArrayIndex(0);
     settings.setValue("Connection","GPS & Time");
     settings.setValue("Echo",true);
-
-    //    settings.beginGroup("01");
-    //    settings.setValue("Connection","GPS & time");
-    //    settings.setValue("Echo",true);
-    //    settings.endGroup();
 
     settings.endArray();
 
@@ -200,53 +205,39 @@ void Flipp::initSettings()
     settings.endGroup();
 
     settings.sync();
+    restoreSettings();
 }
 
 void Flipp::restoreSettings()
 {
     // Read settings file
-    if(m_sSettingsFile.isEmpty())
+    QFile file(m_sSettingsFile);
+    if(!file.open(QIODevice::ReadOnly))
     {
         initSettings();
         return;
     }
+    else
+    {
+        file.close();
+    }
 
     QSettings settings(m_sSettingsFile,QSettings::IniFormat);
 
-    QStringList connectionNames;
-    QStringList terminalNames;
-    QStringList parserNames;
-    //    QStringList *parserNames = new QStringList;
+    restoreState(settings.value("DOCK_LOCATIONS").toByteArray(),1);
 
-    QString val;
+    QStringList connectionNames;
+    QStringList parserNames;
 
     // Restore connection widgets
-    settings.beginGroup("Connections");
-    connectionNames = settings.childGroups();
-    foreach(QString connectionName,settings.childGroups())
+    int connCount = settings.beginReadArray("Connections");
+    for(int i=0;i<connCount;i++)
     {
-        int connType;
-        QString address;
-        QString port;
-
-        val.clear();
-        val.append(connectionName);
-        val.append("/Type");
-        connType = settings.value(val).toString().toInt();
-
-        val.clear();
-        val.append(connectionName);
-        val.append("/Address");
-        address.append(settings.value(val).toString());
-
-        val.clear();
-        val.append(connectionName);
-        val.append("/Port");
-        port.append(settings.value(val).toString());
-
-        connections->addConnection(connectionName,connType,address,port);
+        settings.setArrayIndex(i);
+        connectionNames.append(settings.value("Name").toString());
+        connections->addConnection(settings.value("Name").toString(),settings.value("Type").toInt(),settings.value("Address").toString(),settings.value("Port").toString());
     }
-    settings.endGroup();
+    settings.endArray();
 
     // Restore terminal widgets
     int terminalCount = settings.beginReadArray("Terminals");
@@ -268,29 +259,30 @@ void Flipp::restoreSettings()
     settings.endArray();
 
     // Restore parser widgets
-    settings.beginGroup("Parsers");
-    parserNames = settings.childGroups();
-    foreach(QString parserName,parserNames)
+    int parserCount = settings.beginReadArray("Parsers");
+
+    for(int i=0;i<parserCount;i++)
     {
+        settings.setArrayIndex(i);
         ParserWidget *pw = new ParserWidget;
-        pw->setName(parserName);
+        pw->setName(settings.value("Name").toString());
         parserNames.append(pw->getName());
-        settings.beginGroup(parserName);
+        //        settings.beginGroup(parserName);
         int varSize = settings.beginReadArray("Complex");
-        for(int i=0;i<varSize;i++)
+        for(int j=0;j<varSize;j++)
         {
-            settings.setArrayIndex(i);
+            settings.setArrayIndex(j);
             VariableWidget *vw = new VariableWidget;
-//            vw->itemList->clear();
+            //            vw->itemList->clear();
             vw->setName(settings.value("Name").toString());
             vw->setType(settings.value("Type").toInt());
             if(settings.value("Type").toInt()==VECTYPE)
             {
                 vw->setRepeat(settings.value("Repeat").toInt());
                 int vecSize = settings.beginReadArray("Base");
-                for(int j=0;j<vecSize;j++)
+                for(int k=0;k<vecSize;k++)
                 {
-                    settings.setArrayIndex(j);
+                    settings.setArrayIndex(k);
 
                     // Get variable features and initialize each vector item with them:
                     BaseVariable *bv = new BaseVariable;
@@ -320,7 +312,7 @@ void Flipp::restoreSettings()
                         }
                     }
                     vw->addVectorVariable(bv);
-//                    vw->variable->vector->append(bv);
+                    //                    vw->variable->vector->append(bv);
                 }
                 settings.endArray();
             }
@@ -339,21 +331,35 @@ void Flipp::restoreSettings()
             }
             pw->addVariableWidget(vw);
         }
-
-
         settings.endArray();
 
-        settings.endGroup();
+        //        settings.endGroup();
         parsers->addParser(pw);
     }
-    settings.endGroup();
+    settings.endArray();
+    //    settings.endGroup();
+
+    // Restore plotters
+    int plotSize = settings.beginReadArray("Plotters");
+    for(int i=0;i<plotSize;i++)
+    {
+        settings.setArrayIndex(i);
+        PlotterWidget *pw = new PlotterWidget;
+
+        pw->updateConnections(connectionNames);
+        pw->updateParsers(parserNames);
+        plotters->splitter->addWidget(pw);
+        plotters->plotterList.append(pw);
+
+        connect(pw,SIGNAL(plotterConnectionRequest(QString)),plotters,SLOT(plotterRequestedConnection(QString)));
+        connect(pw,SIGNAL(plotterParserRequest(QString)),plotters,SLOT(plotterRequestedParser(QString)));
+        connect(pw,SIGNAL(removePlotter()),plotters,SLOT(plotterRemoved()));
+        pw->changeConnection(settings.value("Connection").toString());
+        pw->changeParser(settings.value("Parser").toString());
+    }
 
 
-    // View
-
-    // Build parser list
-    //    parsers->addParser(paw);
-    //    parsers->addParser(paw02);
+    settings.endArray();
 
 }
 
@@ -364,28 +370,26 @@ void Flipp::saveSettings()
     settings.clear();
 
     // Connections
-    settings.beginGroup("Connections");
+    settings.beginWriteArray("Connections");
 
-    foreach(ConnectionWidget *connection,connections->connectionList)
+    for(int i=0;i<connections->connectionList.size();i++)
     {
-        settings.beginGroup(connection->getName());
-        quint8 vartype = connection->getType();
+        settings.setArrayIndex(i);
+        settings.setValue("Name",connections->connectionList.at(i)->getName());
+        int vartype = connections->connectionList.at(i)->getType();
         settings.setValue("Type",vartype);
-
         if(vartype==SERIAL)
         {
-            settings.setValue("Address",connection->getSerialPort());
-            settings.setValue("Port",connection->getBaudRate());
+            settings.setValue("Address",connections->connectionList.at(i)->getSerialPort());
+            settings.setValue("Port",connections->connectionList.at(i)->getBaudRate());
         }
         else
         {
-            settings.setValue("Address",connection->getIPAddress());
-            settings.setValue("Port",connection->getIPPort());
+            settings.setValue("Address",connections->connectionList.at(i)->getIPAddress());
+            settings.setValue("Port",connections->connectionList.at(i)->getIPPort());
         }
-        settings.endGroup();
-
     }
-    settings.endGroup();
+    settings.endArray();
 
     // Terminals
     settings.beginWriteArray("Terminals");
@@ -398,10 +402,12 @@ void Flipp::saveSettings()
     settings.endArray();
 
     // Parsers
-    settings.beginGroup("Parsers");
+    settings.beginWriteArray("Parsers");
+    int parserCount=0;
     foreach(ParserWidget *pw, *parsers->parserList)
     {
-        settings.beginGroup(pw->getName());
+        settings.setArrayIndex(parserCount);
+        settings.setValue("Name",pw->getName());
 
         // Save an array of variable widgets
 
@@ -419,7 +425,6 @@ void Flipp::saveSettings()
                 for(int j=0;j<pw->variableList->at(i)->vector->size();j++)
                 {
                     settings.setArrayIndex(j);
-//                    if(settings.va)
 
                     settings.setValue("Name",pw->variableList->at(i)->vector->at(j)->name);
                     settings.setValue("Type",pw->variableList->at(i)->vector->at(j)->type);
@@ -455,9 +460,23 @@ void Flipp::saveSettings()
         }
 
         settings.endArray();
-        settings.endGroup();
+//        settings.endGroup();
+        parserCount++;
     }
-    settings.endGroup();
+    settings.endArray();
+
+    // Save Plotters
+    settings.beginWriteArray("Plotters");
+    for(int i=0; i<plotters->plotterList.size();i++)
+    {
+        settings.setArrayIndex(i);
+        // Set connection and parser assigned to each plotter
+        settings.setValue("Connection",plotters->plotterList.at(i)->currentConnection());
+        settings.setValue("Parser",plotters->plotterList.at(i)->currentParser());
+    }
+    settings.endArray();
+
+    settings.setValue("DOCK_LOCATIONS",saveState(1));
 
     settings.sync();
 }

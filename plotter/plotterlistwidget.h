@@ -16,8 +16,10 @@ public:
     explicit PlotterListWidget(QWidget *parent = 0);
     ~PlotterListWidget();
     QList<PlotterWidget*> plotterList;
-    QStringList *parserNamesList;
+    QStringList parserNamesList;
     QStringList connectionNamesList;
+    QSplitter *splitter;
+
 signals:
     void plotterConnectionRequest(PlotterWidget*,QString);
     void plotterParserRequest(PlotterWidget*,QString);
@@ -25,7 +27,7 @@ signals:
 public slots:
     void newPlotter(void);
     void updateConnections(QStringList);
-    void updateParsers(QStringList*);
+    void updateParsers(QStringList);
 
     void plotterRequestedConnection(QString);
     void plotterRequestedParser(QString);
@@ -37,7 +39,7 @@ private:
     QLabel *bottomLabel;
     QLabel *widgetNameLabel;
 
-    QSplitter *splitter;
+
     QScrollArea *scrollArea;
     QVBoxLayout *scrollAreaVLayout;
     QWidget *saWidgetContents;

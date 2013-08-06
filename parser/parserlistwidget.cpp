@@ -4,7 +4,7 @@ ParserListWidget::ParserListWidget(QWidget *parent) :
     QWidget(parent)
 {
     parserList = new QList<ParserWidget*>;
-    nameList = new QStringList;
+//    nameList = new QStringList;
 
     widgetNameLabel = new QLabel("Parsers");
 
@@ -181,10 +181,10 @@ void ParserListWidget::checkAllNames()
 
 void ParserListWidget::updateList()
 {
-    nameList->clear();
+    nameList.clear();
     foreach(ParserWidget *parser,*parserList)
     {
-        nameList->append(parser->getName());
+        nameList.append(parser->getName());
     }
     emit parserListChanged(nameList);
 }

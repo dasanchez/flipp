@@ -17,9 +17,9 @@ class ParserListWidget : public QWidget
 public:
     explicit ParserListWidget(QWidget *parent = 0);
     QList<ParserWidget*> *parserList;
-    QStringList *nameList;
+    QStringList nameList;
 signals:
-    void parserListChanged(QStringList*);
+    void parserListChanged(QStringList);
 public slots:
 
     void newParser();

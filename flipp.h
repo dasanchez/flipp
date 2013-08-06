@@ -34,6 +34,7 @@ private:
     // Actions:
     QAction *exitAct;
     QAction *saveAct;
+    QAction *dockAct;
 
     // Settings
     //    QSettings *settings;
@@ -49,6 +50,7 @@ private slots:
     void handlePlotterConnectionRequest(PlotterWidget*,QString);
     void handlePlotterParserRequest(PlotterWidget*,QString);
     void saveSettings();
+    void dockWidgets();
 
 
 };

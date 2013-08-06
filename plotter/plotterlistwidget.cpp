@@ -75,7 +75,7 @@ void PlotterListWidget::updateConnections(QStringList connectionNames)
     }
 }
 
-void PlotterListWidget::updateParsers(QStringList *parserNames)
+void PlotterListWidget::updateParsers(QStringList parserNames)
 {
     parserNamesList = parserNames;
     foreach(PlotterWidget *plotter,plotterList)
