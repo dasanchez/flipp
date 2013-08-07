@@ -12,6 +12,7 @@
 #include <QList>
 #include <QTableWidget>
 #include <QComboBox>
+#include <QTimer>
 #include <QStyledItemDelegate>
 #include <connection/connectionwidget.h>
 #include <parser/parserwidget.h>
@@ -62,6 +63,8 @@ private:
     QSpinBox *yMinSpin;
     QSpinBox *yMaxSpin;
 
+    QTimer *plotTimer;
+
     QHBoxLayout *dataSourceLayout;
     QHBoxLayout *contentLayout;
     QVBoxLayout *mainLayout;
@@ -90,7 +93,7 @@ private slots:
     void populateParserTable();
     void populatePlotArea();
     void parsedDataReady(QList<RepeatedVector> parsedData);
-
+    void updatePlot();
     //     void variableListChanged();
 };
 

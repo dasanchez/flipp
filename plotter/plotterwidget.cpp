@@ -4,11 +4,20 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     : QWidget(parent)
 {
     parserEngine = new ParserEngine;
+    plotTimer = new QTimer;
+    plotTimer->setInterval(10);
+    plotTimer->start();
     setupUI();
     connect(parserEngine,SIGNAL(dataParsed(QList<RepeatedVector>)),this,SLOT(parsedDataReady(QList<RepeatedVector>)));
+    connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
 
     //    setFixedWidth(410);
 
+}
+
+void PlotterWidget::updatePlot()
+{
+    customPlot->replot();
 }
 
 PlotterWidget::~PlotterWidget()
@@ -194,11 +203,16 @@ void PlotterWidget::populatePlotArea()
             // Add a graph for each number value
             customPlot->addGraph();
             QBrush brush;
-            brush.setColor(QColor("red"));
+            brush.setColor(QColor("black"));
             QPen pen;
             pen.setWidth(2);
             pen.setColor(QColor(255,0,0));
-                        customPlot->graph(customPlot->graphCount()-1)->setAntialiased(true);
+            //            customPlot->setBackground(brush);
+            //            customPlot->setAutoFillBackground(true);
+            customPlot->graph(customPlot->graphCount()-1)->setPen(pen);
+            customPlot->setNoAntialiasingOnDrag(true);
+            //            customPlot->graph(customPlot->graphCount()-1)setBackground(brush);
+            //                        customPlot->graph(customPlot->graphCount()-1)->setAntialiased(true);
             //            customPlot->graph(customPlot->graphCount()-1)->setBrush(brush);
             //            customPlot->graph(customPlot->graphCount()-1)->setPen(pen);
             //            customPlot->graph(customPlot->graphCount()-1)->setBrush(QBrush("red",Qt::DashLine));
@@ -250,7 +264,7 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
                 // Number variable
                 double numVal = repVector.vectors.at(0).vector.at(0)->varValue;
                 item->setText(QString("%1").arg(numVal));
-
+                customPlot->graph(numberCount)->removeData(0,xMax);
 
                 customPlot->graph(numberCount)->clearData();
                 // Append data point to plot
@@ -260,7 +274,8 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
                 {
                     customPlot->graph(numberCount)->setData(keys,valuesList.at(numberCount));
                 }
-                customPlot->replot();
+
+                //                customPlot->replot();
                 numberCount++;
             }
 
@@ -309,21 +324,29 @@ void PlotterWidget::adjustXRange()
 
         if((quint16)xMax > valuesList.at(0).size())
         {
-            QVector<double> valvec;
-            qDebug() << "xMax (" << xMax << ") is larger than valuesList vector (" << valuesList.at(0).size() << ")";
+            //            QVector<double> valvec;
+//            qDebug() << "xMax (" << xMax << ") is larger than valuesList vector (" << valuesList.at(0).size() << ")";
             quint16 newZeroes = (quint16) xMax -valuesList.at(0).size();
-            qDebug() << "Prepend " << newZeroes << " zeroes";
+//            qDebug() << "Prepend " << newZeroes << " zeroes";
 
             for(int i=0;i<valuesList.size();i++)
             {
                 for(quint16 j=0;j<newZeroes;j++)
-                valuesList[i].prepend(0);
-
+                {
+                    valuesList[i].prepend(0);
+                }
             }
         }
         else
         {
-            qDebug() << "xMax (" << xMax << ") is smaller than valuesList (" << valuesList.at(0).size() << ")";
+//            qDebug() << "xMax (" << xMax << ") is smaller than valuesList (" << valuesList.at(0).size() << ")";
+            quint16 lessPoints = valuesList.at(0).size()- (quint16) xMax;
+//            qDebug() << "Remove " << lessPoints << " points";
+            for(int i=0;i<valuesList.size();i++)
+            {
+                    valuesList[i].remove(0,lessPoints);
+            }
+
         }
     }
     //            if(xMax>valuesList.size())
@@ -349,15 +372,15 @@ void PlotterWidget::setXRange(double newMax)
 {
     xMax=newMax;
 
-//    connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
-//    xRangeSpin->setValue(xMax);
-//    connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
+    //    connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
+    //    xRangeSpin->setValue(xMax);
+    //    connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
 
-    //    keys.clear();
-//    for(int i=0;i<(quint16) newMax;i++)
-//    {
-//        keys.append(i);
-//    }
+    keys.clear();
+    for(int i=0;i<(quint16) xMax;i++)
+    {
+        keys.append(i);
+    }
     customPlot->xAxis->setRange(0,xMax);
     adjustXRange();
 }
@@ -509,6 +532,4 @@ void PlotterWidget::setupUI()
     connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
     connect(yMinSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMin(QString)));
     connect(yMaxSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMax(QString)));
-
-
 }
