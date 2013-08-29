@@ -202,14 +202,19 @@ void PlotterWidget::populatePlotArea()
 
             // Add a graph for each number value
             customPlot->addGraph();
-            QBrush brush;
-            brush.setColor(QColor("black"));
+//            QBrush brush;
+//            brush.setColor(QColor("black"));
             QPen pen;
-            pen.setWidth(2);
+            pen.setWidth(1);
             pen.setColor(QColor(255,0,0));
             //            customPlot->setBackground(brush);
             //            customPlot->setAutoFillBackground(true);
             customPlot->graph(customPlot->graphCount()-1)->setPen(pen);
+
+//            QBrush brush = customPlot->graph(customPlot->graphCount()-1)->brush();
+//            brush.setColor(QColor(100,100,100));
+//            customPlot->graph(customPlot->graphCount()-1)->setBrush(brush);
+
             customPlot->setNoAntialiasingOnDrag(true);
             //            customPlot->graph(customPlot->graphCount()-1)setBackground(brush);
             //                        customPlot->graph(customPlot->graphCount()-1)->setAntialiased(true);
@@ -435,6 +440,31 @@ void PlotterWidget::setupUI()
     customPlot = new QCustomPlot;
     customPlot->xAxis->setRange(0,xMax);
     customPlot->yAxis->setRange(yMin,yMax);
+
+
+    customPlot->setBackground(QBrush("black"));
+
+    QPen gridPen = customPlot->xAxis->grid()->pen();
+    gridPen.setColor(QColor(50,50,50));
+    customPlot->xAxis->grid()->setPen(gridPen);
+    customPlot->yAxis->grid()->setPen(gridPen);
+
+gridPen = customPlot->xAxis->basePen();
+gridPen.setColor(QColor(50,50,50));
+customPlot->xAxis->setBasePen(gridPen);
+customPlot->yAxis->setBasePen(gridPen);
+//customPlot->xAxis->setLabelColor(QColor(50,50,50));
+//customPlot->yAxis->setLabelColor(QColor(50,50,50));
+customPlot->xAxis->setTickPen(gridPen);
+customPlot->yAxis->setTickPen(gridPen);
+customPlot->xAxis->setTickLabelColor(QColor(200,200,200));
+customPlot->yAxis->setTickLabelColor(QColor(200,200,200));
+customPlot->xAxis->setSubTickPen(gridPen);
+customPlot->yAxis->setSubTickPen(gridPen);
+
+//customPlot->xAxis->set
+
+//    mygrid->setVisible(false);
 
     //    customPlot->setColor(QColor("black"));
     customPlot->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
