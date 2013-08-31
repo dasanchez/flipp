@@ -13,6 +13,7 @@
 #include <QTableWidget>
 #include <QComboBox>
 #include <QTimer>
+#include <QSplitter>
 #include <QStyledItemDelegate>
 #include <connection/connectionwidget.h>
 #include <parser/parserwidget.h>
@@ -67,6 +68,9 @@ private:
 
     QHBoxLayout *dataSourceLayout;
     QHBoxLayout *contentLayout;
+    QSplitter *contentSplitter;
+    QSplitter *plotSplitter;
+    QVBoxLayout *plotSettingsLayout;
     QVBoxLayout *mainLayout;
     
     ConnectionWidget *connectionWidget;

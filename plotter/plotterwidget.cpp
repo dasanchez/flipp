@@ -539,20 +539,43 @@ customPlot->yAxis->setSubTickPen(gridPen);
     dataSourceLayout->addWidget(parserBox);
     dataSourceLayout->addWidget(removeButton);
 
-    contentLayout = new QHBoxLayout;
-    contentLayout->addWidget(tableWidget);
-    contentLayout->addWidget(customPlot);
+//    contentLayout = new QHBoxLayout;
+//    contentLayout->addWidget(tableWidget);
+//    contentLayout->addWidget(customPlot);
+
+    contentSplitter = new QSplitter(this);
+    contentSplitter->addWidget(tableWidget);
+
 
     mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(dataSourceLayout);
-    mainLayout->addLayout(contentLayout);
 
-    mainLayout->addWidget(xRangeLabel);
-    mainLayout->addWidget(xRangeSpin);
-    mainLayout->addWidget(yMinLabel);
-    mainLayout->addWidget(yMinSpin);
-    mainLayout->addWidget(yMaxLabel);
-    mainLayout->addWidget(yMaxSpin);
+    plotSplitter = new QSplitter(this);
+    plotSplitter->addWidget(customPlot);
+
+    plotSettingsLayout = new QVBoxLayout;
+    plotSettingsLayout->addWidget(xRangeLabel);
+    plotSettingsLayout->addWidget(xRangeSpin);
+    plotSettingsLayout->addWidget(yMinLabel);
+    plotSettingsLayout->addWidget(yMinSpin);
+    plotSettingsLayout->addWidget(yMaxLabel);
+    plotSettingsLayout->addWidget(yMaxSpin);
+
+    QWidget *settingsWidget = new QWidget;
+
+    settingsWidget->setLayout(plotSettingsLayout);
+
+    plotSplitter->setOrientation(Qt::Vertical);
+    plotSplitter->addWidget(settingsWidget);
+
+contentSplitter->addWidget(plotSplitter);
+
+mainLayout->addWidget(contentSplitter);
+//    mainLayout->addWidget(contentSplitter);
+//    mainLayout->addLayout(contentLayout);
+//    mainLayout->addWidget();
+
+
 
     this->setLayout(mainLayout);
 
