@@ -14,6 +14,7 @@
 #include <QComboBox>
 #include <QTimer>
 #include <QSplitter>
+#include <QGroupBox>
 #include <QStyledItemDelegate>
 #include <connection/connectionwidget.h>
 #include <parser/parserwidget.h>
@@ -38,9 +39,9 @@ public slots:
     void assignParser(ParserWidget *);
     void changeConnection(QString);
     void changeParser(QString);
-        void setXRange(double);
-        void setYMin(QString);
-        void setYMax(QString);
+    void setXRange(double);
+    void setYMin(QString);
+    void setYMax(QString);
 
 signals:
     void plotterConnectionRequest(QString);
@@ -66,11 +67,20 @@ private:
 
     QTimer *plotTimer;
 
+    QHBoxLayout *tableLayout;
+
     QHBoxLayout *dataSourceLayout;
     QHBoxLayout *contentLayout;
     QSplitter *contentSplitter;
     QSplitter *plotSplitter;
+
+    QGroupBox *yAxisSettingsBox;
     QVBoxLayout *plotSettingsLayout;
+    QPushButton *yAxisRangeButton;
+    QHBoxLayout *yAxisMinLayout;
+    QHBoxLayout *yAxisMaxLayout;
+    QVBoxLayout *yAxisLayout;
+
     QVBoxLayout *mainLayout;
     
     ConnectionWidget *connectionWidget;
@@ -86,18 +96,20 @@ private:
 
     quint8 calcRowCount();
     void adjustXRange();
+   bool yAxisAutoRange;
 
     void setupUI();
     
 private slots:
-//    void changeConnection(QString);
+    //    void changeConnection(QString);
     void detachConnection(void);
-//    void changeParser(QString);
+    //    void changeParser(QString);
     void detachParser(void);
     void populateParserTable();
     void populatePlotArea();
     void parsedDataReady(QList<RepeatedVector> parsedData);
     void updatePlot();
+    void toggleyAxisAutoRange(bool);
     //     void variableListChanged();
 };
 
