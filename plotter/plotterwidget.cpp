@@ -11,9 +11,6 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     yAxisAutoRange = false;
     connect(parserEngine,SIGNAL(dataParsed(QList<RepeatedVector>)),this,SLOT(parsedDataReady(QList<RepeatedVector>)));
     connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
-
-    //    setFixedWidth(410);
-
 }
 
 void PlotterWidget::updatePlot()
@@ -24,9 +21,6 @@ void PlotterWidget::updatePlot()
 PlotterWidget::~PlotterWidget()
 {
 
-    //    keys.clear();
-    //    delete keys;
-    //customPlot->deleteLater();
 }
 
 QString PlotterWidget::currentConnection()
@@ -43,9 +37,6 @@ void PlotterWidget::updateConnections(QStringList connectionNames)
 {
     connectionBox->clear();
     connectionBox->addItems(connectionNames);
-    //    int index = connectionBox->findText(connectionWidget->getName());
-    //    if(index>=0)
-    //        connectionBox->setCurrentIndex(index);
     changeConnection(connectionBox->currentText());
 }
 
@@ -53,9 +44,6 @@ void PlotterWidget::updateParsers(QStringList parserNames)
 {
     parserBox->clear();
     parserBox->addItems(parserNames);
-    //    int index = parserBox->findText(connectionWidget->getName());
-    //    if(index>=0)
-    //        parserBox->setCurrentIndex(index);
 }
 
 void PlotterWidget::changeConnection(QString connection)
@@ -102,13 +90,10 @@ void PlotterWidget::detachParser()
 
 void PlotterWidget::populateParserTable()
 {
-    //    qDebug() << "populate table";
-    //    tableWidget->clear();
     quint8 i=0;
     tableWidget->setRowCount(calcRowCount());
     foreach(ComplexVariable *var,*parserWidget->variableList)
     {
-        //        qDebug() << "row: " << i << ", varName: " << var->name;
         if(var->type==VECTYPE)
         {
             QString fullName;
@@ -157,16 +142,6 @@ void PlotterWidget::populateParserTable()
             QTableWidgetItem *item3 = new QTableWidgetItem;
             item3->setCheckState(Qt::Unchecked);
             tableWidget->setItem(i,1,item3);
-            //            QWidget *container = new QWidget;
-            //            QHBoxLayout *layout = new QHBoxLayout;
-            //            layout->setSpacing(0);
-            //            layout->setMargin(0);
-            //            QCheckBox *checkBox = new QCheckBox;
-            //            layout->addStretch(1);
-            //            layout->addWidget(checkBox);
-            //            layout->addStretch(1);
-            //            container->setLayout(layout);
-            //            tableWidget->setCellWidget(i,1,container);
             i++;
         }
     }
@@ -209,9 +184,6 @@ void PlotterWidget::populatePlotArea()
             customPlot->graph(customPlot->graphCount()-1)->setPen(pen);
 
             customPlot->setNoAntialiasingOnDrag(true);
-
-
-            //            customPlot->graph(customPlot->graphCount()-1)->setData(keys,valvec);
         }
     }
 }
@@ -258,12 +230,7 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
                 // Number variable
                 double numVal = repVector.vectors.at(0).vector.at(0)->varValue;
                 item->setText(QString("%1").arg(numVal));
-                //                            customPlot->graph(numberCount)->removeData(0,xMax);
-
-                //                customPlot->graph(numberCount)->clearData();
                 // Append data point to plot
-                //                valuesList[numberCount].append(numVal);
-                //                valuesList[numberCount].remove(0);
                 if(tableWidget->item(complexCount,1)->checkState()==Qt::Checked)
                 {
                     customPlot->graph(numberCount)->addData(key,numVal);
@@ -273,24 +240,16 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
                         customPlot->graph(numberCount)->removeData(customPlot->graph(numberCount)->data()->keys().at(0));
                     }
 
-                    //                    qDebug() << QString("%1").arg(customPlot->graph(numberCount)->data()->keys().at(0),15,'f');
-
-                    //                    customPlot->graph(numberCount)->removeDataBefore(key-10);
-                    //                    customPlot->graph(numberCount)->removeDataBefore(key-8);
                     if(yAxisAutoRange)
                     {
                         customPlot->graph(numberCount)->rescaleValueAxis();
                     }
 
-                    // make key axis range scroll with the data (at a constant range size of 8):
-
-                    //                    customPlot->xAxis->setRange(key+0.25, 10, Qt::AlignRight);
+                    // make key axis range scroll with the data:
 
                     customPlot->xAxis->setRange(customPlot->graph(numberCount)->data()->keys().at(0),key+0.01);
 
                 }
-
-                //                customPlot->replot();
                 numberCount++;
             }
 
@@ -327,6 +286,23 @@ void PlotterWidget::parsedDataReady(QList<RepeatedVector> parsedData)
     //    qDebug() << output;
 }
 
+void PlotterWidget::toggleSettingsVisible(bool on)
+{
+
+    xAxisSettingsBox->setVisible(on);
+    yAxisSettingsBox->setVisible(on);
+
+    if(on)
+    {
+        showPlotSettingsButton->setText("Hide settings");
+    }
+    else
+    {
+        showPlotSettingsButton->setText("Show settings");
+    }
+
+}
+
 void PlotterWidget::adjustXRange()
 {
     // Adjust the valuesList QList to reflect the new xMax value.
@@ -339,10 +315,7 @@ void PlotterWidget::adjustXRange()
 
         if((quint16)xMax > valuesList.at(0).size())
         {
-            //            QVector<double> valvec;
-            //            qDebug() << "xMax (" << xMax << ") is larger than valuesList vector (" << valuesList.at(0).size() << ")";
             quint16 newZeroes = (quint16) xMax -valuesList.at(0).size();
-            //            qDebug() << "Prepend " << newZeroes << " zeroes";
 
             for(int i=0;i<valuesList.size();i++)
             {
@@ -354,9 +327,7 @@ void PlotterWidget::adjustXRange()
         }
         else
         {
-            //            qDebug() << "xMax (" << xMax << ") is smaller than valuesList (" << valuesList.at(0).size() << ")";
             quint16 lessPoints = valuesList.at(0).size()- (quint16) xMax;
-            //            qDebug() << "Remove " << lessPoints << " points";
             for(int i=0;i<valuesList.size();i++)
             {
                 valuesList[i].remove(0,lessPoints);
@@ -364,22 +335,6 @@ void PlotterWidget::adjustXRange()
 
         }
     }
-    //            if(xMax>valuesList.size())
-    //            {
-    //                for(int i=0;i<valuesList.size()-xMax;i++)
-    //                {
-    //                    valvec.append(0);
-    //                }
-    //                valuesList.prepend(valvec);
-    //            }
-    //            else
-    //            {
-    //                for(int i=0;i<xMax;i++)
-    //                            {
-    //                                valvec.append(0);
-    //                            }
-    //                valuesList.append(valvec);
-    //            }
 }
 
 
@@ -387,17 +342,11 @@ void PlotterWidget::setXRange(double newMax)
 {
     xMax=newMax;
 
-    //    connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
-    //    xRangeSpin->setValue(xMax);
-    //    connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
-
     keys.clear();
     for(int i=0;i<(quint16) xMax;i++)
     {
         keys.append(i);
     }
-    //    customPlot->xAxis->setRange(0,xMax);
-    //    adjustXRange();
 }
 
 void PlotterWidget::toggleyAxisAutoRange(bool on)
@@ -436,21 +385,9 @@ void PlotterWidget::setYMax(QString newMax)
     customPlot->replot();
 }
 
-//void tableItemClicked(QTableWidgetItem * item)
-//{
-//    // if check box has been clicked
-//    if (m_pressedItemState != item->checkState())
-//    {
-//        // perform check logic here
-//    }
-//}
-
 void PlotterWidget::setupUI()
 {
     delIconPixmap = QPixmap(":/images/delete_icon.png");
-    //    keys.append(0);
-    //    keys = new QVector<double>;
-    //     valuesList = new QList<QVector<double> *>;
     xMax=100;
     yMin = 0;
     yMax = 70;
@@ -462,16 +399,8 @@ void PlotterWidget::setupUI()
     connectionWidget = new ConnectionWidget;
     parserWidget = new ParserWidget;
 
-
     customPlot = new QCustomPlot;
-    customPlot->xAxis->setRange(0,xMax);
     customPlot->yAxis->setRange(yMin,yMax);
-
-
-    customPlot = new QCustomPlot;
-    //    customPlot->xAxis->setRange(0,xMax);
-    customPlot->yAxis->setRange(yMin,yMax);
-
 
     customPlot->setBackground(QBrush("black"));
 
@@ -503,14 +432,13 @@ void PlotterWidget::setupUI()
     customPlot->xAxis->setTickStep(5);
     //customPlot->axisRect()->setupFullAxesBox();
 
-    //customPlot->xAxis->set
+    showPlotSettingsButton = new QPushButton("Hide Settings");
+    showPlotSettingsButton->setFixedHeight(24);
+    showPlotSettingsButton->setCheckable(true);
+    showPlotSettingsButton->setChecked(true);
+    showPlotSettingsButton->setObjectName("showPlotSettingsBtn");
 
-    //    mygrid->setVisible(false);
-
-    //    customPlot->setColor(QColor("black"));
-    customPlot->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
-
-    xRangeLabel = new QLabel("X Range");
+    xRangeLabel = new QLabel("History");
     xRangeLabel->setFixedHeight(24);
     xRangeSpin = new QDoubleSpinBox;
     xRangeSpin->setDecimals(0);
@@ -562,17 +490,13 @@ void PlotterWidget::setupUI()
     removeButton->setIcon(QIcon(delIconPixmap));
 
     tableWidget = new QTableWidget(this);
-//    tableWidget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-//    tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     tableWidget->setColumnCount(3);
     QStringList tableHeaders;
     tableHeaders.append("Field");
     tableHeaders.append("Plot");
     tableHeaders.append("Value");
     tableWidget->setHorizontalHeaderLabels(tableHeaders);
-//    tableWidget->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Expanding);
     tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
-
 
     QHeaderView *hv = tableWidget->horizontalHeader();
     hv->setStretchLastSection(true);
@@ -590,10 +514,14 @@ void PlotterWidget::setupUI()
     dataSourceLayout->addWidget(parserBox);
     dataSourceLayout->addWidget(removeButton);
 
-    //    contentLayout = new QHBoxLayout;
-    //    contentLayout->addWidget(tableWidget);
-    //    contentLayout->addWidget(customPlot);
 
+    xAxisLayout = new QHBoxLayout;
+    xAxisLayout->addWidget(xRangeLabel);
+    xAxisLayout->addWidget(xRangeSpin);
+
+    xAxisSettingsBox = new QGroupBox("X Axis");
+    xAxisSettingsBox->setLayout(xAxisLayout);
+    xAxisSettingsBox->setFixedHeight(60);
 
     yAxisMinLayout = new QHBoxLayout;
     yAxisMinLayout->addWidget(yMinLabel);
@@ -608,20 +536,19 @@ void PlotterWidget::setupUI()
     yAxisLayout->addLayout(yAxisMaxLayout);
     yAxisSettingsBox = new QGroupBox("Y Axis");
     yAxisSettingsBox->setLayout(yAxisLayout);
+    yAxisSettingsBox->setFixedHeight(130);
 
     plotSettingsLayout = new QVBoxLayout;
-    plotSettingsLayout->addWidget(xRangeLabel);
-    plotSettingsLayout->addWidget(xRangeSpin);
+    plotSettingsLayout->addWidget(xAxisSettingsBox);
     plotSettingsLayout->addWidget(yAxisSettingsBox);
 
-    QWidget *settingsWidget = new QWidget;
-    settingsWidget->setLayout(plotSettingsLayout);
-    settingsWidget->setMaximumHeight(280);
+    plotLayout = new QVBoxLayout;
+    plotLayout->addWidget(customPlot);
+    plotLayout->addWidget(showPlotSettingsButton);
+    plotLayout->addLayout(plotSettingsLayout);
 
-    plotSplitter = new QSplitter(this);
-    plotSplitter->addWidget(customPlot);
-    plotSplitter->setOrientation(Qt::Vertical);
-    plotSplitter->addWidget(settingsWidget);
+    QWidget *plotWidgetContainer = new QWidget;
+    plotWidgetContainer->setLayout(plotLayout);
 
     tableLayout = new QHBoxLayout;
     tableLayout->addWidget(tableWidget);
@@ -629,20 +556,13 @@ void PlotterWidget::setupUI()
     QWidget *tableWidgetContainer = new QWidget;
     tableWidgetContainer->setLayout(tableLayout);
 
-
     contentSplitter = new QSplitter(this);
     contentSplitter->addWidget(tableWidgetContainer);
-    contentSplitter->addWidget(plotSplitter);
-
+    contentSplitter->addWidget(plotWidgetContainer);
 
     mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(dataSourceLayout);
     mainLayout->addWidget(contentSplitter);
-    //    mainLayout->addWidget(contentSplitter);
-    //    mainLayout->addLayout(contentLayout);
-    //    mainLayout->addWidget();
-
-
 
     this->setLayout(mainLayout);
 
@@ -653,4 +573,5 @@ void PlotterWidget::setupUI()
     connect(yMinSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMin(QString)));
     connect(yMaxSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMax(QString)));
     connect(yAxisRangeButton,SIGNAL(clicked(bool)),this,SLOT(toggleyAxisAutoRange(bool)));
+    connect(showPlotSettingsButton,SIGNAL(clicked(bool)),this,SLOT(toggleSettingsVisible(bool)));
 }

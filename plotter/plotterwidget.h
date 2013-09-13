@@ -60,6 +60,9 @@ private:
     // Plot settings
     QLabel *xRangeLabel;
     QDoubleSpinBox *xRangeSpin;
+    QHBoxLayout *xAxisLayout;
+    QGroupBox *xAxisSettingsBox;
+
     QLabel *yMinLabel;
     QLabel *yMaxLabel;
     QSpinBox *yMinSpin;
@@ -70,9 +73,12 @@ private:
     QHBoxLayout *tableLayout;
 
     QHBoxLayout *dataSourceLayout;
-    QHBoxLayout *contentLayout;
+    QVBoxLayout *plotLayout;
     QSplitter *contentSplitter;
-    QSplitter *plotSplitter;
+//    QSplitter *plotSplitter;
+
+    QPushButton *showPlotSettingsButton;
+
 
     QGroupBox *yAxisSettingsBox;
     QVBoxLayout *plotSettingsLayout;
@@ -101,16 +107,14 @@ private:
     void setupUI();
     
 private slots:
-    //    void changeConnection(QString);
     void detachConnection(void);
-    //    void changeParser(QString);
     void detachParser(void);
     void populateParserTable();
     void populatePlotArea();
     void parsedDataReady(QList<RepeatedVector> parsedData);
     void updatePlot();
     void toggleyAxisAutoRange(bool);
-    //     void variableListChanged();
+    void toggleSettingsVisible(bool);
 };
 
 #endif // CONNECTIONWIDGET_H
