@@ -221,7 +221,7 @@ border-bottom-width: 2px;
 border-bottom-color: rgb(100,100,100);
 }
 
-QPushButton#asciiButton::checked, QPushButton#hexButton::checked, QPushButton#yAxisRangeButton::checked, QPushButton#showPlotSettingsBtn::checked{
+QPushButton#asciiButton::checked, QPushButton#hexButton::checked, QPushButton#yAxisRangeButton::checked, QPushButton#showPlotSettingsBtn::checked, QPushButton#xTicksButton::checked{
 background-color: rgb(100,100,100);
 }
 

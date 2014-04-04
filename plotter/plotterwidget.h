@@ -60,8 +60,15 @@ private:
     // Plot settings
     QLabel *xRangeLabel;
     QDoubleSpinBox *xRangeSpin;
-    QHBoxLayout *xAxisLayout;
+    QHBoxLayout *xRangeLayout;
+    QLabel *xTicksLabel;
+    QPushButton *xTicksButton;
+    QSpinBox *xTicksSpin;
+    QHBoxLayout *xTicksLayout;
+
+    QVBoxLayout *xAxisLayout;
     QGroupBox *xAxisSettingsBox;
+
 
     QLabel *yMinLabel;
     QLabel *yMaxLabel;
@@ -75,7 +82,6 @@ private:
     QHBoxLayout *dataSourceLayout;
     QVBoxLayout *plotLayout;
     QSplitter *contentSplitter;
-//    QSplitter *plotSplitter;
 
     QPushButton *showPlotSettingsButton;
 
@@ -102,7 +108,7 @@ private:
 
     quint8 calcRowCount();
     void adjustXRange();
-   bool yAxisAutoRange;
+    bool yAxisAutoRange;
 
     void setupUI();
     
@@ -113,6 +119,8 @@ private slots:
     void populatePlotArea();
     void parsedDataReady(QList<RepeatedVector> parsedData);
     void updatePlot();
+    void togglexAxisAutoTicks(bool);
+    void xTicksChanged(int);
     void toggleyAxisAutoRange(bool);
     void toggleSettingsVisible(bool);
 };

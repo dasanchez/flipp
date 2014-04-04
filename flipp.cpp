@@ -21,7 +21,7 @@ Flipp::Flipp(QWidget *parent)
     connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
 
 
-    //    plotters->newPlotter();
+        plotters->newPlotter();
     setCentralWidget(plotters);
 
     createDocks();

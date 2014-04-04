@@ -349,6 +349,27 @@ void PlotterWidget::setXRange(double newMax)
     }
 }
 
+void PlotterWidget::togglexAxisAutoTicks(bool autotick)
+{
+    customPlot->xAxis->setAutoTickStep(autotick);
+    if(!autotick)
+    {
+    customPlot->xAxis->setTickStep(xTicksSpin->value());
+    }
+    else
+    {
+        customPlot->axisRect()->setupFullAxesBox();
+    }
+}
+
+void PlotterWidget::xTicksChanged(int ticks)
+{
+    if(!customPlot->xAxis->autoTickStep())
+    {
+        customPlot->xAxis->setTickStep(ticks);
+    }
+}
+
 void PlotterWidget::toggleyAxisAutoRange(bool on)
 {
     yAxisAutoRange = on;
@@ -441,10 +462,24 @@ void PlotterWidget::setupUI()
     xRangeLabel = new QLabel("History");
     xRangeLabel->setFixedHeight(24);
     xRangeSpin = new QDoubleSpinBox;
+    xRangeSpin->setFixedHeight(24);
     xRangeSpin->setDecimals(0);
     xRangeSpin->setValue(xMax);
     xRangeSpin->setMinimum(1);
     xRangeSpin->setMaximum(10000);
+
+    xTicksLabel = new QLabel("Ticks");
+    xTicksLabel->setFixedHeight(24);
+    xTicksButton = new QPushButton("Auto");
+    xTicksButton->setFixedHeight(24);
+    xTicksButton->setObjectName("xTicksButton");
+    xTicksButton->setCheckable(true);
+    xTicksButton->setChecked(false);
+    xTicksSpin = new QSpinBox;
+    xTicksSpin->setFixedHeight(24);
+    xTicksSpin->setValue(5);
+    xTicksSpin->setMinimum(1);
+    xTicksSpin->setMaximum(20);
 
     yAxisRangeButton = new QPushButton("Auto-range");
     yAxisRangeButton->setFixedHeight(24);
@@ -514,14 +549,22 @@ void PlotterWidget::setupUI()
     dataSourceLayout->addWidget(parserBox);
     dataSourceLayout->addWidget(removeButton);
 
+    xRangeLayout = new QHBoxLayout;
+    xRangeLayout->addWidget(xRangeLabel);
+    xRangeLayout->addWidget(xRangeSpin);
 
-    xAxisLayout = new QHBoxLayout;
-    xAxisLayout->addWidget(xRangeLabel);
-    xAxisLayout->addWidget(xRangeSpin);
+    xTicksLayout = new QHBoxLayout;
+    xTicksLayout->addWidget(xTicksLabel);
+    xTicksLayout->addWidget(xTicksButton);
+    xTicksLayout->addWidget(xTicksSpin);
+
+    xAxisLayout = new QVBoxLayout;
+    xAxisLayout->addLayout(xRangeLayout);
+    xAxisLayout->addLayout(xTicksLayout);
 
     xAxisSettingsBox = new QGroupBox("X Axis");
     xAxisSettingsBox->setLayout(xAxisLayout);
-    xAxisSettingsBox->setFixedHeight(60);
+    xAxisSettingsBox->setFixedHeight(100);
 
     yAxisMinLayout = new QHBoxLayout;
     yAxisMinLayout->addWidget(yMinLabel);
@@ -570,6 +613,8 @@ void PlotterWidget::setupUI()
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
     connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removePlotter()));
     connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
+    connect(xTicksButton,SIGNAL(clicked(bool)),this,SLOT(togglexAxisAutoTicks(bool)));
+    connect(xTicksSpin,SIGNAL(valueChanged(int)),this,SLOT(xTicksChanged(int)));
     connect(yMinSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMin(QString)));
     connect(yMaxSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMax(QString)));
     connect(yAxisRangeButton,SIGNAL(clicked(bool)),this,SLOT(toggleyAxisAutoRange(bool)));
