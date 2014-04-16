@@ -7,6 +7,7 @@ Flipp::Flipp(QWidget *parent)
     terminals = new TerminalListWidget(this);
     parsers = new ParserListWidget(this);
     plotters = new PlotterListWidget(this);
+    dataStaging = new DataStagingWidget(this);
 
     m_sSettingsFile = QApplication::applicationDirPath() + "/lastSettings.flp";
     //    qDebug() << m_sSettingsFile;
@@ -21,24 +22,18 @@ Flipp::Flipp(QWidget *parent)
     connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
 
 
-        plotters->newPlotter();
+    plotters->newPlotter();
     setCentralWidget(plotters);
 
     createDocks();
     createMenus();
 
-    restoreSettings();
+//    restoreSettings();
 
 
     this->setWindowTitle(tr("f l i p p"));
 
-    // Shortcuts
-//        QShortcut *shortcut = new QShortcut(QKeySequence(tr("Ctrl+S", "File|Save")));
-//        QShortcut *shortcut = new QShortcut(QKeySequence(tr("Ctrl+O", "File|Open")),
-//                                 this);
-//        shortcut->
 
-    //    QFile qss(":/styles/flipp.css");
     QFile qss("../flipp/styles/flipp.css");
     qss.open(QFile::ReadOnly);
     setStyleSheet(qss.readAll());
@@ -115,6 +110,15 @@ void Flipp::createDocks()
     parserDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     addDockWidget(Qt::TopDockWidgetArea,parserDock);
 
+    dataStagingDock = new QDockWidget(tr("Data Staging"));
+    dataStagingDock->setObjectName("DataStaging_Dock");
+    dataStagingDock->setWidget(dataStaging);
+    dataStagingDock->setFeatures(QDockWidget::DockWidgetClosable|
+                            QDockWidget::DockWidgetMovable|
+                            QDockWidget::DockWidgetFloatable);
+    dataStagingDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    addDockWidget(Qt::TopDockWidgetArea,dataStagingDock);
+
     setTabPosition(Qt::AllDockWidgetAreas,QTabWidget::North);
 }
 
@@ -153,6 +157,7 @@ void Flipp::dockWidgets()
 {
     connectionDock->setFloating(false);
     terminalDock->setFloating(false);
+    parserDock->setFloating(false);
     parserDock->setFloating(false);
 }
 

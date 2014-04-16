@@ -12,6 +12,7 @@
 #include <terminal/terminallistwidget.h>
 #include <parser/parserlistwidget.h>
 #include <plotter/plotterlistwidget.h>
+#include <datastagingwidget/datastagingwidget.h>
 
 class Flipp : public QMainWindow
 {
@@ -26,10 +27,12 @@ private:
     TerminalListWidget *terminals;
     ParserListWidget *parsers;
     PlotterListWidget *plotters;
+    DataStagingWidget *dataStaging;
     // Dock Widgets:
     QDockWidget *connectionDock;
     QDockWidget *parserDock;
     QDockWidget *terminalDock;
+    QDockWidget *dataStagingDock;
     //    QHBoxLayout *mainLayout;
     // Actions:
     QAction *exitAct;
