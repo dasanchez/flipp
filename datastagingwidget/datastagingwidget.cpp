@@ -3,21 +3,45 @@
 DataStagingWidget::DataStagingWidget(QWidget *parent) :
     QWidget(parent)
 {
-    connectionLabel = new QLabel("Connection");
+    widgetNameLabel = new QLabel("Data Staging");
+    QFont font = widgetNameLabel->font();
+    font.setPointSize(font.pointSize()+4);
+    widgetNameLabel->setFont(font);
+    newVariableButton = new QPushButton("New Variable");
+    newVariableButton->setFixedHeight(24);
+    newVariableButton->setFixedWidth(100);
+
     connectionBox = new QComboBox;
-    connectionBox->addItem("TCP GPS");
-
-    parserLabel = new QLabel("Parser");
     parserBox = new QComboBox;
-    parserBox->addItem("GPS Parser");
 
-    linkLayout = new QHBoxLayout;
+    topLayout = new QHBoxLayout;
+    topLayout->addWidget(widgetNameLabel);
+    topLayout->addWidget(newVariableButton);
 
-    linkLayout->addWidget(connectionLabel);
-    linkLayout->addWidget(connectionBox);
-    linkLayout->addWidget(parserLabel);
-    linkLayout->addWidget(parserBox);
+    dataSourceLayout = new QHBoxLayout;
+    dataSourceLayout->addWidget(connectionBox);
+    dataSourceLayout->addWidget(parserBox);
 
-    setLayout(linkLayout);
+    mainLayout = new QVBoxLayout(this);
+    mainLayout->addLayout(topLayout);
+    mainLayout->addLayout(dataSourceLayout);
+//    mainLayout->addWidget(scrollArea);
+    this->setLayout(mainLayout);
+
+}
+
+DataStagingWidget::~DataStagingWidget()
+{
+
+}
+
+void DataStagingWidget::updateConnections(QStringList connectionNames)
+{
+    connectionBox->clear();
+    connectionBox->addItems(connectionNames);
+//    int index = connectionBox->findText(connectionWidget->getName());
+  //  if(index>=0)
+  //      connectionBox->setCurrentIndex(index);
+  //  changeConnection(connectionBox->currentText());
 
 }

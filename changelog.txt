@@ -1,0 +1,1 @@
+20140415: Eliminate all instances of the plotter widget. Don't even bother with that for now. Focus on optimizing the parser.
