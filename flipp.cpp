@@ -15,9 +15,14 @@ Flipp::Flipp(QWidget *parent)
 
 
     connect(connections,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
+
+
 //    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
-//    connect(parsers,SIGNAL(parserListChanged(QStringList)),plotters,SLOT(updateParsers(QStringList)));
+connect(connections,SIGNAL(connectionListChanged(QStringList)),dataStaging,SLOT(updateConnections(QStringList)));
+connect(parsers,SIGNAL(parserListChanged(QStringList)),dataStaging,SLOT(updateParsers(QStringList)));
+
+    //    connect(parsers,SIGNAL(parserListChanged(QStringList)),plotters,SLOT(updateParsers(QStringList)));
 //    connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
 //    connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
 

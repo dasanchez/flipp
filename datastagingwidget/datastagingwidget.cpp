@@ -3,6 +3,8 @@
 DataStagingWidget::DataStagingWidget(QWidget *parent) :
     QWidget(parent)
 {
+    parserEngine = new ParserEngine;
+
     widgetNameLabel = new QLabel("Data Staging");
     QFont font = widgetNameLabel->font();
     font.setPointSize(font.pointSize()+4);
@@ -44,4 +46,10 @@ void DataStagingWidget::updateConnections(QStringList connectionNames)
   //      connectionBox->setCurrentIndex(index);
   //  changeConnection(connectionBox->currentText());
 
+}
+
+void DataStagingWidget::updateParsers(QStringList parserNames)
+{
+    parserBox->clear();
+    parserBox->addItems(parserNames);
 }

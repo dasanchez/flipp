@@ -10,6 +10,8 @@
 #include <QScrollArea>
 #include <QComboBox>
 
+#include "parser/parserengine.h"
+
 class DataStagingWidget : public QWidget
 {
     Q_OBJECT
@@ -25,7 +27,8 @@ signals:
 public slots:
 
     void updateConnections(QStringList);
-    
+    void updateParsers(QStringList);
+
 private:
     QVBoxLayout *mainLayout;
     QHBoxLayout *topLayout;
@@ -41,7 +44,7 @@ private:
 //    QScrollArea *scrollArea;
 //    QVBoxLayout *scrollAreaVLayout;
 //    QWidget *saWidgetContents;
-
+ParserEngine *parserEngine;
 };
 
 #endif // DATASTAGINGWIDGET_H
