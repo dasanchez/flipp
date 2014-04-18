@@ -9,8 +9,10 @@
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <QComboBox>
-
-#include "parser/parserengine.h"
+#include <QTableWidget>
+#include <parser/parserwidget.h>
+#include <parser/parserengine.h>
+#include <connection/connectionwidget.h>
 
 class DataStagingWidget : public QWidget
 {
@@ -22,12 +24,21 @@ public:
 
     ~DataStagingWidget();
 signals:
-    //void stagingConnectionRequest(PlotterWidget*,QString);
-    //void staginParserRequest(PlotterWidget*,QString);
+    void stagingConnectionRequest(QString);
+    void stagingParserRequest(QString);
 public slots:
 
     void updateConnections(QStringList);
     void updateParsers(QStringList);
+    void assignConnection(ConnectionWidget *);
+    void changeConnection(QString);
+    void detachConnection(void);
+    void assignParser(ParserWidget *);
+    void changeParser(QString);
+    void detachParser(void);
+
+    void populateParserTable();
+    void parsedDataReady(QList<RepeatedVector> parsedData);
 
 private:
     QVBoxLayout *mainLayout;
@@ -39,12 +50,17 @@ private:
     QComboBox *connectionBox;
     QComboBox *parserBox;
 
+    QTableWidget *tableWidget;
+
     QHBoxLayout *dataSourceLayout;
 
 //    QScrollArea *scrollArea;
 //    QVBoxLayout *scrollAreaVLayout;
 //    QWidget *saWidgetContents;
+    ParserWidget *parserWidget;
 ParserEngine *parserEngine;
+ConnectionWidget *connectionWidget;
+quint8 calcRowCount();
 };
 
 #endif // DATASTAGINGWIDGET_H

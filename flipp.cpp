@@ -18,6 +18,7 @@ Flipp::Flipp(QWidget *parent)
 
 
 //    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
+
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
 connect(connections,SIGNAL(connectionListChanged(QStringList)),dataStaging,SLOT(updateConnections(QStringList)));
 connect(parsers,SIGNAL(parserListChanged(QStringList)),dataStaging,SLOT(updateParsers(QStringList)));
@@ -26,6 +27,8 @@ connect(parsers,SIGNAL(parserListChanged(QStringList)),dataStaging,SLOT(updatePa
 //    connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
 //    connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
 
+connect(dataStaging,SIGNAL(stagingConnectionRequest(QString)),this,SLOT(handleStagingConnectionRequest(QString)));
+connect(dataStaging,SIGNAL(stagingParserRequest(QString)),this,SLOT(handleStagingParserRequest(QString)));
 
 //    plotters->newPlotter();
 //    setCentralWidget(plotters);
@@ -51,6 +54,30 @@ connect(parsers,SIGNAL(parserListChanged(QStringList)),dataStaging,SLOT(updatePa
 Flipp::~Flipp()
 {
 
+}
+
+void Flipp::handleStagingConnectionRequest(QString name)
+{
+    foreach(ConnectionWidget *connection,connections->connectionList)
+    {
+        if(connection->getName()==name)
+        {
+
+            dataStaging->assignConnection(connection);
+        }
+    }
+}
+
+void Flipp::handleStagingParserRequest(QString name)
+{
+    foreach(ParserWidget *parser,*parsers->parserList)
+    {
+        if(parser->getName()==name)
+        {
+
+            dataStaging->assignParser(parser);
+        }
+    }
 }
 
 void Flipp::handleTerminalRequest(TerminalWidget *terminal,QString name)
@@ -151,12 +178,12 @@ void Flipp::createMenus()
     connect(dockAct,SIGNAL(triggered()),this,SLOT(dockWidgets()));
     viewMenu->addAction(dockAct);
 
-//    connectionDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+Q")));
-//    viewMenu->addAction(connectionDock->toggleViewAction());
+    connectionDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+Q")));
+    viewMenu->addAction(connectionDock->toggleViewAction());
 //    terminalDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+W")));
 //    viewMenu->addAction(terminalDock->toggleViewAction());
-//    parserDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+E")));
-//    viewMenu->addAction(parserDock->toggleViewAction());
+    parserDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+E")));
+    viewMenu->addAction(parserDock->toggleViewAction());
 }
 
 void Flipp::dockWidgets()
@@ -484,7 +511,7 @@ void Flipp::saveSettings()
 //    }
 //    settings.endArray();
 
-//    settings.setValue("DOCK_LOCATIONS",saveState(1));
+    settings.setValue("DOCK_LOCATIONS",saveState(1));
 
-//    settings.sync();
+    settings.sync();
 }

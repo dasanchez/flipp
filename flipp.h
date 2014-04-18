@@ -49,6 +49,8 @@ private:
     void restoreSettings();
 
 private slots:
+    void handleStagingConnectionRequest(QString);
+    void handleStagingParserRequest(QString);
     void handleTerminalRequest(TerminalWidget*,QString);
     void handlePlotterConnectionRequest(PlotterWidget*,QString);
     void handlePlotterParserRequest(PlotterWidget*,QString);
