@@ -11,18 +11,18 @@ VectorItemWidget::VectorItemWidget(QWidget *parent) :
     setupUi();
     hexRegex.setPattern(QString("([A-Fa-f0-9]{2}( )?)+"));
 
-    variable = new BaseVariable;
-    variable->name = "variable";
-    variable->type = BYTTYPE;
-    variable->fixed=true;
-    variable->match=false;
-    variable->length=1;
-    variable->matchBytes.clear();
+    //variable = new BaseVariable;
+    variable.name = "variable";
+    variable.type = BYTTYPE;
+    variable.fixed=true;
+    variable.match=false;
+    variable.length=1;
+    variable.matchBytes.clear();
 }
 
 void VectorItemWidget::setName(QString newName)
 {
-    variable->name = newName;
+    variable.name = newName;
     disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(changeName(QString)));
     nameEdit->setText(newName);
     connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(changeName(QString)));
@@ -30,7 +30,7 @@ void VectorItemWidget::setName(QString newName)
 
 void VectorItemWidget::setType(int newType)
 {
-    variable->type = newType;
+    variable.type = newType;
     if(newType == BYTTYPE)
         setByte();
     else
@@ -40,7 +40,7 @@ void VectorItemWidget::setType(int newType)
 void VectorItemWidget::setFixed(bool newFixed)
 {
     QIcon lengthIcon;
-    variable->fixed = newFixed;
+    variable.fixed = newFixed;
     fixed = newFixed;
 
     if(fixed)
@@ -56,7 +56,7 @@ void VectorItemWidget::setFixed(bool newFixed)
 
 void VectorItemWidget::setLength(int newLength)
 {
-    variable->length = newLength;
+    variable.length = newLength;
     disconnect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
     lengthSpin->setValue(newLength);
     connect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
@@ -65,7 +65,7 @@ void VectorItemWidget::setLength(int newLength)
 void VectorItemWidget::setMatch(bool newMatched)
 {
    QIcon matchIcon;
-    variable->match = newMatched;
+    variable.match = newMatched;
     matched = newMatched;
     if(matched)
     {
@@ -80,7 +80,7 @@ void VectorItemWidget::setMatch(bool newMatched)
 
 void VectorItemWidget::setMatchBytes(QByteArray newBytes)
 {
-    variable->matchBytes = newBytes;
+    variable.matchBytes = newBytes;
 
     disconnect(matchEdit,SIGNAL(textChanged(QString)),this,SLOT(changeMatch(QString)));
     matchEdit->setText(newBytes);
@@ -91,7 +91,7 @@ void VectorItemWidget::setMatchBytes(QByteArray newBytes)
 
 void VectorItemWidget::changeName(QString newName)
 {
-    variable->name = newName;
+    variable.name = newName;
     emit variableChanged();
     emit nameChange(newName);
 }
@@ -121,7 +121,7 @@ void VectorItemWidget::setByte()
     hexButton->setEnabled(true);
 
     currentType=BYTTYPE;
-    variable->type=currentType;
+    variable.type=currentType;
     emit sizeToggled(this->sizeHint());
 }
 
@@ -136,7 +136,7 @@ void VectorItemWidget::setNumber()
 
     // Handle options' visibility
     currentType=NUMTYPE;
-    variable->type=currentType;
+    variable.type=currentType;
     emit sizeToggled(this->sizeHint());
 }
 
@@ -153,14 +153,14 @@ void VectorItemWidget::toggleLength()
         lengthIcon=varlenIconPixmap;
     }
     lengthButton->setIcon(lengthIcon);
-    variable->fixed=fixed;
+    variable.fixed=fixed;
     emit variableChanged();
     emit lengthToggle(fixed);
 }
 
 void VectorItemWidget::changeLength(int newLength)
 {
-    variable->length = newLength;
+    variable.length = newLength;
     emit variableChanged();
     emit lengthChange(newLength);
 }
@@ -179,7 +179,7 @@ void VectorItemWidget::toggleMatch()
         matchIcon=matchoffIconPixmap;
     }
     matchButton->setIcon(matchIcon);
-    variable->match = matched;
+    variable.match = matched;
     emit variableChanged();
     emit matchToggle(matched);
 }
@@ -242,7 +242,7 @@ QString VectorItemWidget::hex2char(QString hexChars)
 void VectorItemWidget::changeMatch(QString newMatch)
 {
     QByteArray characters;
-    variable->matchBytes.clear();
+    variable.matchBytes.clear();
     qDebug() << newMatch;
 
     if(hexed)
@@ -265,7 +265,7 @@ void VectorItemWidget::changeMatch(QString newMatch)
     {
         characters.append(newMatch);
     }
-    variable->matchBytes.append(characters);
+    variable.matchBytes.append(characters);
     emit variableChanged();
     emit matchChange(characters);
 }

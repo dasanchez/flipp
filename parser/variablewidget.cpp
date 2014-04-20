@@ -9,16 +9,16 @@ VariableWidget::VariableWidget(QWidget *parent) :
     matched=false;
     hexed=false;
 
-    variable = new ComplexVariable;
-    variable->name = "variable";
-    variable->type = BYTTYPE;
-    variable->fixed=true;
-    variable->match=false;
-    variable->length=1;
-    variable->repeat=5;
-    variable->matchBytes.clear();
+//    variable = new ComplexVariable;
+    variable.name = "variable";
+    variable.type = BYTTYPE;
+    variable.fixed=true;
+    variable.match=false;
+    variable.length=1;
+    variable.repeat=5;
+    variable.matchBytes.clear();
 
-    variable->vector = new QList<BaseVariable*>;
+    //variable->vector = new QList<BaseVariable>;
     itemList = new QList<VectorItemWidget*>;
 
     hexRegex.setPattern(QString("([A-Fa-f0-9]{2}( )?)+"));
@@ -27,14 +27,14 @@ VariableWidget::VariableWidget(QWidget *parent) :
 
 void VariableWidget::nameChanged(QString newName)
 {
-    variable->name = newName;
+    variable.name = newName;
     emit variableChanged();
     emit nameChange(newName);
 }
 
 QString VariableWidget::getName()
 {
-    return variable->name;
+    return variable.name;
 }
 
 void VariableWidget::setName(QString newName)
@@ -43,7 +43,7 @@ void VariableWidget::setName(QString newName)
     nameEdit->setText(newName);
     connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameChanged(QString)));
 
-    variable->name = newName;
+    variable.name = newName;
     emit variableChanged();
     emit nameChange(newName);
 }
@@ -63,7 +63,7 @@ void VariableWidget::setType(int newType)
         break;
     }
     emit variableChanged();
-    emit typeChange(variable->type);
+    emit typeChange(variable.type);
 }
 
 void VariableWidget::setFixed(bool fixedOn)
@@ -79,14 +79,14 @@ void VariableWidget::setFixed(bool fixedOn)
         lengthIcon=varlenIconPixmap;
     }
     lengthButton->setIcon(lengthIcon);
-    variable->fixed=fixed;
+    variable.fixed=fixed;
     emit variableChanged();
     emit lengthToggle(fixed);
 }
 
 void VariableWidget::setLength(int newLength)
 {
-    variable->length=newLength;
+    variable.length=newLength;
     disconnect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
     lengthSpin->setValue(newLength);
     connect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
@@ -109,7 +109,7 @@ void VariableWidget::setMatched(bool matchOn)
         matchIcon=matchoffIconPixmap;
     }
     matchButton->setIcon(matchIcon);
-    variable->match=matched;
+    variable.match=matched;
     emit variableChanged();
     emit matchToggle(matched);
 }
@@ -117,7 +117,7 @@ void VariableWidget::setMatched(bool matchOn)
 void VariableWidget::setMatchBytes(QByteArray newMatch)
 {
     QByteArray characters;
-    variable->matchBytes.clear();
+    variable.matchBytes.clear();
 
     if(hexed)
     {
@@ -145,7 +145,7 @@ void VariableWidget::setMatchBytes(QByteArray newMatch)
     else
         matchEdit->setText(characters);
     connect(matchEdit,SIGNAL(textChanged(QString)),this,SLOT(changeMatch(QString)));
-    variable->matchBytes.append(characters);
+    variable.matchBytes.append(characters);
     emit variableChanged();
     emit matchChange(characters);
 }
@@ -157,7 +157,7 @@ void VariableWidget::setRepeat(int newRepeat)
     repeatSpin->setValue(newRepeat);
     connect(repeatSpin,SIGNAL(valueChanged(int)),this,SLOT(changeRepeat(int)));
 
-    variable->repeat=newRepeat;
+    variable.repeat=newRepeat;
 
     emit variableChanged();
     emit repeatChange(newRepeat);
@@ -178,7 +178,7 @@ void VariableWidget::toggleType()
         break;
     }
     emit variableChanged();
-    emit typeChange(variable->type);
+    emit typeChange(variable.type);
 }
 
 void VariableWidget::setByte()
@@ -207,7 +207,7 @@ void VariableWidget::setByte()
     hexButton->setEnabled(true);
 
     currentType=BYTTYPE;
-    variable->type = BYTTYPE;
+    variable.type = BYTTYPE;
 
     emit sizeToggled(this->sizeHint());
 }
@@ -239,7 +239,7 @@ void VariableWidget::setNumber()
     hexButton->setEnabled(false);
 
     currentType=NUMTYPE;
-    variable->type = NUMTYPE;
+    variable.type = NUMTYPE;
     emit sizeToggled(this->sizeHint());
 }
 
@@ -265,7 +265,7 @@ void VariableWidget::setVector()
     mainLayout->addLayout(vectorListLayout);
 
     currentType=VECTYPE;
-    variable->type = VECTYPE;
+    variable.type = VECTYPE;
     emit sizeToggled(this->sizeHint());
 }
 
@@ -282,14 +282,14 @@ void VariableWidget::toggleLength()
         lengthIcon=varlenIconPixmap;
     }
     lengthButton->setIcon(lengthIcon);
-    variable->fixed=fixed;
+    variable.fixed=fixed;
     emit variableChanged();
     emit lengthToggle(fixed);
 }
 
 void VariableWidget::changeLength(int newLength)
 {
-    variable->length=newLength;
+    variable.length=newLength;
     emit variableChanged();
     emit lengthChange(newLength);
 }
@@ -308,7 +308,7 @@ void VariableWidget::toggleMatch()
         matchIcon=matchoffIconPixmap;
     }
     matchButton->setIcon(matchIcon);
-    variable->match=matched;
+    variable.match=matched;
     emit variableChanged();
     emit matchToggle(matched);
 }
@@ -334,7 +334,7 @@ void VariableWidget::toggleHex()
 void VariableWidget::changeMatch(QString newMatch)
 {
     QByteArray characters;
-    variable->matchBytes.clear();
+    variable.matchBytes.clear();
 
     if(hexed)
     {
@@ -356,14 +356,14 @@ void VariableWidget::changeMatch(QString newMatch)
     {
         characters.append(newMatch);
     }
-    variable->matchBytes.append(characters);
+    variable.matchBytes.append(characters);
     emit variableChanged();
     emit matchChange(characters);
 }
 
 void VariableWidget::changeRepeat(int newRepeat)
 {
-    variable->repeat=newRepeat;
+    variable.repeat=newRepeat;
     emit variableChanged();
     emit repeatChange(newRepeat);
 }
@@ -431,15 +431,15 @@ void VariableWidget::addVectorByte()
     item->setSizeHint(iw->sizeHint());
     vectorItemList->setItemWidget(item,iw);
     itemList->append(iw);
-    BaseVariable *bv = iw->variable;
-    variable->vector->append(bv);
+    BaseVariable bv = iw->variable;
+    variable.vector.append(bv);
     connect(iw,SIGNAL(deleteVar()),this,SLOT(vectorItemRemoved()));
     connect(iw,SIGNAL(nameChange(QString)),this,SLOT(vectorItemNameChanged(QString)));
     connect(iw,SIGNAL(variableChanged()),this,SIGNAL(variableChanged()));
     emit variableChanged();
 }
 
-void VariableWidget::addVectorVariable(BaseVariable *bvar)
+void VariableWidget::addVectorVariable(BaseVariable bvar)
 {
     QListWidgetItem *item = new QListWidgetItem;
     VectorItemWidget *iw = new VectorItemWidget(this);
@@ -447,17 +447,17 @@ void VariableWidget::addVectorVariable(BaseVariable *bvar)
     item->setSizeHint(iw->sizeHint());
     vectorItemList->setItemWidget(item,iw);
     iw->variable = bvar;
-    iw->setName(bvar->name);
-    iw->setType(bvar->type);
-    iw->setFixed(bvar->fixed);
-    iw->setLength(bvar->length);
-    iw->setMatch(bvar->match);
-    iw->setMatchBytes(bvar->matchBytes);
+    iw->setName(bvar.name);
+    iw->setType(bvar.type);
+    iw->setFixed(bvar.fixed);
+    iw->setLength(bvar.length);
+    iw->setMatch(bvar.match);
+    iw->setMatchBytes(bvar.matchBytes);
     itemList->append(iw);
 
 //    iw->variable->name = bvar->name;
 //    qDebug() << iw->variable->name;
-    variable->vector->append(bvar);
+    variable.vector.append(bvar);
     connect(iw,SIGNAL(deleteVar()),this,SLOT(vectorItemRemoved()));
     connect(iw,SIGNAL(nameChange(QString)),this,SLOT(vectorItemNameChanged(QString)));
     connect(iw,SIGNAL(variableChanged()),this,SIGNAL(variableChanged()));
@@ -489,7 +489,7 @@ void VariableWidget::addVectorNumber()
     item->setSizeHint(iw->sizeHint());
     vectorItemList->setItemWidget(item,iw);
     itemList->append(iw);
-    variable->vector->append(iw->variable);
+    variable.vector.append(iw->variable);
     connect(iw,SIGNAL(deleteVar()),this,SLOT(vectorItemRemoved()));
     connect(iw,SIGNAL(nameChange(QString)),this,SLOT(vectorItemNameChanged(QString)));
     connect(iw,SIGNAL(variableChanged()),this,SIGNAL(variableChanged()));
@@ -505,7 +505,7 @@ void VariableWidget::vectorItemResorted(int src,int dest,QListWidgetItem* item)
 {
     // Resort in list:
     itemList->insert(dest,itemList->takeAt(src));
-    variable->vector->insert(dest,variable->vector->takeAt(src));
+    variable.vector.insert(dest,variable.vector.takeAt(src));
     emit variableChanged();
 }
 
@@ -529,7 +529,7 @@ void VariableWidget::vectorItemRemoved()
     vectorItemList->removeItemWidget(vectorItemList->item(row));
     vectorItemList->takeItem(row);
     itemList->removeAt(row);
-    variable->vector->removeAt(row);
+    variable.vector.removeAt(row);
     delete op_sender;
     emit variableChanged();
 }

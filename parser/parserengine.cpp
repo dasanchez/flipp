@@ -4,7 +4,7 @@ ParserEngine::ParserEngine(QObject *parent) :
     QObject(parent)
 {
     qRegisterMetaType<VariableList> ("VariableList");
-    targetVars = new QList<ComplexVariable*>;
+    targetVars;//' = QList<ComplexVariable>;
     buffer.clear();
     bufferCount=0;
     varIndex=0;
@@ -19,7 +19,7 @@ ParserEngine::ParserEngine(QObject *parent) :
     numRegex.setPattern("( *[-+]? *\\d+\\.?\\d*)|( *[-+]? *\\d*\\.?\\d+)| +| *[+-]| *[+-] +| *[+-]? *\\.");
 }
 
-void ParserEngine::setVariables(QList<ComplexVariable*> *newVars)
+void ParserEngine::setVariables(QList<ComplexVariable> newVars)
 {
     targetVars = newVars;
     resetVariables();
@@ -99,9 +99,9 @@ byteDecision ParserEngine::checkByte(char onebyte)
 
     byteDecision dec=BYTE_HANDLED;
 
-    if(targetVars->at(varIndex)->type!=VECTYPE)
+    if(targetVars.at(varIndex).type!=VECTYPE)
     {
-        if(targetVars->at(varIndex)->type==BYTTYPE)
+        if(targetVars.at(varIndex).type==BYTTYPE)
         {
             // Assign non-number to array
             // Possible responses:
@@ -178,7 +178,7 @@ byteDecision ParserEngine::checkByte(char onebyte)
     }
     else
     {
-        if(targetVars->at(varIndex)->vector->at(vecIndex)->type==BYTTYPE)
+        if(targetVars.at(varIndex).vector.at(vecIndex).type==BYTTYPE)
         {
             // Assign non-number to array
             // Possible responses:
@@ -262,23 +262,23 @@ void ParserEngine::resetVariables()
     matchIndex=0;
     vecIndex=0;
     repeatIndex =0;
-    for(quint8 i=0;i<targetVars->size();i++)
+    for(quint8 i=0;i<targetVars.size();i++)
     {
         RepeatedVector repVec;
         // Populate vector list result with data containers
-        switch(targetVars->at(i)->type)
+        switch(targetVars.at(i).type)
         {
         case VECTYPE:
         {
             // Iterate through each repetition
-            for(quint8 j=0;j<targetVars->at(i)->repeat;j++)
+            for(quint8 j=0;j<targetVars.at(i).repeat;j++)
             {
                 // Iterate through each vector element
                 SingleVector sv;
-                for(quint8 k=0;k<targetVars->at(i)->vector->size();k++)
+                for(quint8 k=0;k<targetVars.at(i).vector.size();k++)
                 {
-                    SingleResult *sr = new SingleResult;
-                    sr->varType=targetVars->at(i)->vector->at(k)->type;
+                    SingleResult sr;// = new SingleResult;
+                    sr.varType=targetVars.at(i).vector.at(k).type;
                     sv.vector.append(sr);
                 }
                 repVec.vectors.append(sv);
@@ -289,8 +289,8 @@ void ParserEngine::resetVariables()
 
             SingleVector sv;
 
-            SingleResult *sr = new SingleResult;
-            sr->varType=targetVars->at(i)->type;
+            SingleResult sr;// = new SingleResult;
+            sr.varType=targetVars.at(i).type;
             sv.vector.append(sr);
             repVec.vectors.append(sv);
             break;
@@ -306,7 +306,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
     checkOutput->clear();
 
     // Check list size
-    if(targetVars->size()<2)
+    if(targetVars.size()<2)
     {
         testout.append("Parser will only work with two or more variables");
         checkOutput->append(testout);
@@ -315,10 +315,10 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
     }
 
     // Cycle through each variable
-    for(quint8 i=0;i<targetVars->size();i++)
+    for(quint8 i=0;i<targetVars.size();i++)
     {
         // Make sure vectors are not empty
-        if(targetVars->at(i)->type==VECTYPE && targetVars->at(i)->vector->isEmpty())
+        if(targetVars.at(i).type==VECTYPE && targetVars.at(i).vector.isEmpty())
         {
             testout.append("Vector is empty.");
             checkOutput->append(testout);
@@ -327,7 +327,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
         }
 
         // Check all special cases
-        switch(targetVars->at(i)->type)
+        switch(targetVars.at(i).type)
         {
         case BYTTYPE:
             // Invalid cases:
@@ -336,22 +336,22 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
             // 3. Variable length in a middle position and the next variable is a vector whose 1st item is not a number or a matched byte.
             // 4. Variable length in the last position and the 1st variable is a vector whose 1st item is not a number or a matched byte.
             // 5. Byte array to match is empty
-            if(!(targetVars->at(i)->fixed || targetVars->at(i)->match))
+            if(!(targetVars.at(i).fixed || targetVars.at(i).match))
             {
-                if(i<targetVars->size()-1) // Have variables left.
+                if(i<targetVars.size()-1) // Have variables left.
                 {
                     // Case 1
-                    if(!(targetVars->at(i+1)->match || targetVars->at(i+1)->type==NUMTYPE))
+                    if(!(targetVars.at(i+1).match || targetVars.at(i+1).type==NUMTYPE))
                     {
                         testout.append("Use a number or matched-byte array in after a variable-length byte array");
                         checkOutput->append(testout);
                         validList=false;
                         return validList;
                     }
-                    if(targetVars->at(i+1)->type==VECTYPE)
+                    if(targetVars.at(i+1).type==VECTYPE)
                     {
                         // Case 3
-                        if(!(targetVars->at(i+1)->vector->at(0)->match || targetVars->at(i+1)->vector->at(0)->type==NUMTYPE))
+                        if(!(targetVars.at(i+1).vector.at(0).match || targetVars.at(i+1).vector.at(0).type==NUMTYPE))
                         {
                             testout.append("Use a number or matched-byte array in after a variable-length byte array");
                             checkOutput->append(testout);
@@ -363,17 +363,17 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                 else
                 {
                     // Case 2
-                    if(!(targetVars->at(0)->match || targetVars->at(0)->type==NUMTYPE))
+                    if(!(targetVars.at(0).match || targetVars.at(0).type==NUMTYPE))
                     {
                         testout.append("Start with a number or matched byte array when the last variable is a variable-length byte array");
                         checkOutput->append(testout);
                         validList=false;
                         return validList;
                     }
-                    if(targetVars->at(0)->type==VECTYPE)
+                    if(targetVars.at(0).type==VECTYPE)
                     {
                         // Case 4
-                        if(!(targetVars->at(0)->vector->at(0)->match || targetVars->at(0)->vector->at(0)->type==NUMTYPE))
+                        if(!(targetVars.at(0).vector.at(0).match || targetVars.at(0).vector.at(0).type==NUMTYPE))
                         {
                             testout.append("Start with a number or matched byte array when the last variable is a variable-length byte array");
                             checkOutput->append(testout);
@@ -383,7 +383,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                     }
                 }
             }
-            if(targetVars->at(i)->match && targetVars->at(i)->matchBytes.isEmpty())
+            if(targetVars.at(i).match && targetVars.at(i).matchBytes.isEmpty())
             {
                 // Case 5
                 testout.append("Array to match is empty");
@@ -399,12 +399,12 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
             // 3. Variable length in the last position and the 1st variable is also a number.
             // 4. Variable length in the last position and the 1st variable is a vector whose first item is also a number.
 
-            if(!targetVars->at(i)->fixed)
+            if(!targetVars.at(i).fixed)
             {
-                if(i<targetVars->size()-1)
+                if(i<targetVars.size()-1)
                 {
                     // Case 1
-                    if(targetVars->at(i+1)->type==NUMTYPE)
+                    if(targetVars.at(i+1).type==NUMTYPE)
                     {
                         testout.append("Use a byte array after a variable-length number");
                         checkOutput->append(testout);
@@ -412,7 +412,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                         return validList;
                     }
                     // Case 2
-                    if(targetVars->at(i+1)->type==VECTYPE && targetVars->at(i+1)->vector->at(0)->type==NUMTYPE)
+                    if(targetVars.at(i+1).type==VECTYPE && targetVars.at(i+1).vector.at(0).type==NUMTYPE)
                     {
                         testout.append("Use a byte array after a variable-length number");
                         checkOutput->append(testout);
@@ -423,7 +423,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                 else
                 {
                     // Case 3
-                    if(targetVars->at(0)->type==NUMTYPE)
+                    if(targetVars.at(0).type==NUMTYPE)
                     {
                         testout.append("Start with a byte array if the last variable is a variable-length number");
                         checkOutput->append(testout);
@@ -431,7 +431,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                         return validList;
                     }
                     // Case 4
-                    if(targetVars->at(0)->type==VECTYPE && targetVars->at(0)->vector->at(0)->type==NUMTYPE)
+                    if(targetVars.at(0).type==VECTYPE && targetVars.at(0).vector.at(0).type==NUMTYPE)
                     {
                         testout.append("Start with a byte array if the last variable is a variable-length number");
                         checkOutput->append(testout);
@@ -443,9 +443,9 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
 
             break;
         case VECTYPE:
-            for(quint8 j=0;j<targetVars->at(i)->vector->size();j++)
+            for(quint8 j=0;j<targetVars.at(i).vector.size();j++)
             {
-                switch(targetVars->at(i)->vector->at(j)->type)
+                switch(targetVars.at(i).vector.at(j).type)
                 {
                 case BYTTYPE:
                     // Invalid cases:
@@ -457,12 +457,12 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                     // 6. Variable length in the last vector position and the next variable is a vector whose first item is not a number or matched byte.
                     // 7. Variable length in the last position and the 1st variable is a vector whose first item is not a number or matched byte.
 
-                    if(!(targetVars->at(i)->vector->at(j)->fixed || targetVars->at(i)->vector->at(j)->match))
+                    if(!(targetVars.at(i).vector.at(j).fixed || targetVars.at(i).vector.at(j).match))
                     {
-                        if(j<targetVars->at(i)->vector->size()-1)
+                        if(j<targetVars.at(i).vector.size()-1)
                         {
                             // Case 1
-                            if(!(targetVars->at(i)->vector->at(j+1)->match || targetVars->at(i)->vector->at(j+1)->type==NUMTYPE))
+                            if(!(targetVars.at(i).vector.at(j+1).match || targetVars.at(i).vector.at(j+1).type==NUMTYPE))
                             {
                                 testout.append("Use a number or matched-byte array in after a variable-length byte array");
                                 checkOutput->append(testout);
@@ -473,17 +473,17 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                         else
                         {
                             // Case 2
-                            if(!(targetVars->at(i)->vector->at(0)->match || targetVars->at(i+1)->vector->at(0)->type==NUMTYPE))
+                            if(!(targetVars.at(i).vector.at(0).match || targetVars.at(i+1).vector.at(0).type==NUMTYPE))
                             {
                                 testout.append("Start with a number or matched byte array when the last variable is a variable-length byte array");
                                 checkOutput->append(testout);
                                 validList=false;
                                 return validList;
                             }
-                            if(i<targetVars->size()-1)
+                            if(i<targetVars.size()-1)
                             {
                                 // Case 3
-                                if(!(targetVars->at(i+1)->match || targetVars->at(i+1)->type==NUMTYPE))
+                                if(!(targetVars.at(i+1).match || targetVars.at(i+1).type==NUMTYPE))
                                 {
                                     testout.append("Use a number or matched-byte array in after a variable-length byte array");
                                     checkOutput->append(testout);
@@ -491,10 +491,10 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                                     return validList;
                                 }
 
-                                if(targetVars->at(i+1)->type==VECTYPE)
+                                if(targetVars.at(i+1).type==VECTYPE)
                                 {
                                     // Case 6
-                                    if(!(targetVars->at(i+1)->vector->at(0)->match || targetVars->at(i+1)->vector->at(0)->type==NUMTYPE))
+                                    if(!(targetVars.at(i+1).vector.at(0).match || targetVars.at(i+1).vector.at(0).type==NUMTYPE))
                                     {
                                         testout.append("Use a number or matched-byte array in after a variable-length byte array");
                                         checkOutput->append(testout);
@@ -506,17 +506,17 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                             else
                             {
                                 // Case 4
-                                if(!(targetVars->at(0)->match || targetVars->at(0)->type==NUMTYPE))
+                                if(!(targetVars.at(0).match || targetVars.at(0).type==NUMTYPE))
                                 {
                                     testout.append("Start with a number or matched byte array when the last variable is a variable-length byte array");
                                     checkOutput->append(testout);
                                     validList=false;
                                     return validList;
                                 }
-                                if(targetVars->at(0)->type==VECTYPE)
+                                if(targetVars.at(0).type==VECTYPE)
                                 {
                                     // Case 7
-                                    if(!(targetVars->at(0)->vector->at(0)->match || targetVars->at(0)->vector->at(0)->type==NUMTYPE))
+                                    if(!(targetVars.at(0).vector.at(0).match || targetVars.at(0).vector.at(0).type==NUMTYPE))
                                     {
                                         testout.append("Start with a number or matched byte array when the last variable is a variable-length byte array");
                                         checkOutput->append(testout);
@@ -527,7 +527,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                             }
                         }
                         // Case 5
-                        if(targetVars->at(i)->vector->at(j)->match && targetVars->at(i)->vector->at(j)->matchBytes.isEmpty())
+                        if(targetVars.at(i).vector.at(j).match && targetVars.at(i).vector.at(j).matchBytes.isEmpty())
                         {
                             testout.append("Array to match is empty");
                             checkOutput->append(testout);
@@ -544,12 +544,12 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                     // 4. Variable length in the last vector position and the 1st variable is also a number.
                     // 5. Variable length in the last vector position and the next variable is a vector whose first item is also a number.
                     // 6. Variable length in the last position and the 1st variable is a vector whose first item is also a number.
-                    if(!targetVars->at(i)->vector->at(j)->fixed)
+                    if(!targetVars.at(i).vector.at(j).fixed)
                     {
-                        if(j<targetVars->at(i)->vector->size()-1)
+                        if(j<targetVars.at(i).vector.size()-1)
                         {
                             // Case 1
-                            if(!(targetVars->at(i)->vector->at(j+1)->match || targetVars->at(i)->vector->at(j+1)->type==NUMTYPE))
+                            if(!(targetVars.at(i).vector.at(j+1).match || targetVars.at(i).vector.at(j+1).type==NUMTYPE))
                             {
                                 testout.append("Use a byte array after a variable-length number");
                                 checkOutput->append(testout);
@@ -560,7 +560,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                         else
                         {
                             // Case 2
-                            if(targetVars->at(i)->vector->at(0)->type==NUMTYPE)
+                            if(targetVars.at(i).vector.at(0).type==NUMTYPE)
                             {
                                 testout.append("Start with a byte array if the last variable is a variable-length number");
                                 checkOutput->append(testout);
@@ -568,19 +568,19 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                                 return validList;
                             }
                             // Case 3
-                            if(i<targetVars->size()-1)
+                            if(i<targetVars.size()-1)
                             {
-                                if(targetVars->at(i+1)->type==NUMTYPE)
+                                if(targetVars.at(i+1).type==NUMTYPE)
                                 {
                                     testout.append("Use a byte array after a variable-length number");
                                     checkOutput->append(testout);
                                     validList=false;
                                     return validList;
                                 }
-                                if(targetVars->at(i+1)->type==VECTYPE)
+                                if(targetVars.at(i+1).type==VECTYPE)
                                 {
                                     // Case 5
-                                    if(targetVars->at(i+1)->vector->at(0)->type==NUMTYPE)
+                                    if(targetVars.at(i+1).vector.at(0).type==NUMTYPE)
                                     {
                                         testout.append("Use a byte array after a variable-length number");
                                         checkOutput->append(testout);
@@ -592,7 +592,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                             else
                             {
                                 // Case 4
-                                if(targetVars->at(0)->type==NUMTYPE)
+                                if(targetVars.at(0).type==NUMTYPE)
                                 {
                                     testout.append("Start with a byte array if the last variable is a variable-length number");
                                     checkOutput->append(testout);
@@ -600,7 +600,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
                                     return validList;
                                 }
                                 // Case 6
-                                if(targetVars->at(0)->vector->at(0)->type==NUMTYPE)
+                                if(targetVars.at(0).vector.at(0).type==NUMTYPE)
                                 {
                                     testout.append("Start with a byte array if the last variable is a variable-length number");
                                     checkOutput->append(testout);
@@ -633,20 +633,20 @@ int ParserEngine::assignNonNumber(char newChar)
 {
     // Handle match:
     // Do ComplexVariable first
-    if(targetVars->at(varIndex)->type!=VECTYPE)
+    if(targetVars.at(varIndex).type!=VECTYPE)
     {
-        if(targetVars->at(varIndex)->match)
+        if(targetVars.at(varIndex).match)
         {
 
-            if(targetVars->at(varIndex)->matchBytes.at(matchIndex)==newChar)
+            if(targetVars.at(varIndex).matchBytes.at(matchIndex)==newChar)
             {
                 // Byte matches OK
                 // Two cases:
                 // 1. Byte completes matchBytes array
                 // 2. Byte does not complete matchBytes array (default)
-                masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
+                masterList[varIndex].vectors[0].vector[0].varBytes.append(newChar);
                 matchIndex++;
-                if(masterList.at(varIndex).vectors[0].vector[0]->varBytes.size()==targetVars->at(varIndex)->matchBytes.size())
+                if(masterList[varIndex].vectors[0].vector[0].varBytes.size()==targetVars.at(varIndex).matchBytes.size())
                 {
                     // Case 1
                     matchIndex=0;
@@ -661,14 +661,14 @@ int ParserEngine::assignNonNumber(char newChar)
                 return INVALID_ERR;
             }
         }
-        else if(targetVars->at(varIndex)->fixed)
+        else if(targetVars.at(varIndex).fixed)
         {
             // Fixed
             // Two cases:
             // 1. Byte completes variable length
             // 2. Byte does not complete variable length
-            masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
-            if(masterList.at(varIndex).vectors[0].vector[0]->varBytes.size()==targetVars->at(varIndex)->length)
+            masterList[varIndex].vectors[0].vector[0].varBytes.append(newChar);
+            if(masterList[varIndex].vectors[0].vector[0].varBytes.size()==targetVars.at(varIndex).length)
             {
                 // Case 1
                 variableComplete();
@@ -701,7 +701,7 @@ int ParserEngine::assignNonNumber(char newChar)
                 break;
             default:
                 // Case 2:
-                masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
+                masterList[varIndex].vectors[0].vector[0].varBytes.append(newChar);
                 break;
             }
             return VALID_CHAR;
@@ -710,18 +710,18 @@ int ParserEngine::assignNonNumber(char newChar)
     // Do BaseVariable next
     else
     {
-        if(targetVars->at(varIndex)->vector->at(vecIndex)->match)
+        if(targetVars.at(varIndex).vector.at(vecIndex).match)
         {
             // Matched bytes
-            if(targetVars->at(varIndex)->vector->at(vecIndex)->matchBytes.at(matchIndex)==newChar)
+            if(targetVars.at(varIndex).vector.at(vecIndex).matchBytes.at(matchIndex)==newChar)
             {
                 // byte matches OK
                 // Two cases:
                 // 1. Byte completes matchBytes array
                 // 2. Byte does not complete matchBytes array (default)
-                masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
+                masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.append(newChar);
                 matchIndex++;
-                if(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.size()==targetVars->at(varIndex)->vector->at(vecIndex)->matchBytes.size())
+                if(masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.size()==targetVars.at(varIndex).vector.at(vecIndex).matchBytes.size())
                 {
                     // Case 1
                     matchIndex=0;
@@ -735,14 +735,14 @@ int ParserEngine::assignNonNumber(char newChar)
                 return INVALID_ERR;
             }
         }
-        else  if(targetVars->at(varIndex)->vector->at(vecIndex)->fixed)
+        else  if(targetVars[varIndex].vector.at(vecIndex).fixed)
         {
             // Fixed
             // Two cases:
             // 1. Byte completes variable length
             // 2. Byte does not complete variable length
-            masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
-            if(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.size()==targetVars->at(varIndex)->vector->at(vecIndex)->length)
+            masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.append(newChar);
+            if(masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.size()==targetVars.at(varIndex).vector.at(vecIndex).length)
             {
                 // Case 1
                 variableComplete();
@@ -775,7 +775,7 @@ int ParserEngine::assignNonNumber(char newChar)
                 break;
             default:
                 // Case 2:
-                masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
+                masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.append(newChar);
                 break;
             }
             return VALID_CHAR;
@@ -805,20 +805,20 @@ int ParserEngine::assignNumber(char newChar)
         // Incoming byte is a number
         // Cases:
         // Complex Variable
-        if(targetVars->at(varIndex)->type!=VECTYPE)
+        if(targetVars.at(varIndex).type!=VECTYPE)
         {
 
-            if(targetVars->at(varIndex)->fixed)
+            if(targetVars.at(varIndex).fixed)
             {
                 // Fixed length
                 // Case 1: Incoming byte completes length
                 // Case 2: Incoming byte does not complete length
                 // Case 3: Incoming byte invalidates buffer
-                masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
-                if(masterList.at(varIndex).vectors[0].vector[0]->varBytes.size()==targetVars->at(varIndex)->length)
+                masterList[varIndex].vectors[0].vector[0].varBytes.append(newChar);
+                if(masterList[varIndex].vectors[0].vector[0].varBytes.size()==targetVars.at(varIndex).length)
                 {
                     // Case 1
-                    masterList.at(varIndex).vectors[0].vector[0]->varValue=masterList.at(varIndex).vectors[0].vector[0]->varBytes.toDouble();
+                    masterList[varIndex].vectors[0].vector[0].varValue=masterList[varIndex].vectors[0].vector[0].varBytes.toDouble();
                     variableComplete();
                 }
                 return VALID_CHAR;
@@ -829,18 +829,18 @@ int ParserEngine::assignNumber(char newChar)
                 // Case 1: Incoming byte keeps buffer valid
                 // Case 2: Incoming byte invalidates buffer
                 QByteArray checkArray;
-                checkArray.append(masterList.at(varIndex).vectors[0].vector[0]->varBytes);
+                checkArray.append(masterList[varIndex].vectors[0].vector[0].varBytes);
                 checkArray.append(newChar);
                 if(numRegex.indexIn(checkArray)==0 && numRegex.matchedLength()==checkArray.size())
                 {
                     // Case 1
-                    masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
+                    masterList[varIndex].vectors[0].vector[0].varBytes.append(newChar);
                     return VALID_CHAR;
                 }
                 else
                 {
                     // Case 2
-                    masterList.at(varIndex).vectors[0].vector[0]->varValue=masterList.at(varIndex).vectors[0].vector[0]->varBytes.toDouble();
+                    masterList[varIndex].vectors[0].vector[0].varValue=masterList[varIndex].vectors[0].vector[0].varBytes.toDouble();
                     variableComplete();
                     return INVALID_OK;
                 }
@@ -850,17 +850,17 @@ int ParserEngine::assignNumber(char newChar)
         // Base Variable
         else
         {
-            if(targetVars->at(varIndex)->vector->at(vecIndex)->fixed)
+            if(targetVars[varIndex].vector.at(vecIndex).fixed)
             {
                 // Fixed length
                 // Case 1: Incoming byte completes length
                 // Case 2: Incoming byte does not complete length
                 // Case 3: Incoming byte invalidates buffer
-                masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
-                if(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.size()==targetVars->at(varIndex)->vector->at(vecIndex)->length)
+                masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.append(newChar);
+                if(masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.size()==targetVars.at(varIndex).vector.at(vecIndex).length)
                 {
                     // Case 1
-                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varValue=masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.toDouble();
+                    masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varValue=masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.toDouble();
                     variableComplete();
                 }
                 return VALID_CHAR;
@@ -871,18 +871,18 @@ int ParserEngine::assignNumber(char newChar)
                 // Case 1: Incoming byte keeps buffer valid
                 // Case 2: Incoming byte invalidates buffer
                 QByteArray checkArray;
-                checkArray.append(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes);
+                checkArray.append(masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes);
                 checkArray.append(newChar);
                 if(numRegex.indexIn(checkArray)==0 && numRegex.matchedLength()==checkArray.size())
                 {
                     // Case 1
-                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
+                    masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.append(newChar);
                     return VALID_CHAR;
                 }
                 else
                 {
                     // Case 2
-                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varValue=masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.toDouble();
+                    masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varValue=masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.toDouble();
                     variableComplete();
                     return INVALID_OK;
                 }
@@ -892,9 +892,9 @@ int ParserEngine::assignNumber(char newChar)
     default:
         // Incoming byte is not even a number
         // Check Complex Variable first
-        if(targetVars->at(varIndex)->type!=VECTYPE)
+        if(targetVars.at(varIndex).type!=VECTYPE)
         {
-            if(targetVars->at(varIndex)->fixed)
+            if(targetVars.at(varIndex).fixed)
             {
                 return INVALID_ERR;
             }
@@ -904,19 +904,19 @@ int ParserEngine::assignNumber(char newChar)
                 // Case 1: Incoming byte keeps buffer valid
                 // Case 2: Incoming byte invalidates buffer
                 QByteArray checkArray;
-                checkArray.append(masterList.at(varIndex).vectors[0].vector[0]->varBytes);
+                checkArray.append(masterList[varIndex].vectors[0].vector[0].varBytes);
                 checkArray.append(newChar);
                 if(numRegex.indexIn(checkArray)==0 && numRegex.matchedLength()==checkArray.size())
                 {
                     // Case 1
                     // Modify to check that the matched regex length equals the length in checkarray
-                    masterList.at(varIndex).vectors[0].vector[0]->varBytes.append(newChar);
+                    masterList[varIndex].vectors[0].vector[0].varBytes.append(newChar);
                     return VALID_CHAR;
                 }
                 else
                 {
                     // Case 2
-                    masterList.at(varIndex).vectors[0].vector[0]->varValue=masterList.at(varIndex).vectors[0].vector[0]->varBytes.toDouble();
+                    masterList[varIndex].vectors[0].vector[0].varValue=masterList[varIndex].vectors[0].vector[0].varBytes.toDouble();
                     variableComplete();
                     return INVALID_OK;
                 }
@@ -925,7 +925,7 @@ int ParserEngine::assignNumber(char newChar)
         else
         {
             // Base Variable
-            if(targetVars->at(varIndex)->vector->at(vecIndex)->fixed)
+            if(targetVars.at(varIndex).vector.at(vecIndex).fixed)
             {
                 return INVALID_ERR;
             }
@@ -935,19 +935,19 @@ int ParserEngine::assignNumber(char newChar)
                 // Case 1: Incoming byte keeps buffer valid
                 // Case 2: Incoming byte invalidates buffer
                 QByteArray checkArray;
-                checkArray.append(masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes);
+                checkArray.append(masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes);
                 checkArray.append(newChar);
 
                 if(numRegex.indexIn(checkArray)==0 && numRegex.matchedLength()==checkArray.size())
                 {
                     // Case 1
-                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.append(newChar);
+                    masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.append(newChar);
                     return VALID_CHAR;
                 }
                 else
                 {
                     // Case 2
-                    masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varValue=masterList.at(varIndex).vectors[repeatIndex].vector[vecIndex]->varBytes.toDouble();
+                    masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varValue=masterList[varIndex].vectors[repeatIndex].vector[vecIndex].varBytes.toDouble();
                     variableComplete();
                     return INVALID_OK;
                 }
@@ -960,15 +960,15 @@ int ParserEngine::assignNumber(char newChar)
 void ParserEngine::variableComplete()
 {
     // ComplexVariable case:
-    if(targetVars->at(varIndex)->type==VECTYPE)
+    if(targetVars.at(varIndex).type==VECTYPE)
     {
         vecIndex++;
-        if(vecIndex==targetVars->at(varIndex)->vector->size())
+        if(vecIndex==targetVars.at(varIndex).vector.size())
         {
             // Vector is complete
             repeatIndex++;
             vecIndex=0;
-            if(repeatIndex==targetVars->at(varIndex)->repeat)
+            if(repeatIndex==targetVars.at(varIndex).repeat)
             {
                 // All repetitions have been caught.
                 varIndex++;
@@ -987,10 +987,10 @@ void ParserEngine::variableComplete()
         //          qDebug() << "Full list caught";
         varIndex++;
     }
-    if(varIndex==targetVars->size())
+    if(varIndex==targetVars.size())
     {
         listComplete=true;
-//        qDebug() << masterList.at(0).vectors.at(0).vector.at(0)->varBytes;
+
         emit dataParsed(masterList);
 
 //        qDebug() << "Full list caught";
@@ -1012,8 +1012,8 @@ void ParserEngine::clearVariables()
         {
             for(quint8 k=0;k<masterList.at(i).vectors.at(j).vector.size();k++)
             {
-                masterList.at(i).vectors.at(j).vector.at(k)->varBytes.clear();
-                masterList.at(i).vectors.at(j).vector.at(k)->varValue=0;
+                masterList[i].vectors[j].vector[k].varBytes.clear();
+                masterList[i].vectors[j].vector[k].varValue=0;
                 //                resultVals->at(i)->bytesFound.at(j)->clear();
                 //                resultVals->at(i)->valuesFound.at(j)->clear();
             }

@@ -59,7 +59,7 @@ private:
 
 public:
     explicit VectorItemWidget(QWidget *parent = 0);
-    BaseVariable *variable;
+    BaseVariable variable;
     int currentType;
     bool matched;
     bool fixed;

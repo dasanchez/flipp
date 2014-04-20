@@ -323,30 +323,30 @@ void Flipp::restoreSettings()
                     settings.setArrayIndex(k);
 
                     // Get variable features and initialize each vector item with them:
-                    BaseVariable *bv = new BaseVariable;
-                    bv->name = settings.value("Name").toString();
+                    BaseVariable bv;// = new BaseVariable;
+                    bv.name = settings.value("Name").toString();
                     if(settings.value("Fixed").toBool())
                     {
-                        bv->fixed = true;
-                        bv->length = settings.value("Length").toInt();
+                        bv.fixed = true;
+                        bv.length = settings.value("Length").toInt();
                     }
                     else
                     {
-                        bv->fixed = false;
+                        bv.fixed = false;
                     }
 
                     if(settings.value("Type").toInt()==NUMTYPE)
                     {
-                        bv->type = NUMTYPE;
+                        bv.type = NUMTYPE;
 
                     }
                     else
                     {
-                        bv->type = BYTTYPE;
+                        bv.type = BYTTYPE;
                         if(settings.value("Match").toBool())
                         {
-                            bv->match = true;
-                            bv->matchBytes = settings.value("MBytes").toByteArray();
+                            bv.match = true;
+                            bv.matchBytes = settings.value("MBytes").toByteArray();
                         }
                     }
                     vw->addVectorVariable(bv);
@@ -398,6 +398,7 @@ void Flipp::restoreSettings()
 
 }
 
+
 void Flipp::saveSettings()
 {
     // Read settings file
@@ -447,32 +448,32 @@ void Flipp::saveSettings()
         // Save an array of variable widgets
 
         settings.beginWriteArray("Complex");
-        for(int i=0;i<pw->variableList->size();i++)
+        for(int i=0;i<pw->variableList.size();i++)
         {
             settings.setArrayIndex(i);
-            settings.setValue("Name",pw->variableList->at(i)->name);
-            settings.setValue("Type",pw->variableList->at(i)->type);
-            if(pw->variableList->at(i)->type==VECTYPE)
+            settings.setValue("Name",pw->variableList[i].name);
+            settings.setValue("Type",pw->variableList[i].type);
+            if(pw->variableList[i].type==VECTYPE)
             {
-                settings.setValue("Repeat",pw->variableList->at(i)->repeat);
+                settings.setValue("Repeat",pw->variableList[i].repeat);
                 // Save an array of base variables
                 settings.beginWriteArray("Base");
-                for(int j=0;j<pw->variableList->at(i)->vector->size();j++)
+                for(int j=0;j<pw->variableList[i].vector.size();j++)
                 {
                     settings.setArrayIndex(j);
 
-                    settings.setValue("Name",pw->variableList->at(i)->vector->at(j)->name);
-                    settings.setValue("Type",pw->variableList->at(i)->vector->at(j)->type);
-                    settings.setValue("Fixed",pw->variableList->at(i)->vector->at(j)->fixed);
-                    if(pw->variableList->at(i)->vector->at(j)->fixed)
+                    settings.setValue("Name",pw->variableList[i].vector.at(j).name);
+                    settings.setValue("Type",pw->variableList[i].vector.at(j).type);
+                    settings.setValue("Fixed",pw->variableList[i].vector.at(j).fixed);
+                    if(pw->variableList[i].vector.at(j).fixed)
                     {
-                        settings.setValue("Length",pw->variableList->at(i)->vector->at(j)->length);
+                        settings.setValue("Length",pw->variableList[i].vector.at(j).length);
                     }
-                    settings.setValue("Match",pw->variableList->at(i)->vector->at(j)->match);
-                    if(pw->variableList->at(i)->vector->at(j)->match)
+                    settings.setValue("Match",pw->variableList[i].vector.at(j).match);
+                    if(pw->variableList[i].vector.at(j).match)
                     {
-                        qDebug() << pw->variableList->at(i)->vector->at(j)->matchBytes;
-                        settings.setValue("MBytes",pw->variableList->at(i)->vector->at(j)->matchBytes);
+                        qDebug() << pw->variableList[i].vector.at(j).matchBytes;
+                        settings.setValue("MBytes",pw->variableList[i].vector.at(j).matchBytes);
                     }
 
                 }
@@ -481,15 +482,15 @@ void Flipp::saveSettings()
             else
             {
                 // Save an individual complex variable
-                settings.setValue("Fixed",pw->variableList->at(i)->fixed);
-                if(pw->variableList->at(i)->fixed)
+                settings.setValue("Fixed",pw->variableList[i].fixed);
+                if(pw->variableList[i].fixed)
                 {
-                    settings.setValue("Length",pw->variableList->at(i)->length);
+                    settings.setValue("Length",pw->variableList[i].length);
                 }
-                settings.setValue("Match",pw->variableList->at(i)->match);
-                if(pw->variableList->at(i)->match)
+                settings.setValue("Match",pw->variableList[i].match);
+                if(pw->variableList[i].match)
                 {
-                    settings.setValue("MBytes",pw->variableList->at(i)->matchBytes);
+                    settings.setValue("MBytes",pw->variableList[i].matchBytes);
                 }
             }
         }
@@ -515,3 +516,4 @@ void Flipp::saveSettings()
 
     settings.sync();
 }
+

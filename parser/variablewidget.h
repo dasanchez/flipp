@@ -71,7 +71,7 @@ private:
 
 public:
     explicit VariableWidget(QWidget *parent = 0);
-    ComplexVariable *variable;
+    ComplexVariable variable;
 
     int currentType;
     bool matched;
@@ -125,7 +125,7 @@ public slots:
     void vectorItemResorted(int,int,QListWidgetItem*);
     void vectorItemRemoved();
     void addVectorByte(void);
-    void addVectorVariable(BaseVariable *);
+    void addVectorVariable(BaseVariable);
 //    void addVectorByte(QString varName, bool fixed, int length, bool matched, QByteArray mbytes);
     void addVectorNumber(void);
 //    void addVectorNumber(QString varName, bool fixed, int length);

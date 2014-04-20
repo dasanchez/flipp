@@ -39,7 +39,7 @@ ParserWidget::ParserWidget(QWidget *parent) :
     deleteButton->setIcon(QIcon(delIconPixmap));
 
     vwList = new QList<VariableWidget*>;
-    variableList = new QList<ComplexVariable*>;
+    //variableList = new QList<ComplexVariable*>;
     lw = new LiveListWidget(this);
 
 //    for(quint8 i =0;i<1;i++)
@@ -149,7 +149,7 @@ void ParserWidget::newVariable()
     }
 
     vwList->append(vw);
-    variableList->append(vw->variable);
+    variableList.append(vw->variable);
     QListWidgetItem *item = new QListWidgetItem(lw);
 
     lw->addItem(item);
@@ -172,7 +172,7 @@ void ParserWidget::newVariable()
 void ParserWidget::addVariableWidget(VariableWidget *vw)
 {
     vwList->append(vw);
-    variableList->append(vw->variable);
+    variableList.append(vw->variable);
     QListWidgetItem *item = new QListWidgetItem(lw);
     lw->addItem(item);
     item->setSizeHint(vw->sizeHint());
@@ -196,7 +196,7 @@ void ParserWidget::remVariable()
     VariableWidget *vw = static_cast<VariableWidget*>(QObject::sender());
     int row = vwList->indexOf(vw);
     QListWidgetItem *item = lw->item(row);
-    variableList->removeAt(row);
+    variableList.removeAt(row);
     lw->removeItemWidget(item);
     lw->takeItem(row);
     vwList->removeAt(row);
@@ -218,13 +218,13 @@ void ParserWidget::resorted(int src,int dest,QListWidgetItem* item)
 
     // Resort in list:
     vwList->insert(dest, vwList->takeAt(src));
-    variableList->insert(dest,variableList->takeAt(src));
+    variableList.insert(dest,variableList.takeAt(src));
     variableListChanged();
 }
 
 void ParserWidget::itemRemoved(int row)
 {
-    variableList->removeAt(row);
+    variableList.removeAt(row);
     delete vwList->at(row);
     vwList->removeAt(row);
     variableListChanged();
@@ -232,11 +232,11 @@ void ParserWidget::itemRemoved(int row)
 
 void ParserWidget::printList()
 {
-    foreach(ComplexVariable *item, *variableList)
+    foreach(ComplexVariable item, variableList)
     {
-        QString outString = item->name;
+        QString outString = item.name;
         outString.append("| type: ");
-        switch(item->type)
+        switch(item.type)
         {
         case BYTTYPE:
             outString.append("byt, ");
@@ -246,15 +246,15 @@ void ParserWidget::printList()
             break;
         default:
             outString.append("vec, rep: ");
-            outString.append(QString("%1:\n").arg(item->repeat));
+            outString.append(QString("%1:\n").arg(item.repeat));
             // Print vector contents
-            foreach(BaseVariable *vecItem, *item->vector)
+            foreach(BaseVariable vecItem, item.vector)
             {
                 outString.append("\t");
-                outString.append(vecItem->name);
+                outString.append(vecItem.name);
                 outString.append("| ");
                 // Type
-                if(vecItem->type==BYTTYPE)
+                if(vecItem.type==BYTTYPE)
                 {
                     outString.append("byt, ");
                 }
@@ -263,20 +263,20 @@ void ParserWidget::printList()
                     outString.append("num, ");
                 }
                 // Length
-                if(vecItem->fixed)
+                if(vecItem.fixed)
                 {
                     outString.append("length: fix, ");
-                    outString.append(QString("len_val: %1, ").arg(vecItem->length));
+                    outString.append(QString("len_val: %1, ").arg(vecItem.length));
                 }
                 else
                 {
                     outString.append("length: var, ");
                 }
                 // Match
-                if(vecItem->match)
+                if(vecItem.match)
                 {
                     outString.append("match: yes: , ");
-                    outString.append(vecItem->matchBytes.toHex());
+                    outString.append(vecItem.matchBytes.toHex());
                 }
                 else
                 {
@@ -287,22 +287,22 @@ void ParserWidget::printList()
 
             break;
         }
-        if(item->type!=VECTYPE)
+        if(item.type!=VECTYPE)
         {
-            if(item->fixed)
+            if(item.fixed)
             {
                 outString.append("length: fix, ");
-                outString.append(QString("len_val: %1, ").arg(item->length));
+                outString.append(QString("len_val: %1, ").arg(item.length));
             }
             else
             {
                 outString.append("length: var, ");
             }
 
-            if(item->match)
+            if(item.match)
             {
                 outString.append("match: yes: ");
-                outString.append(item->matchBytes.toHex());
+                outString.append(item.matchBytes.toHex());
             }
             else
             {

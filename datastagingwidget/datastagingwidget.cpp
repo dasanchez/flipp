@@ -142,17 +142,17 @@ void DataStagingWidget::populateParserTable()
 {
     quint8 i=0;
     tableWidget->setRowCount(calcRowCount());
-    foreach(ComplexVariable *var,*parserWidget->variableList)
+    foreach(ComplexVariable var, parserWidget->variableList)
     {
-        if(var->type==VECTYPE)
+        if(var.type==VECTYPE)
         {
             QString fullName;
-            foreach(BaseVariable *bvar,*var->vector)
+            foreach(BaseVariable bvar, var.vector)
             {
                 fullName.clear();
-                fullName.append(var->name);
+                fullName.append(var.name);
                 fullName.append(".");
-                fullName.append(bvar->name);
+                fullName.append(bvar.name);
                 QTableWidgetItem *item = new QTableWidgetItem(fullName);
                 item->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
                 item->setFlags(Qt::NoItemFlags);
@@ -179,7 +179,7 @@ void DataStagingWidget::populateParserTable()
         }
         else
         {
-            QTableWidgetItem *item = new QTableWidgetItem(var->name);
+            QTableWidgetItem *item = new QTableWidgetItem(var.name);
             item->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
             item->setFlags(Qt::NoItemFlags);
             tableWidget->setItem(i,0,item);
@@ -210,11 +210,11 @@ quint8 DataStagingWidget::calcRowCount()
 {
     // Calculate the total number of rows to use based on the total amount of variables.
     quint8 total=0;
-    foreach(ComplexVariable *cv,*parserWidget->variableList)
+    foreach(ComplexVariable cv, parserWidget->variableList)
     {
-        if(cv->type==VECTYPE)
+        if(cv.type==VECTYPE)
         {
-            total+=cv->vector->size();
+            total+=cv.vector.size();
         }
         else
         {
@@ -230,10 +230,8 @@ void DataStagingWidget::testThread(int value)
     qDebug() << value;
 }
 
-//void DataStagingWidget::parsedDataReady(QList<RepeatedVector> parsedData)
 void DataStagingWidget::parsedDataReady(VariableList parsedData)
 {
-    parsedData = parserEngine->masterList;
     QString output;
     output.append("List found:\n");
     int complexCount=0;
@@ -245,14 +243,14 @@ void DataStagingWidget::parsedDataReady(VariableList parsedData)
         if(repVector.vectors.size()<2)
         {
             // Single variable
-            if(repVector.vectors.at(0).vector.at(0)->varType==BYTTYPE)
+            if(repVector.vectors.at(0).vector.at(0).varType==BYTTYPE)
             {
-                item->setText(repVector.vectors.at(0).vector.at(0)->varBytes);
+                item->setText(repVector.vectors.at(0).vector.at(0).varBytes);
             }
             else
             {
                 // Number variable
-                double numVal = repVector.vectors.at(0).vector.at(0)->varValue;
+                double numVal = repVector.vectors.at(0).vector.at(0).varValue;
                 item->setText(QString("%1").arg(numVal));
                 // Append data point to plot
                 //                if(tableWidget->item(complexCount,1)->checkState()==Qt::Checked)
@@ -309,3 +307,4 @@ void DataStagingWidget::parsedDataReady(VariableList parsedData)
 
     //    qDebug() << output;
 }
+

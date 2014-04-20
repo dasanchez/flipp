@@ -59,14 +59,14 @@ private:
 
     QHBoxLayout *dataSourceLayout;
 
-//    QScrollArea *scrollArea;
-//    QVBoxLayout *scrollAreaVLayout;
-//    QWidget *saWidgetContents;
+    //    QScrollArea *scrollArea;
+    //    QVBoxLayout *scrollAreaVLayout;
+    //    QWidget *saWidgetContents;
     ParserWidget *parserWidget;
-ParserEngine *parserEngine;
-QThread *thread;
-ConnectionWidget *connectionWidget;
-quint8 calcRowCount();
+    ParserEngine *parserEngine;
+    QThread *thread;
+    ConnectionWidget *connectionWidget;
+    quint8 calcRowCount();
 };
 
 #endif // DATASTAGINGWIDGET_H

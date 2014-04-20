@@ -37,7 +37,7 @@ public:
     quint8 length;
     QByteArray matchBytes;
     quint8 repeat;
-    QList<BaseVariable*> *vector;
+    QList<BaseVariable> vector;
 };
 
 class SingleResult{
@@ -49,7 +49,7 @@ public:
 
 class SingleVector{
 public:
-    QList<SingleResult*> vector;
+    QList<SingleResult> vector;
 };
 
 class RepeatedVector{
@@ -65,9 +65,9 @@ class ParserEngine : public QObject
     Q_OBJECT
 public:
     explicit ParserEngine(QObject *parent = 0);
-    void setVariables(QList<ComplexVariable*> *);
+    void setVariables(QList<ComplexVariable>);
     bool isValid(QByteArray *);
-VariableList masterList;
+
 
 signals:
     void dataParsed(VariableList);
@@ -78,9 +78,8 @@ public slots:
     //    void newData(QByteArray);
 
 private:
-    QList<ComplexVariable*> *targetVars;
-    //    QList<RepeatedVector> masterList;
-
+    QList<ComplexVariable> targetVars;
+VariableList masterList;
     QByteArray buffer;
     quint8 bufferCount;
     quint8 varIndex;

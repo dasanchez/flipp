@@ -15,7 +15,7 @@ class ParserWidget : public QWidget
 public:
     explicit ParserWidget(QWidget *parent = 0);
     ~ParserWidget();
-    QList<ComplexVariable*> *variableList;
+    QList<ComplexVariable> variableList;
     QString getName();
     bool hasValidName(void);
     void setName(QString);
