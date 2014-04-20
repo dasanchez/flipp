@@ -3,6 +3,7 @@
 ParserEngine::ParserEngine(QObject *parent) :
     QObject(parent)
 {
+    qRegisterMetaType<VariableList> ("VariableList");
     targetVars = new QList<ComplexVariable*>;
     buffer.clear();
     bufferCount=0;
@@ -24,14 +25,23 @@ void ParserEngine::setVariables(QList<ComplexVariable*> *newVars)
     resetVariables();
 }
 
+//void ParserEngine::newData(QByteArray newDataIn)
+//{
+//    buffer.append(newDataIn);
+//    parseData();
+//}
+
 void ParserEngine::parseData(QByteArray dataIn)
 {
     quint16 i=0;
     if(!dataIn.isEmpty() && validList==true)
+//    if(!buffer.isEmpty() && validList==true)
     {
         while(dataIn.size()>0)
+//        while(buffer.size()>0)
         {
             char ch = dataIn.at(i);
+//            char ch = buffer.at(i);
             // Loop while there is data in the incoming buffer.
             switch(checkByte(ch))
             {
@@ -44,6 +54,7 @@ void ParserEngine::parseData(QByteArray dataIn)
                 else
                 {
                     dataIn = dataIn.right(dataIn.size()-1);
+//                    buffer = buffer.right(buffer.size()-1);
                     i=0;
                 }
                 break;
@@ -55,6 +66,7 @@ void ParserEngine::parseData(QByteArray dataIn)
                     // known to be fully parsed is removed.
                     listComplete=false;
                     dataIn = dataIn.right(dataIn.size()-i);
+//                    buffer = buffer.right(buffer.size()-i);
                     i=0;
                 }
                 else
@@ -63,8 +75,10 @@ void ParserEngine::parseData(QByteArray dataIn)
                     // if the end of the buffer is reached.
                     i++;
                     if(i==dataIn.size())
+//                    if(i==buffer.size())
                     {
                         dataIn.clear();
+//                        buffer.clear();
                         if(vecIndex!=0 || varIndex!=0)
                         {
                             packetRemains=true;
@@ -76,6 +90,7 @@ void ParserEngine::parseData(QByteArray dataIn)
         }
 
     }
+//    emit bufferEmpty();
 }
 
 // CheckByte receives a single byte, and allocates it to the corresponding variable.
@@ -975,7 +990,9 @@ void ParserEngine::variableComplete()
     if(varIndex==targetVars->size())
     {
         listComplete=true;
+//        qDebug() << masterList.at(0).vectors.at(0).vector.at(0)->varBytes;
         emit dataParsed(masterList);
+
 //        qDebug() << "Full list caught";
         clearVariables();
 

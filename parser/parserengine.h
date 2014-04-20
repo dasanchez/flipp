@@ -16,6 +16,8 @@
 enum parsingstate{START,PARSE};
 enum byteDecision{BYTE_HANDLED,BYTE_COMPLETES,BYTE_INVALID};
 
+
+
 class BaseVariable{
 public:
     QString name;
@@ -55,6 +57,9 @@ public:
     QList<SingleVector> vectors;
 };
 
+typedef QList<RepeatedVector> VariableList;
+
+
 class ParserEngine : public QObject
 {
     Q_OBJECT
@@ -62,14 +67,20 @@ public:
     explicit ParserEngine(QObject *parent = 0);
     void setVariables(QList<ComplexVariable*> *);
     bool isValid(QByteArray *);
+VariableList masterList;
+
 signals:
-    void dataParsed(QList<RepeatedVector>);
+    void dataParsed(VariableList);
+    void intOut(int);
+    //    void bufferEmpty();
 public slots:
     void parseData(QByteArray);
+    //    void newData(QByteArray);
 
 private:
     QList<ComplexVariable*> *targetVars;
-    QList<RepeatedVector> masterList;
+    //    QList<RepeatedVector> masterList;
+
     QByteArray buffer;
     quint8 bufferCount;
     quint8 varIndex;

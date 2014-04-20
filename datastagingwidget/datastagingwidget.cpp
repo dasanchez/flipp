@@ -4,6 +4,7 @@ DataStagingWidget::DataStagingWidget(QWidget *parent) :
     QWidget(parent)
 {
     parserEngine = new ParserEngine;
+    thread = new QThread;
 
     widgetNameLabel = new QLabel("Data Staging");
     QFont font = widgetNameLabel->font();
@@ -56,14 +57,26 @@ DataStagingWidget::DataStagingWidget(QWidget *parent) :
     setMinimumWidth(400);
     setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
 
+    parserEngine->moveToThread(thread);
+
     connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
-    connect(parserEngine,SIGNAL(dataParsed(QList<RepeatedVector>)),this,SLOT(parsedDataReady(QList<RepeatedVector>)));
+    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
+    connect(parserEngine,SIGNAL(intOut(int)),this,SLOT(testThread(int)));
+//    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    connect(thread,SIGNAL(started()),this,SLOT(threadStarted()));
+//    connect(parserEngine,SIGNAL(bufferEmpty()),thread,SLOT(quit()));
+    thread->start();
 }
 
 DataStagingWidget::~DataStagingWidget()
 {
 
+}
+
+void DataStagingWidget::threadStarted()
+{
+    qDebug() << "Thread started";
 }
 
 void DataStagingWidget::updateConnections(QStringList connectionNames)
@@ -92,6 +105,8 @@ void DataStagingWidget::assignConnection(ConnectionWidget *connWidget)
 {
     connectionWidget=connWidget;
     connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(newData(QByteArray)));
+//    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),thread,SLOT(start()));
     connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
 }
 
@@ -120,7 +135,7 @@ void DataStagingWidget::assignParser(ParserWidget *parser)
 
 void DataStagingWidget::detachParser()
 {
-        parserWidget = new ParserWidget;
+    parserWidget = new ParserWidget;
 }
 
 void DataStagingWidget::populateParserTable()
@@ -148,16 +163,16 @@ void DataStagingWidget::populateParserTable()
                 item2->setFlags(Qt::NoItemFlags);
                 tableWidget->setItem(i,1,item2);
                 // Checkbox
-//                QWidget *container = new QWidget;
-//                QHBoxLayout *layout = new QHBoxLayout;
-//                layout->setSpacing(0);
-//                layout->setMargin(0);
-//                QCheckBox *checkBox = new QCheckBox;
-//                layout->addStretch(1);
-//                layout->addWidget(checkBox);
-//                layout->addStretch(1);
-//                container->setLayout(layout);
-//                tableWidget->setCellWidget(i,1,container);
+                //                QWidget *container = new QWidget;
+                //                QHBoxLayout *layout = new QHBoxLayout;
+                //                layout->setSpacing(0);
+                //                layout->setMargin(0);
+                //                QCheckBox *checkBox = new QCheckBox;
+                //                layout->addStretch(1);
+                //                layout->addWidget(checkBox);
+                //                layout->addStretch(1);
+                //                container->setLayout(layout);
+                //                tableWidget->setCellWidget(i,1,container);
                 i++;
 
             }
@@ -174,9 +189,9 @@ void DataStagingWidget::populateParserTable()
             item2->setFlags(Qt::NoItemFlags);
             tableWidget->setItem(i,1,item2);
             // Checkbox
-//            QTableWidgetItem *item3 = new QTableWidgetItem;
-//            item3->setCheckState(Qt::Unchecked);
-//            tableWidget->setItem(i,1,item3);
+            //            QTableWidgetItem *item3 = new QTableWidgetItem;
+            //            item3->setCheckState(Qt::Unchecked);
+            //            tableWidget->setItem(i,1,item3);
             i++;
         }
     }
@@ -210,8 +225,15 @@ quint8 DataStagingWidget::calcRowCount()
     return total;
 }
 
-void DataStagingWidget::parsedDataReady(QList<RepeatedVector> parsedData)
+void DataStagingWidget::testThread(int value)
 {
+    qDebug() << value;
+}
+
+//void DataStagingWidget::parsedDataReady(QList<RepeatedVector> parsedData)
+void DataStagingWidget::parsedDataReady(VariableList parsedData)
+{
+    parsedData = parserEngine->masterList;
     QString output;
     output.append("List found:\n");
     int complexCount=0;
@@ -233,25 +255,25 @@ void DataStagingWidget::parsedDataReady(QList<RepeatedVector> parsedData)
                 double numVal = repVector.vectors.at(0).vector.at(0)->varValue;
                 item->setText(QString("%1").arg(numVal));
                 // Append data point to plot
-//                if(tableWidget->item(complexCount,1)->checkState()==Qt::Checked)
-//                {
-//                    customPlot->graph(numberCount)->addData(key,numVal);
+                //                if(tableWidget->item(complexCount,1)->checkState()==Qt::Checked)
+                //                {
+                //                    customPlot->graph(numberCount)->addData(key,numVal);
 
-//                    while(customPlot->graph(numberCount)->data()->size()>xMax)
-//                    {
-//                        customPlot->graph(numberCount)->removeData(customPlot->graph(numberCount)->data()->keys().at(0));
-//                    }
+                //                    while(customPlot->graph(numberCount)->data()->size()>xMax)
+                //                    {
+                //                        customPlot->graph(numberCount)->removeData(customPlot->graph(numberCount)->data()->keys().at(0));
+                //                    }
 
-//                    if(yAxisAutoRange)
-//                    {
-//                        customPlot->graph(numberCount)->rescaleValueAxis();
-//                    }
+                //                    if(yAxisAutoRange)
+                //                    {
+                //                        customPlot->graph(numberCount)->rescaleValueAxis();
+                //                    }
 
-//                    // make key axis range scroll with the data:
+                //                    // make key axis range scroll with the data:
 
-//                    customPlot->xAxis->setRange(customPlot->graph(numberCount)->data()->keys().at(0),key+0.01);
+                //                    customPlot->xAxis->setRange(customPlot->graph(numberCount)->data()->keys().at(0),key+0.01);
 
-//                }
+                //                }
                 numberCount++;
             }
 

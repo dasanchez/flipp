@@ -13,6 +13,9 @@
 #include <parser/parserwidget.h>
 #include <parser/parserengine.h>
 #include <connection/connectionwidget.h>
+#include <QThread>
+
+//typedef QList<RepeatedVector> VariableList;
 
 class DataStagingWidget : public QWidget
 {
@@ -38,7 +41,9 @@ public slots:
     void detachParser(void);
 
     void populateParserTable();
-    void parsedDataReady(QList<RepeatedVector> parsedData);
+    void parsedDataReady(VariableList parsedData);
+    void testThread(int);
+    void threadStarted();
 
 private:
     QVBoxLayout *mainLayout;
@@ -59,6 +64,7 @@ private:
 //    QWidget *saWidgetContents;
     ParserWidget *parserWidget;
 ParserEngine *parserEngine;
+QThread *thread;
 ConnectionWidget *connectionWidget;
 quint8 calcRowCount();
 };
