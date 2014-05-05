@@ -232,7 +232,7 @@ void ParserWidget::itemRemoved(int row)
 
 void ParserWidget::printList()
 {
-    qDebug() << "variables:";
+//    qDebug() << "variables:";
     foreach(ComplexVariable item, variableList)
     {
         QString outString = item.name;

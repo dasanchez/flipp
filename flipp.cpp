@@ -180,10 +180,14 @@ void Flipp::createMenus()
 
     connectionDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+Q")));
     viewMenu->addAction(connectionDock->toggleViewAction());
+
+
 //    terminalDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+W")));
 //    viewMenu->addAction(terminalDock->toggleViewAction());
     parserDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+E")));
     viewMenu->addAction(parserDock->toggleViewAction());
+    dataStagingDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+L")));
+    viewMenu->addAction(dataStagingDock->toggleViewAction());
 }
 
 void Flipp::dockWidgets()

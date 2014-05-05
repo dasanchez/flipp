@@ -76,7 +76,7 @@ DataStagingWidget::~DataStagingWidget()
 
 void DataStagingWidget::threadStarted()
 {
-    qDebug() << "Thread started";
+//    qDebug() << "Thread started";
 }
 
 void DataStagingWidget::updateConnections(QStringList connectionNames)
@@ -142,7 +142,7 @@ void DataStagingWidget::populateParserTable()
 {
     quint8 i=0;
 
-    qDebug() << "populating parser table";
+//    qDebug() << "populating parser table";
 
     tableWidget->setRowCount(calcRowCount());
     foreach(ComplexVariable var, parserWidget->variableList)
