@@ -4,7 +4,7 @@ ParserEngine::ParserEngine(QObject *parent) :
     QObject(parent)
 {
     qRegisterMetaType<VariableList> ("VariableList");
-    targetVars;//' = QList<ComplexVariable>;
+//    targetVars = QList<ComplexVariable>;
     buffer.clear();
     bufferCount=0;
     varIndex=0;
@@ -21,6 +21,7 @@ ParserEngine::ParserEngine(QObject *parent) :
 
 void ParserEngine::setVariables(QList<ComplexVariable> newVars)
 {
+   qDebug() << "new variables";
     targetVars = newVars;
     resetVariables();
 }

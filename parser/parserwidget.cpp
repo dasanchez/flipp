@@ -39,13 +39,8 @@ ParserWidget::ParserWidget(QWidget *parent) :
     deleteButton->setIcon(QIcon(delIconPixmap));
 
     vwList = new QList<VariableWidget*>;
-    //variableList = new QList<ComplexVariable*>;
     lw = new LiveListWidget(this);
 
-//    for(quint8 i =0;i<1;i++)
-//    {
-//        addVariable();
-//    }
 
     controlLayout = new QHBoxLayout;
     controlLayout->addWidget(nameEdit);
@@ -130,6 +125,11 @@ void ParserWidget::toggleExpand()
 
 void ParserWidget::variableListChanged()
 {
+    for(int i=0;i<variableList.size();i++)
+    {
+        variableList[i]=vwList->at(i)->variable;
+    }
+
     printList();
     emit updateVariableList();
 }
@@ -232,6 +232,7 @@ void ParserWidget::itemRemoved(int row)
 
 void ParserWidget::printList()
 {
+    qDebug() << "variables:";
     foreach(ComplexVariable item, variableList)
     {
         QString outString = item.name;
@@ -311,7 +312,6 @@ void ParserWidget::printList()
         }
 //        qDebug() << outString;
     }
-//    qDebug() << "===";
 }
 
 

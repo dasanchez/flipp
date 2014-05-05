@@ -141,6 +141,9 @@ void DataStagingWidget::detachParser()
 void DataStagingWidget::populateParserTable()
 {
     quint8 i=0;
+
+    qDebug() << "populating parser table";
+
     tableWidget->setRowCount(calcRowCount());
     foreach(ComplexVariable var, parserWidget->variableList)
     {
@@ -179,6 +182,7 @@ void DataStagingWidget::populateParserTable()
         }
         else
         {
+//            qDebug() << var.name;
             QTableWidgetItem *item = new QTableWidgetItem(var.name);
             item->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
             item->setFlags(Qt::NoItemFlags);
