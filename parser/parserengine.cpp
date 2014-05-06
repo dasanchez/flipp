@@ -21,7 +21,7 @@ ParserEngine::ParserEngine(QObject *parent) :
 
 void ParserEngine::setVariables(QList<ComplexVariable> newVars)
 {
-   qDebug() << "new variables";
+   //qDebug() << "new variables";
     targetVars = newVars;
     resetVariables();
 }
