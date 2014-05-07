@@ -1,18 +1,18 @@
-#include "datastagingwidget.h"
+#include "linkerwidget.h"
 
-DataStagingWidget::DataStagingWidget(QWidget *parent) :
+LinkerWidget::LinkerWidget(QWidget *parent) :
     QWidget(parent)
 {
     parserEngine = new ParserEngine;
     thread = new QThread;
 
-    widgetNameLabel = new QLabel("Data Staging");
-    QFont font = widgetNameLabel->font();
-    font.setPointSize(font.pointSize()+4);
-    widgetNameLabel->setFont(font);
-    newVariableButton = new QPushButton("New Variable");
-    newVariableButton->setFixedHeight(24);
-    newVariableButton->setFixedWidth(100);
+//    widgetNameLabel = new QLabel("Data Staging");
+//    QFont font = widgetNameLabel->font();
+//    font.setPointSize(font.pointSize()+4);
+//    widgetNameLabel->setFont(font);
+//    newVariableButton = new QPushButton("New Variable");
+//    newVariableButton->setFixedHeight(24);
+//    newVariableButton->setFixedWidth(100);
 
     connectionBox = new QComboBox;
     parserBox = new QComboBox;
@@ -44,16 +44,16 @@ DataStagingWidget::DataStagingWidget(QWidget *parent) :
     //    hv->setSectionsClickable(false);
 
 
-    topLayout = new QHBoxLayout;
-    topLayout->addWidget(widgetNameLabel);
-    topLayout->addWidget(newVariableButton);
+//    topLayout = new QHBoxLayout;
+//    topLayout->addWidget(widgetNameLabel);
+//    topLayout->addWidget(newVariableButton);
 
     dataSourceLayout = new QHBoxLayout;
     dataSourceLayout->addWidget(connectionBox);
     dataSourceLayout->addWidget(parserBox);
 
     mainLayout = new QVBoxLayout(this);
-    mainLayout->addLayout(topLayout);
+//    mainLayout->addLayout(topLayout);
     mainLayout->addLayout(dataSourceLayout);
     mainLayout->addWidget(tableWidget);
     //    mainLayout->addWidget(scrollArea);
@@ -76,17 +76,17 @@ DataStagingWidget::DataStagingWidget(QWidget *parent) :
     thread->start();
 }
 
-DataStagingWidget::~DataStagingWidget()
+LinkerWidget::~LinkerWidget()
 {
 
 }
 
-void DataStagingWidget::threadStarted()
+void LinkerWidget::threadStarted()
 {
     //    qDebug() << "Thread started";
 }
 
-void DataStagingWidget::updateConnections(QStringList connectionNames)
+void LinkerWidget::updateConnections(QStringList connectionNames)
 {
     connectionBox->clear();
     connectionBox->addItems(connectionNames);
@@ -97,18 +97,18 @@ void DataStagingWidget::updateConnections(QStringList connectionNames)
 
 }
 
-void DataStagingWidget::updateParsers(QStringList parserNames)
+void LinkerWidget::updateParsers(QStringList parserNames)
 {
     parserBox->clear();
     parserBox->addItems(parserNames);
 }
 
-void DataStagingWidget::changeConnection(QString connection)
+void LinkerWidget::changeConnection(QString connection)
 {
-    emit stagingConnectionRequest(connection);
+    emit linkerConnectionRequest(connection);
 }
 
-void DataStagingWidget::assignConnection(ConnectionWidget *connWidget)
+void LinkerWidget::assignConnection(ConnectionWidget *connWidget)
 {
     connectionWidget=connWidget;
     connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
@@ -117,18 +117,18 @@ void DataStagingWidget::assignConnection(ConnectionWidget *connWidget)
     connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
 }
 
-void DataStagingWidget::detachConnection()
+void LinkerWidget::detachConnection()
 {
     connectionWidget = new ConnectionWidget;
 }
 
-void DataStagingWidget::changeParser(QString parserName)
+void LinkerWidget::changeParser(QString parserName)
 {
 
-    emit stagingParserRequest(parserName);
+    emit linkerParserRequest(parserName);
 }
 
-void DataStagingWidget::assignParser(ParserWidget *parser)
+void LinkerWidget::assignParser(ParserWidget *parser)
 {
     parserWidget = parser;
 
@@ -140,12 +140,12 @@ void DataStagingWidget::assignParser(ParserWidget *parser)
 
 }
 
-void DataStagingWidget::detachParser()
+void LinkerWidget::detachParser()
 {
     parserWidget = new ParserWidget;
 }
 
-void DataStagingWidget::populateParserTable()
+void LinkerWidget::populateParserTable()
 {
     quint8 i=0;
 
@@ -233,7 +233,7 @@ void DataStagingWidget::populateParserTable()
 
 }
 
-quint8 DataStagingWidget::calcRowCount()
+quint8 LinkerWidget::calcRowCount()
 {
     // Calculate the total number of rows to use based on the total amount of variables.
     quint8 total=0;
@@ -252,12 +252,12 @@ quint8 DataStagingWidget::calcRowCount()
     return total;
 }
 
-void DataStagingWidget::testThread(int value)
+void LinkerWidget::testThread(int value)
 {
     qDebug() << value;
 }
 
-void DataStagingWidget::parsedDataReady(VariableList parsedData)
+void LinkerWidget::parsedDataReady(VariableList parsedData)
 {
     QString output;
     output.append("List found:\n");

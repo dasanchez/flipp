@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     plotter/plotterwidget.cpp \
     plotter/qcustomplot.cpp \
     plotter/plotterlistwidget.cpp \
-    datastagingwidget/datastagingwidget.cpp
+    linker/linkerwidget.cpp \
+    linker/linkerlistwidget.cpp
 
 HEADERS  += flipp.h \
     livelistwidget/livelistwidget.h \
@@ -47,7 +48,8 @@ HEADERS  += flipp.h \
     plotter/plotterwidget.h \
     plotter/qcustomplot.h \
     plotter/plotterlistwidget.h \
-    datastagingwidget/datastagingwidget.h
+    linker/linkerwidget.h \
+    linker/linkerlistwidget.h
 
 RESOURCES += \
     resources.qrc

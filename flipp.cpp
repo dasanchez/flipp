@@ -7,7 +7,7 @@ Flipp::Flipp(QWidget *parent)
     terminals = new TerminalListWidget(this);
     parsers = new ParserListWidget(this);
 //    plotters = new PlotterListWidget(this);
-    dataStaging = new DataStagingWidget(this);
+    linkers = new LinkerListWidget(this);
 
     m_sSettingsFile = QApplication::applicationDirPath() + "/lastSettings.flp";
     //    qDebug() << m_sSettingsFile;
@@ -20,15 +20,17 @@ Flipp::Flipp(QWidget *parent)
 //    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
 
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
-connect(connections,SIGNAL(connectionListChanged(QStringList)),dataStaging,SLOT(updateConnections(QStringList)));
-connect(parsers,SIGNAL(parserListChanged(QStringList)),dataStaging,SLOT(updateParsers(QStringList)));
+//connect(connections,SIGNAL(connectionListChanged(QStringList)),linkers,SLOT(updateConnections(QStringList)));
+//connect(parsers,SIGNAL(parserListChanged(QStringList)),linkers,SLOT(updateParsers(QStringList)));
+
+
+//connect(linkerWidget,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(handleLinkerConnectionRequest(QString)));
+//connect(linkerWidget,SIGNAL(linkerParserRequest(QString)),this,SLOT(handleLinkerParserRequest(QString)));
+
 
     //    connect(parsers,SIGNAL(parserListChanged(QStringList)),plotters,SLOT(updateParsers(QStringList)));
 //    connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
 //    connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
-
-connect(dataStaging,SIGNAL(stagingConnectionRequest(QString)),this,SLOT(handleStagingConnectionRequest(QString)));
-connect(dataStaging,SIGNAL(stagingParserRequest(QString)),this,SLOT(handleStagingParserRequest(QString)));
 
 //    plotters->newPlotter();
 //    setCentralWidget(plotters);
@@ -56,29 +58,29 @@ Flipp::~Flipp()
 
 }
 
-void Flipp::handleStagingConnectionRequest(QString name)
-{
-    foreach(ConnectionWidget *connection,connections->connectionList)
-    {
-        if(connection->getName()==name)
-        {
+//void Flipp::handleLinkerConnectionRequest(QString name)
+//{
+//    foreach(ConnectionWidget *connection,connections->connectionList)
+//    {
+//        if(connection->getName()==name)
+//        {
 
-            dataStaging->assignConnection(connection);
-        }
-    }
-}
+//            linkerWidget->assignConnection(connection);
+//        }
+//    }
+//}
 
-void Flipp::handleStagingParserRequest(QString name)
-{
-    foreach(ParserWidget *parser,*parsers->parserList)
-    {
-        if(parser->getName()==name)
-        {
+//void Flipp::handleLinkerParserRequest(QString name)
+//{
+//    foreach(ParserWidget *parser,*parsers->parserList)
+//    {
+//        if(parser->getName()==name)
+//        {
 
-            dataStaging->assignParser(parser);
-        }
-    }
-}
+//            linkerWidget->assignParser(parser);
+//        }
+//    }
+//}
 
 void Flipp::handleTerminalRequest(TerminalWidget *terminal,QString name)
 {
@@ -143,14 +145,14 @@ void Flipp::createDocks()
     parserDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     addDockWidget(Qt::TopDockWidgetArea,parserDock);
 
-    dataStagingDock = new QDockWidget(tr("Data Staging"));
-    dataStagingDock->setObjectName("DataStaging_Dock");
-    dataStagingDock->setWidget(dataStaging);
-    dataStagingDock->setFeatures(QDockWidget::DockWidgetClosable|
+    linkerDock = new QDockWidget(tr("Linker list"));
+    linkerDock->setObjectName("Linkers_Dock");
+    linkerDock->setWidget(linkers);
+    linkerDock->setFeatures(QDockWidget::DockWidgetClosable|
                             QDockWidget::DockWidgetMovable|
                             QDockWidget::DockWidgetFloatable);
-    dataStagingDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    addDockWidget(Qt::TopDockWidgetArea,dataStagingDock);
+    linkerDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    addDockWidget(Qt::TopDockWidgetArea,linkerDock);
 
     setTabPosition(Qt::AllDockWidgetAreas,QTabWidget::North);
 }
@@ -186,8 +188,8 @@ void Flipp::createMenus()
 //    viewMenu->addAction(terminalDock->toggleViewAction());
     parserDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+E")));
     viewMenu->addAction(parserDock->toggleViewAction());
-    dataStagingDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+L")));
-    viewMenu->addAction(dataStagingDock->toggleViewAction());
+    linkerDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+L")));
+    viewMenu->addAction(linkerDock->toggleViewAction());
 }
 
 void Flipp::dockWidgets()
@@ -195,7 +197,7 @@ void Flipp::dockWidgets()
     connectionDock->setFloating(false);
 //    terminalDock->setFloating(false);
     parserDock->setFloating(false);
-    dataStagingDock->setFloating(false);
+    linkerDock->setFloating(false);
 }
 
 void Flipp::initSettings()

@@ -1,5 +1,5 @@
-#ifndef DATASTAGINGWIDGET_H
-#define DATASTAGINGWIDGET_H
+#ifndef LINKERWIDGET_H
+#define LINKERWIDGET_H
 
 #include <QWidget>
 #include <QComboBox>
@@ -17,18 +17,18 @@
 
 //typedef QList<RepeatedVector> VariableList;
 
-class DataStagingWidget : public QWidget
+class LinkerWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DataStagingWidget(QWidget *parent = 0);
+    explicit LinkerWidget(QWidget *parent = 0);
     QStringList connectionNamesList;
     QStringList parserNamesList;
 
-    ~DataStagingWidget();
+    ~LinkerWidget();
 signals:
-    void stagingConnectionRequest(QString);
-    void stagingParserRequest(QString);
+    void linkerConnectionRequest(QString);
+    void linkerParserRequest(QString);
 public slots:
 
     void updateConnections(QStringList);
@@ -47,10 +47,10 @@ public slots:
 
 private:
     QVBoxLayout *mainLayout;
-    QHBoxLayout *topLayout;
-    QPushButton *newVariableButton;
+//    QHBoxLayout *topLayout;
+//    QPushButton *newVariableButton;
     QLabel *bottomLabel;
-    QLabel *widgetNameLabel;
+//    QLabel *widgetNameLabel;
 
     QComboBox *connectionBox;
     QComboBox *parserBox;
@@ -69,4 +69,4 @@ private:
     quint8 calcRowCount();
 };
 
-#endif // DATASTAGINGWIDGET_H
+#endif // LINKERWIDGET_H
