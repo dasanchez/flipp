@@ -6,34 +6,34 @@ Flipp::Flipp(QWidget *parent)
     connections = new ConnectionListWidget(this);
     terminals = new TerminalListWidget(this);
     parsers = new ParserListWidget(this);
-//    plotters = new PlotterListWidget(this);
+    //    plotters = new PlotterListWidget(this);
     linkers = new LinkerListWidget(this);
 
     m_sSettingsFile = QApplication::applicationDirPath() + "/lastSettings.flp";
     //    qDebug() << m_sSettingsFile;
-//        initSettings();
+    //        initSettings();
 
 
     connect(connections,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
 
 
-//    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
+    //    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
 
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
-//connect(connections,SIGNAL(connectionListChanged(QStringList)),linkers,SLOT(updateConnections(QStringList)));
-//connect(parsers,SIGNAL(parserListChanged(QStringList)),linkers,SLOT(updateParsers(QStringList)));
+    connect(connections,SIGNAL(connectionListChanged(QStringList)),linkers,SLOT(updateConnections(QStringList)));
+    connect(parsers,SIGNAL(parserListChanged(QStringList)),linkers,SLOT(updateParsers(QStringList)));
 
 
-//connect(linkerWidget,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(handleLinkerConnectionRequest(QString)));
-//connect(linkerWidget,SIGNAL(linkerParserRequest(QString)),this,SLOT(handleLinkerParserRequest(QString)));
+    connect(linkers,SIGNAL(linkerConnectionRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerConnectionRequest(LinkerWidget*, QString)));
+    connect(linkers,SIGNAL(linkerParserRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerParserRequest(LinkerWidget*, QString)));
 
 
     //    connect(parsers,SIGNAL(parserListChanged(QStringList)),plotters,SLOT(updateParsers(QStringList)));
-//    connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
-//    connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
+    //    connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
+    //    connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
 
-//    plotters->newPlotter();
-//    setCentralWidget(plotters);
+    //    plotters->newPlotter();
+    //    setCentralWidget(plotters);
     setCentralWidget(terminals);
 
     createDocks();
@@ -58,29 +58,29 @@ Flipp::~Flipp()
 
 }
 
-//void Flipp::handleLinkerConnectionRequest(QString name)
-//{
-//    foreach(ConnectionWidget *connection,connections->connectionList)
-//    {
-//        if(connection->getName()==name)
-//        {
+void Flipp::handleLinkerConnectionRequest(LinkerWidget* linker, QString name)
+{
+    foreach(ConnectionWidget *connection,connections->connectionList)
+    {
+        if(connection->getName()==name)
+        {
 
-//            linkerWidget->assignConnection(connection);
-//        }
-//    }
-//}
+            linker->assignConnection(connection);
+        }
+    }
+}
 
-//void Flipp::handleLinkerParserRequest(QString name)
-//{
-//    foreach(ParserWidget *parser,*parsers->parserList)
-//    {
-//        if(parser->getName()==name)
-//        {
+void Flipp::handleLinkerParserRequest(LinkerWidget* linker, QString name)
+{
+    foreach(ParserWidget *parser,*parsers->parserList)
+    {
+        if(parser->getName()==name)
+        {
 
-//            linkerWidget->assignParser(parser);
-//        }
-//    }
-//}
+            linker->assignParser(parser);
+        }
+    }
+}
 
 void Flipp::handleTerminalRequest(TerminalWidget *terminal,QString name)
 {
@@ -127,14 +127,14 @@ void Flipp::createDocks()
 
     addDockWidget(Qt::TopDockWidgetArea,connectionDock);
 
-//    terminalDock = new QDockWidget(tr("Terminal list"));
-//    terminalDock->setObjectName("Terminals_Dock");
-//    terminalDock->setWidget(terminals);
-//    terminalDock->setFeatures(QDockWidget::DockWidgetClosable|
-//                              QDockWidget::DockWidgetMovable|
-//                              QDockWidget::DockWidgetFloatable);
-//    terminalDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-//    addDockWidget(Qt::TopDockWidgetArea,terminalDock);
+    //    terminalDock = new QDockWidget(tr("Terminal list"));
+    //    terminalDock->setObjectName("Terminals_Dock");
+    //    terminalDock->setWidget(terminals);
+    //    terminalDock->setFeatures(QDockWidget::DockWidgetClosable|
+    //                              QDockWidget::DockWidgetMovable|
+    //                              QDockWidget::DockWidgetFloatable);
+    //    terminalDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    //    addDockWidget(Qt::TopDockWidgetArea,terminalDock);
 
     parserDock = new QDockWidget(tr("Parser list"));
     parserDock->setObjectName("Parsers_Dock");
@@ -184,8 +184,8 @@ void Flipp::createMenus()
     viewMenu->addAction(connectionDock->toggleViewAction());
 
 
-//    terminalDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+W")));
-//    viewMenu->addAction(terminalDock->toggleViewAction());
+    //    terminalDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+W")));
+    //    viewMenu->addAction(terminalDock->toggleViewAction());
     parserDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+E")));
     viewMenu->addAction(parserDock->toggleViewAction());
     linkerDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+L")));
@@ -195,7 +195,7 @@ void Flipp::createMenus()
 void Flipp::dockWidgets()
 {
     connectionDock->setFloating(false);
-//    terminalDock->setFloating(false);
+    //    terminalDock->setFloating(false);
     parserDock->setFloating(false);
     linkerDock->setFloating(false);
 }
@@ -383,24 +383,24 @@ void Flipp::restoreSettings()
     //    settings.endGroup();
 
     // Restore plotters
-//    int plotSize = settings.beginReadArray("Plotters");
-//    for(int i=0;i<plotSize;i++)
-//    {
-//        settings.setArrayIndex(i);
-//        PlotterWidget *pw = new PlotterWidget;
+    //    int plotSize = settings.beginReadArray("Plotters");
+    //    for(int i=0;i<plotSize;i++)
+    //    {
+    //        settings.setArrayIndex(i);
+    //        PlotterWidget *pw = new PlotterWidget;
 
-//        pw->updateConnections(connectionNames);
-//        pw->updateParsers(parserNames);
-//        plotters->splitter->addWidget(pw);
-//        plotters->plotterList.append(pw);
+    //        pw->updateConnections(connectionNames);
+    //        pw->updateParsers(parserNames);
+    //        plotters->splitter->addWidget(pw);
+    //        plotters->plotterList.append(pw);
 
-//        connect(pw,SIGNAL(plotterConnectionRequest(QString)),plotters,SLOT(plotterRequestedConnection(QString)));
-//        connect(pw,SIGNAL(plotterParserRequest(QString)),plotters,SLOT(plotterRequestedParser(QString)));
-//        connect(pw,SIGNAL(removePlotter()),plotters,SLOT(plotterRemoved()));
-//        pw->changeConnection(settings.value("Connection").toString());
-//        pw->changeParser(settings.value("Parser").toString());
-//    }
-//   settings.endArray();
+    //        connect(pw,SIGNAL(plotterConnectionRequest(QString)),plotters,SLOT(plotterRequestedConnection(QString)));
+    //        connect(pw,SIGNAL(plotterParserRequest(QString)),plotters,SLOT(plotterRequestedParser(QString)));
+    //        connect(pw,SIGNAL(removePlotter()),plotters,SLOT(plotterRemoved()));
+    //        pw->changeConnection(settings.value("Connection").toString());
+    //        pw->changeParser(settings.value("Parser").toString());
+    //    }
+    //   settings.endArray();
 
 }
 
@@ -502,21 +502,21 @@ void Flipp::saveSettings()
         }
 
         settings.endArray();
-//        settings.endGroup();
+        //        settings.endGroup();
         parserCount++;
     }
     settings.endArray();
 
     // Save Plotters
-//    settings.beginWriteArray("Plotters");
-//    for(int i=0; i<plotters->plotterList.size();i++)
-//    {
-//        settings.setArrayIndex(i);
-//        // Set connection and parser assigned to each plotter
-//        settings.setValue("Connection",plotters->plotterList.at(i)->currentConnection());
-//        settings.setValue("Parser",plotters->plotterList.at(i)->currentParser());
-//    }
-//    settings.endArray();
+    //    settings.beginWriteArray("Plotters");
+    //    for(int i=0; i<plotters->plotterList.size();i++)
+    //    {
+    //        settings.setArrayIndex(i);
+    //        // Set connection and parser assigned to each plotter
+    //        settings.setValue("Connection",plotters->plotterList.at(i)->currentConnection());
+    //        settings.setValue("Parser",plotters->plotterList.at(i)->currentParser());
+    //    }
+    //    settings.endArray();
 
     settings.setValue("DOCK_LOCATIONS",saveState(1));
 

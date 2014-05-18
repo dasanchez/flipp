@@ -16,6 +16,9 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
 
     connectionBox = new QComboBox;
     parserBox = new QComboBox;
+    removeButton = new QPushButton("Remove");
+    removeButton->setFixedHeight(24);
+
     parserWidget = new ParserWidget;
     parserEngine = new ParserEngine;
     connectionWidget = new ConnectionWidget;
@@ -51,6 +54,7 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     dataSourceLayout = new QHBoxLayout;
     dataSourceLayout->addWidget(connectionBox);
     dataSourceLayout->addWidget(parserBox);
+    dataSourceLayout->addWidget(removeButton);
 
     mainLayout = new QVBoxLayout(this);
 //    mainLayout->addLayout(topLayout);
@@ -60,7 +64,7 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
 
     this->setLayout(mainLayout);
 
-    setMinimumWidth(400);
+    setMinimumWidth(200);
 
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
@@ -68,6 +72,7 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
 
     connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
+    connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removeLinker()));
     connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     connect(parserEngine,SIGNAL(intOut(int)),this,SLOT(testThread(int)));
     //    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));

@@ -3,10 +3,6 @@
 LinkerListWidget::LinkerListWidget(QWidget *parent) :
     QWidget(parent)
 {
-
-    linkerList = new QList<LinkerWidget*>;
-
-
     widgetNameLabel = new QLabel("Linkers");
 
     QFont font = widgetNameLabel->font();
@@ -44,7 +40,7 @@ LinkerListWidget::LinkerListWidget(QWidget *parent) :
     mainLayout->addWidget(scrollArea);
     setLayout(mainLayout);
 
-    setMinimumWidth(620);
+    setMinimumWidth(500);
     connect(newLinkerButton,SIGNAL(clicked()),this,SLOT(newLinker()));
 
 }
@@ -52,9 +48,16 @@ LinkerListWidget::LinkerListWidget(QWidget *parent) :
 void LinkerListWidget::newLinker()
 {
     LinkerWidget *linker = new LinkerWidget;
-//    parser->setName(newParserName());
-    linkerList->append(linker);
+
+    linker->updateConnections(connectionNamesList);
+    linker->updateParsers(parserNamesList);
+
+    linkerList.append(linker);
     splitter->addWidget(linker);
+
+    connect(linker,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(linkerRequestedConnection(QString)));
+    connect(linker,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
+    connect(linker,SIGNAL(removeLinker()),this,SLOT(linkerRemoved()));
 
 //    connect(parser,SIGNAL(nameChange()),this,SLOT(nameChanged()));
 //    connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
@@ -64,10 +67,49 @@ void LinkerListWidget::newLinker()
 
 void LinkerListWidget::addLinker(LinkerWidget *liw)
 {
-    linkerList->append(liw);
+    linkerList.append(liw);
     splitter->addWidget(liw);
-//    connect(paw,SIGNAL(nameChange()),this,SLOT(nameChanged()));
-//    connect(paw,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
-//    connect(paw,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
-//    updateList();
+
+    connect(liw,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(linkerRequestedConnection(QString)));
+    connect(liw,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
+    connect(liw,SIGNAL(removeLinker()),this,SLOT(linkerRemoved()));
+}
+
+void LinkerListWidget::linkerRemoved()
+{
+    LinkerWidget* linker = qobject_cast<LinkerWidget *>(QObject::sender());
+    disconnect(linker,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(linkerRequestedConnection(QString)));
+    disconnect(linker,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
+    linkerList.removeAt(linkerList.indexOf(linker));
+    linker->deleteLater();
+}
+
+void LinkerListWidget::updateConnections(QStringList connectionNames)
+{
+    connectionNamesList = connectionNames;
+    foreach(LinkerWidget *linker, linkerList)
+    {
+        linker->updateConnections(connectionNamesList);
+    }
+}
+
+void LinkerListWidget::updateParsers(QStringList parserNames)
+{
+    parserNamesList = parserNames;
+    foreach(LinkerWidget *linker, linkerList)
+    {
+        linker->updateParsers(parserNamesList);
+    }
+}
+
+void LinkerListWidget::linkerRequestedConnection(QString connectionName)
+{
+    LinkerWidget *linker = qobject_cast<LinkerWidget *>(QObject::sender());
+    emit linkerConnectionRequest(linker,connectionName);
+}
+
+void LinkerListWidget::linkerRequestedParser(QString parserName)
+{
+    LinkerWidget *linker = qobject_cast<LinkerWidget *>(QObject::sender());
+    emit linkerParserRequest(linker,parserName);
 }

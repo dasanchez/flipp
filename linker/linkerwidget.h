@@ -29,6 +29,7 @@ public:
 signals:
     void linkerConnectionRequest(QString);
     void linkerParserRequest(QString);
+    void removeLinker();
 public slots:
 
     void updateConnections(QStringList);
@@ -49,11 +50,12 @@ private:
     QVBoxLayout *mainLayout;
 //    QHBoxLayout *topLayout;
 //    QPushButton *newVariableButton;
-    QLabel *bottomLabel;
+//    QLabel *bottomLabel;
 //    QLabel *widgetNameLabel;
 
     QComboBox *connectionBox;
     QComboBox *parserBox;
+    QPushButton *removeButton;
 
     QTableWidget *tableWidget;
 

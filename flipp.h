@@ -49,8 +49,8 @@ private:
     void restoreSettings();
 
 private slots:
-//    void handleLinkerConnectionRequest(QString);
-//    void handleLinkerParserRequest(QString);
+    void handleLinkerConnectionRequest(LinkerWidget*, QString);
+    void handleLinkerParserRequest(LinkerWidget*,QString);
     void handleTerminalRequest(TerminalWidget*,QString);
     void handlePlotterConnectionRequest(PlotterWidget*,QString);
     void handlePlotterParserRequest(PlotterWidget*,QString);
