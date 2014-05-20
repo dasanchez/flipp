@@ -26,6 +26,11 @@ void ParserEngine::setVariables(QList<ComplexVariable> newVars)
     resetVariables();
 }
 
+QList<ComplexVariable> ParserEngine::getVariables()
+{
+    return targetVars;
+}
+
 //void ParserEngine::newData(QByteArray newDataIn)
 //{
 //    buffer.append(newDataIn);

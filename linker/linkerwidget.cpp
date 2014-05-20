@@ -6,20 +6,11 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     parserEngine = new ParserEngine;
     thread = new QThread;
 
-//    widgetNameLabel = new QLabel("Data Staging");
-//    QFont font = widgetNameLabel->font();
-//    font.setPointSize(font.pointSize()+4);
-//    widgetNameLabel->setFont(font);
-//    newVariableButton = new QPushButton("New Variable");
-//    newVariableButton->setFixedHeight(24);
-//    newVariableButton->setFixedWidth(100);
-
     connectionBox = new QComboBox;
     parserBox = new QComboBox;
     removeButton = new QPushButton("Remove");
     removeButton->setFixedHeight(24);
 
-    parserWidget = new ParserWidget;
     parserEngine = new ParserEngine;
     connectionWidget = new ConnectionWidget;
 
@@ -36,20 +27,9 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
 
 
     QHeaderView *hv = tableWidget->horizontalHeader();
-    //        hv->setStretchLastSection(false);
 
     hv->setSectionsClickable(false);
-    //    hv->setFixedHeight(24);
     hv->setSectionResizeMode(2,QHeaderView::Fixed);
-
-
-    //    hv = tableWidget->verticalHeader();
-    //    hv->setSectionsClickable(false);
-
-
-//    topLayout = new QHBoxLayout;
-//    topLayout->addWidget(widgetNameLabel);
-//    topLayout->addWidget(newVariableButton);
 
     dataSourceLayout = new QHBoxLayout;
     dataSourceLayout->addWidget(connectionBox);
@@ -57,10 +37,8 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     dataSourceLayout->addWidget(removeButton);
 
     mainLayout = new QVBoxLayout(this);
-//    mainLayout->addLayout(topLayout);
     mainLayout->addLayout(dataSourceLayout);
     mainLayout->addWidget(tableWidget);
-    //    mainLayout->addWidget(scrollArea);
 
     this->setLayout(mainLayout);
 
@@ -75,9 +53,7 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removeLinker()));
     connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     connect(parserEngine,SIGNAL(intOut(int)),this,SLOT(testThread(int)));
-    //    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(thread,SIGNAL(started()),this,SLOT(threadStarted()));
-    //    connect(parserEngine,SIGNAL(bufferEmpty()),thread,SLOT(quit()));
     thread->start();
 }
 
@@ -95,11 +71,6 @@ void LinkerWidget::updateConnections(QStringList connectionNames)
 {
     connectionBox->clear();
     connectionBox->addItems(connectionNames);
-    //    int index = connectionBox->findText(connectionWidget->getName());
-    //  if(index>=0)
-    //      connectionBox->setCurrentIndex(index);
-    //  changeConnection(connectionBox->currentText());
-
 }
 
 void LinkerWidget::updateParsers(QStringList parserNames)
@@ -135,40 +106,93 @@ void LinkerWidget::changeParser(QString parserName)
 
 void LinkerWidget::assignParser(ParserWidget *parser)
 {
-    parserWidget = parser;
+    //    parserWidget = parser;
 
-    connect(parserWidget,SIGNAL(updateVariableList()),this,SLOT(populateParserTable()));
-    connect(parserWidget,SIGNAL(deleteParser()),this,SLOT(detachParser()));
+    //    parserEngine->clearVariables();
 
-    // Populate QTableWidget and QCustomPlot
+    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+
+    parserEngine->setVariables(parser->variableList);
+
+
+    connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
+//    connect(parser,SIGNAL(deleteParser()),this,SLOT(detachParser()));
+
     populateParserTable();
+    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
 
+}
+
+void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
+{
+    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    parserEngine->setVariables(newVars);
+    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    populateParserTable();
 }
 
 void LinkerWidget::detachParser()
 {
-    parserWidget = new ParserWidget;
+//    qDebug() << "Clearing variables";
+//    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    parserEngine = new ParserEngine;
+
+//    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+  //  QList<ComplexVariable> emptyList;
+
+    //parserEngine->setVariables(emptyList);
+//    populateParserTable();
+//    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    //    parserWidget = new ParserWidget;
 }
 
 void LinkerWidget::populateParserTable()
 {
     quint8 i=0;
 
-    //    qDebug() << "populating parser table";
-
     tableWidget->setRowCount(calcRowCount());
-    foreach(ComplexVariable var, parserWidget->variableList)
+    if(parserEngine->getVariables().size()>0)
     {
-        if(var.type==VECTYPE)
+
+        foreach(ComplexVariable var, parserEngine->getVariables())
         {
-            QString fullName;
-            foreach(BaseVariable bvar, var.vector)
+            if(var.type==VECTYPE)
             {
-                fullName.clear();
-                fullName.append(var.name);
-                fullName.append(".");
-                fullName.append(bvar.name);
-                QTableWidgetItem *item = new QTableWidgetItem(fullName);
+                QString fullName;
+                foreach(BaseVariable bvar, var.vector)
+                {
+                    fullName.clear();
+                    fullName.append(var.name);
+                    fullName.append(".");
+                    fullName.append(bvar.name);
+                    QTableWidgetItem *item = new QTableWidgetItem(fullName);
+                    item->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
+                    item->setFlags(Qt::NoItemFlags);
+                    tableWidget->setItem(i,0,item);
+                    QTableWidgetItem *item2 = new QTableWidgetItem("-");
+                    item2->setTextAlignment(Qt::AlignBottom);
+                    item2->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
+                    item2->setFlags(Qt::NoItemFlags);
+                    tableWidget->setItem(i,1,item2);
+                    // Checkbox
+                    //                                QWidget *container = new QWidget;
+                    //                                QHBoxLayout *layout = new QHBoxLayout;
+                    //                                layout->setSpacing(0);
+                    //                                layout->setMargin(0);
+                    //                                QCheckBox *checkBox = new QCheckBox;
+                    //                                layout->addStretch(1);
+                    //                                layout->addWidget(checkBox);
+                    //                                layout->addStretch(1);
+                    //                                container->setLayout(layout);
+                    //                                tableWidget->setCellWidget(i,1,container);
+                    i++;
+
+                }
+            }
+            else
+            {
+                //            qDebug() << var.name;
+                QTableWidgetItem *item = new QTableWidgetItem(var.name);
                 item->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
                 item->setFlags(Qt::NoItemFlags);
                 tableWidget->setItem(i,0,item);
@@ -178,71 +202,45 @@ void LinkerWidget::populateParserTable()
                 item2->setFlags(Qt::NoItemFlags);
                 tableWidget->setItem(i,1,item2);
                 // Checkbox
-                //                                QWidget *container = new QWidget;
-                //                                QHBoxLayout *layout = new QHBoxLayout;
-                //                                layout->setSpacing(0);
-                //                                layout->setMargin(0);
-                //                                QCheckBox *checkBox = new QCheckBox;
-                //                                layout->addStretch(1);
-                //                                layout->addWidget(checkBox);
-                //                                layout->addStretch(1);
-                //                                container->setLayout(layout);
-                //                                tableWidget->setCellWidget(i,1,container);
-                i++;
+                //            QTableWidgetItem *cbItem = new QTableWidgetItem;
+                //            cbItem->setCheckState(Qt::Unchecked);
+                //            cbItem->setTextAlignment(Qt::AlignRight);
+                //            tableWidget->setItem(i,2,cbItem);
+                // v2:
+                QWidget *container = new QWidget;
+                QHBoxLayout *layout = new QHBoxLayout;
+                layout->setSpacing(0);
+                layout->setMargin(0);
+                QCheckBox *checkBox = new QCheckBox;
+                layout->addStretch(1);
+                layout->addWidget(checkBox);
+                layout->addStretch(1);
+                container->setLayout(layout);
+                tableWidget->setCellWidget(i,2,container);
 
+
+                i++;
             }
         }
-        else
+        tableWidget->setColumnWidth(2,50);
+        //    tableWidget->set
+
+        // Set up parser engine with the new parser properties
+        // parserEngine->setVariables(parserEngine->getVariables());
+        QByteArray *check = new QByteArray;
+        if(!parserEngine->isValid(check))
         {
-            //            qDebug() << var.name;
-            QTableWidgetItem *item = new QTableWidgetItem(var.name);
-            item->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
-            item->setFlags(Qt::NoItemFlags);
-            tableWidget->setItem(i,0,item);
-            QTableWidgetItem *item2 = new QTableWidgetItem("-");
-            item2->setTextAlignment(Qt::AlignBottom);
-            item2->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
-            item2->setFlags(Qt::NoItemFlags);
-            tableWidget->setItem(i,1,item2);
-            // Checkbox
-            //            QTableWidgetItem *cbItem = new QTableWidgetItem;
-            //            cbItem->setCheckState(Qt::Unchecked);
-            //            cbItem->setTextAlignment(Qt::AlignRight);
-            //            tableWidget->setItem(i,2,cbItem);
-            // v2:
-            QWidget *container = new QWidget;
-            QHBoxLayout *layout = new QHBoxLayout;
-            layout->setSpacing(0);
-            layout->setMargin(0);
-            QCheckBox *checkBox = new QCheckBox;
-            layout->addStretch(1);
-            layout->addWidget(checkBox);
-            layout->addStretch(1);
-            container->setLayout(layout);
-            tableWidget->setCellWidget(i,2,container);
 
-
-            i++;
+            qDebug() << *check;
         }
     }
-    tableWidget->setColumnWidth(2,50);
-    //    tableWidget->set
-
-    // Set up parser engine with the new parser properties
-    parserEngine->setVariables(parserWidget->variableList);
-    QByteArray *check = new QByteArray;
-    if(!parserEngine->isValid(check))
-    {
-        qDebug() << *check;
-    }
-
 }
 
 quint8 LinkerWidget::calcRowCount()
 {
     // Calculate the total number of rows to use based on the total amount of variables.
     quint8 total=0;
-    foreach(ComplexVariable cv, parserWidget->variableList)
+    foreach(ComplexVariable cv, parserEngine->getVariables())
     {
         if(cv.type==VECTYPE)
         {

@@ -23,7 +23,7 @@ public:
     QString parserName;
 
 signals:
-    void updateVariableList();
+    void updateVariableList(QList<ComplexVariable>);
     void changeSize(QSize);
     void deleteParser(void);
     void nameChange(void);

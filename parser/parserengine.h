@@ -67,19 +67,22 @@ public:
     explicit ParserEngine(QObject *parent = 0);
     void setVariables(QList<ComplexVariable>);
     bool isValid(QByteArray *);
-
+    QList<ComplexVariable> getVariables();
 
 signals:
     void dataParsed(VariableList);
     void intOut(int);
+
     //    void bufferEmpty();
 public slots:
     void parseData(QByteArray);
+    void clearVariables();
+    void resetVariables();
     //    void newData(QByteArray);
 
 private:
     QList<ComplexVariable> targetVars;
-VariableList masterList;
+    VariableList masterList;
     QByteArray buffer;
     quint8 bufferCount;
     quint8 varIndex;
@@ -98,8 +101,8 @@ VariableList masterList;
     int assignNonNumber(char);
     int assignNumber(char);
     void variableComplete();
-    void clearVariables();
-    void resetVariables();
+
+
 };
 
 #endif // PARSERENGINE_H

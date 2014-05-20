@@ -131,7 +131,7 @@ void ParserWidget::variableListChanged()
     }
 
     printList();
-    emit updateVariableList();
+    emit updateVariableList(variableList);
 }
 
 

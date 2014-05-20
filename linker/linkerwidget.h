@@ -41,6 +41,7 @@ public slots:
     void changeParser(QString);
     void detachParser(void);
 
+    void newParserVariables(QList<ComplexVariable>);
     void populateParserTable();
     void parsedDataReady(VariableList parsedData);
     void testThread(int);
@@ -64,7 +65,7 @@ private:
     //    QScrollArea *scrollArea;
     //    QVBoxLayout *scrollAreaVLayout;
     //    QWidget *saWidgetContents;
-    ParserWidget *parserWidget;
+//    ParserWidget *parserWidget;
     ParserEngine *parserEngine;
     QThread *thread;
     ConnectionWidget *connectionWidget;
