@@ -24,8 +24,6 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
     tableWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-
-
     QHeaderView *hv = tableWidget->horizontalHeader();
 
     hv->setSectionsClickable(false);
@@ -77,19 +75,35 @@ void LinkerWidget::updateParsers(QStringList parserNames)
 {
     parserBox->clear();
     parserBox->addItems(parserNames);
+    if(parserBox->count()==1)
+    {
+        emit linkerParserRequest(parserBox->currentText());
+    }
+}
+
+QString LinkerWidget::getConnection()
+{
+    return connectionBox->currentText();
+}
+
+QString LinkerWidget::getParser()
+{
+    return parserBox->currentText();
 }
 
 void LinkerWidget::changeConnection(QString connection)
 {
+    disconnect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
+    connectionBox->setCurrentText(connection);
+    connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
     emit linkerConnectionRequest(connection);
 }
+
 
 void LinkerWidget::assignConnection(ConnectionWidget *connWidget)
 {
     connectionWidget=connWidget;
     connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    //    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(newData(QByteArray)));
-    //    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),thread,SLOT(start()));
     connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
 }
 
@@ -100,27 +114,20 @@ void LinkerWidget::detachConnection()
 
 void LinkerWidget::changeParser(QString parserName)
 {
-
+    disconnect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
+    parserBox->setCurrentText(parserName);
+    connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
     emit linkerParserRequest(parserName);
 }
 
 void LinkerWidget::assignParser(ParserWidget *parser)
 {
-    //    parserWidget = parser;
-
-    //    parserEngine->clearVariables();
-
     disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-
     parserEngine->setVariables(parser->variableList);
-
-
     connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
-//    connect(parser,SIGNAL(deleteParser()),this,SLOT(detachParser()));
-
+    connect(parser,SIGNAL(deleteParser()),this,SLOT(detachParser()));
     populateParserTable();
     connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-
 }
 
 void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
@@ -133,17 +140,18 @@ void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
 
 void LinkerWidget::detachParser()
 {
-//    qDebug() << "Clearing variables";
-//    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-//    parserEngine = new ParserEngine;
+    if(parserBox->count()>0)
+    {
+        emit linkerParserRequest(parserBox->currentText());
+    }
+    else
+    {
+        disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+        QList<ComplexVariable> emptyList;
+        parserEngine->setVariables(emptyList);
+        connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    }
 
-//    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-  //  QList<ComplexVariable> emptyList;
-
-    //parserEngine->setVariables(emptyList);
-//    populateParserTable();
-//    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    //    parserWidget = new ParserWidget;
 }
 
 void LinkerWidget::populateParserTable()
@@ -251,7 +259,6 @@ quint8 LinkerWidget::calcRowCount()
             total++;
         }
     }
-    //    qDebug() << total << " rows";
     return total;
 }
 
@@ -282,26 +289,6 @@ void LinkerWidget::parsedDataReady(VariableList parsedData)
                 // Number variable
                 double numVal = repVector.vectors.at(0).vector.at(0).varValue;
                 item->setText(QString("%1").arg(numVal));
-                // Append data point to plot
-                //                if(tableWidget->item(complexCount,1)->checkState()==Qt::Checked)
-                //                {
-                //                    customPlot->graph(numberCount)->addData(key,numVal);
-
-                //                    while(customPlot->graph(numberCount)->data()->size()>xMax)
-                //                    {
-                //                        customPlot->graph(numberCount)->removeData(customPlot->graph(numberCount)->data()->keys().at(0));
-                //                    }
-
-                //                    if(yAxisAutoRange)
-                //                    {
-                //                        customPlot->graph(numberCount)->rescaleValueAxis();
-                //                    }
-
-                //                    // make key axis range scroll with the data:
-
-                //                    customPlot->xAxis->setRange(customPlot->graph(numberCount)->data()->keys().at(0),key+0.01);
-
-                //                }
                 numberCount++;
             }
 
@@ -310,31 +297,8 @@ void LinkerWidget::parsedDataReady(VariableList parsedData)
         {
             // Vector
             item->setText("OK");
-            //            tableWidget->setItem(i,1,"OK");
-
-            //            foreach(SingleVector sinVector, repVector.vectors)
-            //            {
-            //                foreach(SingleResult *sinResult, sinVector.vector)
-            //                {
-            //                    switch(sinResult->varType)
-            //                    {
-            //                    case BYTTYPE:
-            //                        output.append(" B: ");
-            //                        output.append(sinResult->varBytes);
-            //                        break;
-            //                    default:
-            //                        output.append(" N: ");
-            //                        output.append(sinResult->varBytes);
-            //                        output.append(QString(" (%1) ").arg(sinResult->varValue));
-            //                        break;
-            //                    }
-            //                }
-            //                output.append('\n');
-            //            }
         }
         complexCount++;
     }
-
-    //    qDebug() << output;
 }
 

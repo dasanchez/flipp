@@ -332,7 +332,8 @@ void ConnectionWidget::connectionChanged(connectionState newState)
 {
     if(newState == ACTIVE)
     {
-        connectButton->setIcon(QIcon(connOnIconPixmap));
+//        connectButton->setIcon(QIcon(connOnIconPixmap));
+        connectButton->setText("Disconnect");
         connectButton->setEnabled(true);
         connectButton->setToolTip("Close connection");
         statusBar->setText("Connected");
@@ -346,7 +347,8 @@ void ConnectionWidget::connectionChanged(connectionState newState)
     }
     else
     {
-        connectButton->setIcon(QIcon(connOffIconPixmap));
+//        connectButton->setIcon(QIcon(connOffIconPixmap));
+        connectButton->setText("Connect");
         connectButton->setEnabled(true);
         connectButton->setToolTip("Open connection");
         togglePropertyFields(true);
@@ -400,10 +402,13 @@ void ConnectionWidget::setupUI()
     nameEdit->setMinimumWidth(200);
     nameEdit->setFixedHeight(24);
 
-    connectButton = new QPushButton;
+
+//    connectButton = new QPushButton;
+//    connectButton->setIcon(QIcon(connOffIconPixmap));
+    connectButton = new QPushButton("Connect");
     connectButton->setToolTip("Open connection");
-    connectButton->setIcon(QIcon(connOffIconPixmap));
-    connectButton->setFixedWidth(24);
+//    connectButton->setFixedWidth(24);
+    connectButton->setFixedWidth(76);
     connectButton->setFixedHeight(24);
     viewButton = new QPushButton;
     viewButton->setIcon(QIcon(moreIconPixmap));
@@ -461,8 +466,9 @@ void ConnectionWidget::setupUI()
     statusBar = new QLabel("Click the Connect button");
     statusBar->setFixedHeight(24);
     statusBar->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-    dataIcon = new QPushButton;
-    dataIcon->setIcon(QIcon(inOutIconPixmap));
+dataIcon = new QPushButton("IO");
+    //    dataIcon = new QPushButton;
+//    dataIcon->setIcon(QIcon(inOutIconPixmap));
     dataIcon->setFixedHeight(24);
     dataIcon->setFixedWidth(24);
     dataIconShade = 255;

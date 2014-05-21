@@ -4,7 +4,7 @@ ParserEngine::ParserEngine(QObject *parent) :
     QObject(parent)
 {
     qRegisterMetaType<VariableList> ("VariableList");
-//    targetVars = QList<ComplexVariable>;
+    //    targetVars = QList<ComplexVariable>;
     buffer.clear();
     bufferCount=0;
     varIndex=0;
@@ -21,8 +21,9 @@ ParserEngine::ParserEngine(QObject *parent) :
 
 void ParserEngine::setVariables(QList<ComplexVariable> newVars)
 {
-   //qDebug() << "new variables";
+    //qDebug() << "new variables";
     targetVars = newVars;
+    verifyVariables();
     resetVariables();
 }
 
@@ -41,13 +42,13 @@ void ParserEngine::parseData(QByteArray dataIn)
 {
     quint16 i=0;
     if(!dataIn.isEmpty() && validList==true)
-//    if(!buffer.isEmpty() && validList==true)
+        //    if(!buffer.isEmpty() && validList==true)
     {
         while(dataIn.size()>0)
-//        while(buffer.size()>0)
+            //        while(buffer.size()>0)
         {
             char ch = dataIn.at(i);
-//            char ch = buffer.at(i);
+            //            char ch = buffer.at(i);
             // Loop while there is data in the incoming buffer.
             switch(checkByte(ch))
             {
@@ -60,7 +61,7 @@ void ParserEngine::parseData(QByteArray dataIn)
                 else
                 {
                     dataIn = dataIn.right(dataIn.size()-1);
-//                    buffer = buffer.right(buffer.size()-1);
+                    //                    buffer = buffer.right(buffer.size()-1);
                     i=0;
                 }
                 break;
@@ -72,7 +73,7 @@ void ParserEngine::parseData(QByteArray dataIn)
                     // known to be fully parsed is removed.
                     listComplete=false;
                     dataIn = dataIn.right(dataIn.size()-i);
-//                    buffer = buffer.right(buffer.size()-i);
+                    //                    buffer = buffer.right(buffer.size()-i);
                     i=0;
                 }
                 else
@@ -81,10 +82,10 @@ void ParserEngine::parseData(QByteArray dataIn)
                     // if the end of the buffer is reached.
                     i++;
                     if(i==dataIn.size())
-//                    if(i==buffer.size())
+                        //                    if(i==buffer.size())
                     {
                         dataIn.clear();
-//                        buffer.clear();
+                        //                        buffer.clear();
                         if(vecIndex!=0 || varIndex!=0)
                         {
                             packetRemains=true;
@@ -96,7 +97,7 @@ void ParserEngine::parseData(QByteArray dataIn)
         }
 
     }
-//    emit bufferEmpty();
+    //    emit bufferEmpty();
 }
 
 // CheckByte receives a single byte, and allocates it to the corresponding variable.
@@ -268,43 +269,326 @@ void ParserEngine::resetVariables()
     matchIndex=0;
     vecIndex=0;
     repeatIndex =0;
-    for(quint8 i=0;i<targetVars.size();i++)
+
+    if(!targetVars.isEmpty())
     {
-        RepeatedVector repVec;
-        // Populate vector list result with data containers
-        switch(targetVars.at(i).type)
+
+        for(quint8 i=0;i<targetVars.size();i++)
         {
-        case VECTYPE:
-        {
-            // Iterate through each repetition
-            for(quint8 j=0;j<targetVars.at(i).repeat;j++)
+            RepeatedVector repVec;
+            // Populate vector list result with data containers
+            switch(targetVars.at(i).type)
             {
-                // Iterate through each vector element
-                SingleVector sv;
-                for(quint8 k=0;k<targetVars.at(i).vector.size();k++)
+            case VECTYPE:
+            {
+                // Iterate through each repetition
+                for(quint8 j=0;j<targetVars.at(i).repeat;j++)
                 {
-                    SingleResult sr;// = new SingleResult;
-                    sr.varType=targetVars.at(i).vector.at(k).type;
-                    sv.vector.append(sr);
+                    // Iterate through each vector element
+                    SingleVector sv;
+                    for(quint8 k=0;k<targetVars.at(i).vector.size();k++)
+                    {
+                        SingleResult sr;// = new SingleResult;
+                        sr.varType=targetVars.at(i).vector.at(k).type;
+                        sv.vector.append(sr);
+                    }
+                    repVec.vectors.append(sv);
                 }
-                repVec.vectors.append(sv);
             }
-        }
-            break;
-        default:
+                break;
+            default:
 
-            SingleVector sv;
+                SingleVector sv;
 
-            SingleResult sr;// = new SingleResult;
-            sr.varType=targetVars.at(i).type;
-            sv.vector.append(sr);
-            repVec.vectors.append(sv);
-            break;
+                SingleResult sr;// = new SingleResult;
+                sr.varType=targetVars.at(i).type;
+                sv.vector.append(sr);
+                repVec.vectors.append(sv);
+                break;
+            }
+            masterList.append(repVec);
         }
-        masterList.append(repVec);
     }
 
 }
+
+
+bool ParserEngine::verifyVariables()
+{
+    // Check list size
+    if(targetVars.size()<2)
+    {
+        validList=false;
+        return validList;
+    }
+
+    // Cycle through each variable
+    for(quint8 i=0;i<targetVars.size();i++)
+    {
+        // Make sure vectors are not empty
+        if(targetVars.at(i).type==VECTYPE && targetVars.at(i).vector.isEmpty())
+        {
+            validList=false;
+            return validList;
+        }
+
+        // Check all special cases
+        switch(targetVars.at(i).type)
+        {
+        case BYTTYPE:
+            // Invalid cases:
+            // 1. Variable length in a middle position and the next variable is not a number or a matched byte.
+            // 2. Variable length in the last position and the 1st variable is not a number or a matched byte.
+            // 3. Variable length in a middle position and the next variable is a vector whose 1st item is not a number or a matched byte.
+            // 4. Variable length in the last position and the 1st variable is a vector whose 1st item is not a number or a matched byte.
+            // 5. Byte array to match is empty
+            if(!(targetVars.at(i).fixed || targetVars.at(i).match))
+            {
+                if(i<targetVars.size()-1) // Have variables left.
+                {
+                    // Case 1
+                    if(!(targetVars.at(i+1).match || targetVars.at(i+1).type==NUMTYPE))
+                    {
+                        validList=false;
+                        return validList;
+                    }
+                    if(targetVars.at(i+1).type==VECTYPE)
+                    {
+                        // Case 3
+                        if(!(targetVars.at(i+1).vector.at(0).match || targetVars.at(i+1).vector.at(0).type==NUMTYPE))
+                        {
+                            validList=false;
+                            return validList;
+                        }
+                    }
+                }
+                else
+                {
+                    // Case 2
+                    if(!(targetVars.at(0).match || targetVars.at(0).type==NUMTYPE))
+                    {
+                        validList=false;
+                        return validList;
+                    }
+                    if(targetVars.at(0).type==VECTYPE)
+                    {
+                        // Case 4
+                        if(!(targetVars.at(0).vector.at(0).match || targetVars.at(0).vector.at(0).type==NUMTYPE))
+                        {
+                            validList=false;
+                            return validList;
+                        }
+                    }
+                }
+            }
+            if(targetVars.at(i).match && targetVars.at(i).matchBytes.isEmpty())
+            {
+                // Case 5
+                validList=false;
+                return validList;
+            }
+            break;
+        case NUMTYPE:
+            // Invalid cases:
+            // 1. Variable length in a middle position and the next variable is also a number.
+            // 2. Variable length in a middle position and the next variable is a vector whose first item is also a number.
+            // 3. Variable length in the last position and the 1st variable is also a number.
+            // 4. Variable length in the last position and the 1st variable is a vector whose first item is also a number.
+
+            if(!targetVars.at(i).fixed)
+            {
+                if(i<targetVars.size()-1)
+                {
+                    // Case 1
+                    if(targetVars.at(i+1).type==NUMTYPE)
+                    {
+                        validList=false;
+                        return validList;
+                    }
+                    // Case 2
+                    if(targetVars.at(i+1).type==VECTYPE && targetVars.at(i+1).vector.at(0).type==NUMTYPE)
+                    {
+                        validList=false;
+                        return validList;
+                    }
+                }
+                else
+                {
+                    // Case 3
+                    if(targetVars.at(0).type==NUMTYPE)
+                    {
+                        validList=false;
+                        return validList;
+                    }
+                    // Case 4
+                    if(targetVars.at(0).type==VECTYPE && targetVars.at(0).vector.at(0).type==NUMTYPE)
+                    {
+                        validList=false;
+                        return validList;
+                    }
+                }
+            }
+
+            break;
+        case VECTYPE:
+            for(quint8 j=0;j<targetVars.at(i).vector.size();j++)
+            {
+                switch(targetVars.at(i).vector.at(j).type)
+                {
+                case BYTTYPE:
+                    // Invalid cases:
+                    // 1. Variable length in a middle vector position and the next vector item is not a number or a matched byte.
+                    // 2. Variable length in the last vector position and the 1st vector item is not a number or a matched byte.
+                    // 3. Variable length in the last vector position and the next variable is not a number or a matched byte.
+                    // 4. Variable length in the last position and the 1st variable is not a number or a matched byte.
+                    // 5. Byte array to match is empty
+                    // 6. Variable length in the last vector position and the next variable is a vector whose first item is not a number or matched byte.
+                    // 7. Variable length in the last position and the 1st variable is a vector whose first item is not a number or matched byte.
+
+                    if(!(targetVars.at(i).vector.at(j).fixed || targetVars.at(i).vector.at(j).match))
+                    {
+                        if(j<targetVars.at(i).vector.size()-1)
+                        {
+                            // Case 1
+                            if(!(targetVars.at(i).vector.at(j+1).match || targetVars.at(i).vector.at(j+1).type==NUMTYPE))
+                            {
+                                validList=false;
+                                return validList;
+                            }
+                        }
+                        else
+                        {
+                            // Case 2
+                            if(!(targetVars.at(i).vector.at(0).match || targetVars.at(i+1).vector.at(0).type==NUMTYPE))
+                            {
+                                validList=false;
+                                return validList;
+                            }
+                            if(i<targetVars.size()-1)
+                            {
+                                // Case 3
+                                if(!(targetVars.at(i+1).match || targetVars.at(i+1).type==NUMTYPE))
+                                {
+                                    validList=false;
+                                    return validList;
+                                }
+
+                                if(targetVars.at(i+1).type==VECTYPE)
+                                {
+                                    // Case 6
+                                    if(!(targetVars.at(i+1).vector.at(0).match || targetVars.at(i+1).vector.at(0).type==NUMTYPE))
+                                    {
+                                        validList=false;
+                                        return validList;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Case 4
+                                if(!(targetVars.at(0).match || targetVars.at(0).type==NUMTYPE))
+                                {
+                                    validList=false;
+                                    return validList;
+                                }
+                                if(targetVars.at(0).type==VECTYPE)
+                                {
+                                    // Case 7
+                                    if(!(targetVars.at(0).vector.at(0).match || targetVars.at(0).vector.at(0).type==NUMTYPE))
+                                    {
+                                        validList=false;
+                                        return validList;
+                                    }
+                                }
+                            }
+                        }
+                        // Case 5
+                        if(targetVars.at(i).vector.at(j).match && targetVars.at(i).vector.at(j).matchBytes.isEmpty())
+                        {
+                            validList=false;
+                            return validList;
+                        }
+                    }
+                    break;
+                case NUMTYPE:
+                    // Invalid cases:
+                    // 1. Variable length in a middle vector position and the next variable is a number.
+                    // 2. Variable length in the last vector position and the 1st vector item is also a number.
+                    // 3. Variable length in the last vector position and the next variable is also a number.
+                    // 4. Variable length in the last vector position and the 1st variable is also a number.
+                    // 5. Variable length in the last vector position and the next variable is a vector whose first item is also a number.
+                    // 6. Variable length in the last position and the 1st variable is a vector whose first item is also a number.
+                    if(!targetVars.at(i).vector.at(j).fixed)
+                    {
+                        if(j<targetVars.at(i).vector.size()-1)
+                        {
+                            // Case 1
+                            if(!(targetVars.at(i).vector.at(j+1).match || targetVars.at(i).vector.at(j+1).type==NUMTYPE))
+                            {
+                                validList=false;
+                                return validList;
+                            }
+                        }
+                        else
+                        {
+                            // Case 2
+                            if(targetVars.at(i).vector.at(0).type==NUMTYPE)
+                            {
+                                validList=false;
+                                return validList;
+                            }
+                            // Case 3
+                            if(i<targetVars.size()-1)
+                            {
+                                if(targetVars.at(i+1).type==NUMTYPE)
+                                {
+                                    validList=false;
+                                    return validList;
+                                }
+                                if(targetVars.at(i+1).type==VECTYPE)
+                                {
+                                    // Case 5
+                                    if(targetVars.at(i+1).vector.at(0).type==NUMTYPE)
+                                    {
+                                        validList=false;
+                                        return validList;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Case 4
+                                if(targetVars.at(0).type==NUMTYPE)
+                                {
+                                    validList=false;
+                                    return validList;
+                                }
+                                // Case 6
+                                if(targetVars.at(0).vector.at(0).type==NUMTYPE)
+                                {
+                                    validList=false;
+                                    return validList;
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    break;
+                }
+            }
+            break;
+        default:
+            break;
+        }
+
+    }
+
+    validList=true;
+    return validList;
+}
+
 
 bool ParserEngine::isValid(QByteArray *checkOutput)
 {
@@ -999,7 +1283,7 @@ void ParserEngine::variableComplete()
 
         emit dataParsed(masterList);
 
-//        qDebug() << "Full list caught";
+        //        qDebug() << "Full list caught";
         clearVariables();
 
     }

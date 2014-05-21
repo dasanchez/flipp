@@ -101,6 +101,7 @@ private:
     int assignNonNumber(char);
     int assignNumber(char);
     void variableComplete();
+    bool verifyVariables();
 
 
 };

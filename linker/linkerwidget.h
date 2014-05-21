@@ -26,6 +26,9 @@ public:
     QStringList parserNamesList;
 
     ~LinkerWidget();
+    QString getConnection(void);
+    QString getParser(void);
+
 signals:
     void linkerConnectionRequest(QString);
     void linkerParserRequest(QString);

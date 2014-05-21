@@ -66,13 +66,6 @@ private slots:
     void toggleExpand();
 
     // Variable data
-    //    void nameChanged(QString);
-    //    void typeChanged(int);
-    //    void lengthToggled(bool);
-    //    void lengthChanged(int);
-    //    void matchToggled(bool);
-    //    void matchChanged(QString);
-    //    void repeatChanged(int);
 
     void variableListChanged();
     // Testing operation

@@ -15,19 +15,15 @@ Flipp::Flipp(QWidget *parent)
 
 
     connect(connections,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
-
-
-    //    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
-
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
+
     connect(connections,SIGNAL(connectionListChanged(QStringList)),linkers,SLOT(updateConnections(QStringList)));
     connect(parsers,SIGNAL(parserListChanged(QStringList)),linkers,SLOT(updateParsers(QStringList)));
-
-
     connect(linkers,SIGNAL(linkerConnectionRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerConnectionRequest(LinkerWidget*, QString)));
     connect(linkers,SIGNAL(linkerParserRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerParserRequest(LinkerWidget*, QString)));
 
 
+    //    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
     //    connect(parsers,SIGNAL(parserListChanged(QStringList)),plotters,SLOT(updateParsers(QStringList)));
     //    connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
     //    connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
@@ -245,7 +241,6 @@ void Flipp::initSettings()
     settings.endGroup();
 
     settings.endGroup();
-
     settings.endGroup();
 
     settings.sync();
@@ -380,7 +375,20 @@ void Flipp::restoreSettings()
         parsers->addParser(pw);
     }
     settings.endArray();
-    //    settings.endGroup();
+
+    // Restore linker widgets
+    int linkerCount = settings.beginReadArray("Linkers");
+    for(int i=0;i<linkerCount;i++)
+    {
+        settings.setArrayIndex(i);
+        LinkerWidget *lw = new LinkerWidget;
+        lw->updateConnections(connectionNames);
+        lw->updateParsers(parserNames);
+        linkers->addLinker(lw);
+        lw->changeConnection(settings.value("Connection").toString());
+        lw->changeParser(settings.value("Parser").toString());
+    }
+    settings.endArray();
 
     // Restore plotters
     //    int plotSize = settings.beginReadArray("Plotters");
@@ -413,7 +421,6 @@ void Flipp::saveSettings()
 
     // Connections
     settings.beginWriteArray("Connections");
-
     for(int i=0;i<connections->connectionList.size();i++)
     {
         settings.setArrayIndex(i);
@@ -504,6 +511,23 @@ void Flipp::saveSettings()
         settings.endArray();
         //        settings.endGroup();
         parserCount++;
+    }
+    settings.endArray();
+
+    // Linkers
+    settings.beginWriteArray("Linkers");
+    int linkerCount=0;
+    qDebug() << linkers->linkerList.size();
+    foreach(LinkerWidget *lw, linkers->linkerList)
+    {
+        if(connections->connectionList.size()>0 && parsers->parserList->size()>0)
+        {
+            settings.setArrayIndex(linkerCount);
+            settings.setValue("Connection", lw->getConnection());
+            settings.setValue("Parser",lw->getParser());
+            qDebug() << lw->getConnection() << lw->getParser();
+        }
+        linkerCount++;
     }
     settings.endArray();
 
