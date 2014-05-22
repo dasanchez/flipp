@@ -49,11 +49,14 @@ void TerminalWidget::updateEchoButton()
 {
     if(echoing)
     {
-        echoButton->setIcon(QIcon(echoOnIconPixmap));
+//        echoButton->setIcon(QIcon(echoOnIconPixmap));
+//        echoButton->setText("E");
+        echoButton->setChecked(true);
     }
     else
     {
-        echoButton->setIcon(QIcon(echoOffIconPixmap));
+//        echoButton->setIcon(QIcon(echoOffIconPixmap));
+        echoButton->setChecked(false);
     }
 }
 
@@ -77,11 +80,13 @@ void TerminalWidget::updatePauseButton()
 {
     if(paused)
     {
-        pauseButton->setIcon(QIcon(pauseIconPixmap));
+//        pauseButton->setIcon(QIcon(pauseIconPixmap));
+        pauseButton->setChecked(true);
     }
     else
     {
-        pauseButton->setIcon(QIcon(playIconPixmap));
+//        pauseButton->setIcon(QIcon(playIconPixmap));
+        pauseButton->setChecked(false);
     }
 }
 
@@ -107,13 +112,15 @@ void TerminalWidget::updatePacketButton()
     if(hexPacket)
     {
         packetEdit->setText(char2hex(packetEdit->text()));
-        hexPacketButton->setIcon(QIcon(hexIconPixmap));
+//        hexPacketButton->setIcon(QIcon(hexIconPixmap));
+        hexPacketButton->setText("Hex");
     }
     else
     {
 
         packetEdit->setText(hex2char(packetEdit->text()));
-        hexPacketButton->setIcon(QIcon(ascIconPixmap));
+//        hexPacketButton->setIcon(QIcon(ascIconPixmap));
+        hexPacketButton->setText("Ascii");
     }
 }
 
@@ -390,40 +397,55 @@ void TerminalWidget::setupUI()
     hexButton->setChecked(true);
     hexButton->setFixedHeight(24);
     hexButton->setObjectName("hexButton");
-    echoButton = new QPushButton;
+    //    echoButton = new QPushButton;
+    //    echoButton->setIcon(QIcon(echoOffIconPixmap));
+    echoButton = new QPushButton("Echo");
     echoButton->setToolTip("Toggle echo");
-    echoButton->setIcon(QIcon(echoOffIconPixmap));
     echoButton->setFixedHeight(24);
-    echoButton->setFixedWidth(24);
-    pauseButton = new QPushButton;
+    echoButton->setFixedWidth(36);
+    echoButton->setObjectName("echoButton");
+    echoButton->setCheckable(true);
+//    pauseButton = new QPushButton;
+    //    pauseButton->setIcon(QIcon(playIconPixmap));
+    pauseButton = new QPushButton("Pause");
     pauseButton->setToolTip("Pause terminal display");
+
     pauseButton->setFixedHeight(24);
-    pauseButton->setFixedWidth(24);
-    pauseButton->setIcon(QIcon(playIconPixmap));
-    clearButton = new QPushButton;
-    clearButton->setToolTip("Clear terminal views");
-    clearButton->setIcon(QIcon(clearIconPixmap));
+    pauseButton->setFixedWidth(40);
+pauseButton->setCheckable(true);
+pauseButton->setObjectName("pauseButton");
+
+//    clearButton = new QPushButton;
+//clearButton->setIcon(QIcon(clearIconPixmap));
+clearButton = new QPushButton("Clear");
+clearButton->setToolTip("Clear terminal views");
+
     clearButton->setFixedHeight(24);
-    clearButton->setFixedWidth(24);
-    removeButton = new QPushButton;
+    clearButton->setFixedWidth(40);
+//    removeButton = new QPushButton;
+//    removeButton->setIcon(QIcon(delIconPixmap));
+    removeButton = new QPushButton("Delete");
     removeButton->setToolTip("Remove terminal");
-    removeButton->setIcon(QIcon(delIconPixmap));
+
     removeButton->setFixedHeight(24);
-    removeButton->setFixedWidth(24);
+    removeButton->setFixedWidth(60);
 
     packetEdit = new QLineEdit;
     packetEdit->setToolTip("Enter packet to transmit");
     packetEdit->setFixedHeight(24);
-    hexPacketButton = new QPushButton;
-    hexPacketButton->setIcon(QIcon(ascIconPixmap));
+//    hexPacketButton = new QPushButton;
+//    hexPacketButton->setIcon(QIcon(ascIconPixmap));
+    hexPacketButton = new QPushButton("Ascii");
     hexPacketButton->setFixedHeight(24);
-    hexPacketButton->setFixedWidth(24);
+    hexPacketButton->setFixedWidth(40);
     hexPacketButton->setToolTip("Toggle hex display");
-    sendButton = new QPushButton;
+//    sendButton = new QPushButton;
+//    sendButton->setIcon(QIcon(sendIconPixmap));
+    sendButton = new QPushButton("Send");
     sendButton->setToolTip("Transmit packet");
-    sendButton->setIcon(QIcon(sendIconPixmap));
+
     sendButton->setFixedHeight(24);
-    sendButton->setFixedWidth(24);
+    sendButton->setFixedWidth(40);
 
     // Layout:
     controlLayout = new QHBoxLayout;

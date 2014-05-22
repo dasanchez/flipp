@@ -90,12 +90,14 @@ void ConnectionWidget::toggleView()
     if(isExpanded)
     {
         mainLayout->addLayout(controlLayout);
-        viewButton->setIcon(QIcon(moreIconPixmap));
+        //        viewButton->setIcon(QIcon(moreIconPixmap));
+        viewButton->setText("Less");
     }
     else
     {
         mainLayout->removeItem(controlLayout);
-        viewButton->setIcon(QIcon(lessIconPixmap));
+        //        viewButton->setIcon(QIcon(lessIconPixmap));
+        viewButton->setText("More");
     }
     mainLayout->addLayout(bottomLayout);
 
@@ -163,7 +165,8 @@ void ConnectionWidget::setType(int newType)
     {
     case TCP:
         dataConnection->setType(TCP);
-        typeButton->setIcon(QIcon(tcpIconPixmap));
+//        typeButton->setIcon(QIcon(tcpIconPixmap));
+        typeButton->setText("TCP");
         if(isExpanded)
         {
             serialPortCombo->setVisible(false);
@@ -175,7 +178,8 @@ void ConnectionWidget::setType(int newType)
         break;
     case UDP:
         dataConnection->setType(UDP);
-        typeButton->setIcon(QIcon(udpIconPixmap));
+//        typeButton->setIcon(QIcon(udpIconPixmap));
+        typeButton->setText("UDP");
         if(isExpanded)
         {
             serialPortCombo->setVisible(false);
@@ -187,7 +191,8 @@ void ConnectionWidget::setType(int newType)
         break;
     case SERIAL:
         dataConnection->setType(SERIAL);
-        typeButton->setIcon(QIcon(comIconPixmap));
+//        typeButton->setIcon(QIcon(comIconPixmap));
+        typeButton->setText("COM");
         if(isExpanded)
         {
             addressEdit->setVisible(false);
@@ -211,7 +216,8 @@ void ConnectionWidget::toggleType()
 
     case UDP:
         dataConnection->setType(SERIAL);
-        typeButton->setIcon(QIcon(comIconPixmap));
+//        typeButton->setIcon(QIcon(comIconPixmap));
+        typeButton->setText("COM");
         if(isExpanded)
         {
             addressEdit->setVisible(false);
@@ -223,7 +229,8 @@ void ConnectionWidget::toggleType()
         break;
     case SERIAL:
         dataConnection->setType(TCP);
-        typeButton->setIcon(QIcon(tcpIconPixmap));
+//        typeButton->setIcon(QIcon(tcpIconPixmap));
+        typeButton->setText("TCP");
         if(isExpanded)
         {
             serialPortCombo->setVisible(false);
@@ -235,7 +242,8 @@ void ConnectionWidget::toggleType()
         break;
     default:
         dataConnection->setType(UDP);
-        typeButton->setIcon(QIcon(udpIconPixmap));
+//        typeButton->setIcon(QIcon(udpIconPixmap));
+        typeButton->setText("UDP");
         break;
     }
 }
@@ -332,7 +340,7 @@ void ConnectionWidget::connectionChanged(connectionState newState)
 {
     if(newState == ACTIVE)
     {
-//        connectButton->setIcon(QIcon(connOnIconPixmap));
+        //        connectButton->setIcon(QIcon(connOnIconPixmap));
         connectButton->setText("Disconnect");
         connectButton->setEnabled(true);
         connectButton->setToolTip("Close connection");
@@ -347,7 +355,7 @@ void ConnectionWidget::connectionChanged(connectionState newState)
     }
     else
     {
-//        connectButton->setIcon(QIcon(connOffIconPixmap));
+        //        connectButton->setIcon(QIcon(connOffIconPixmap));
         connectButton->setText("Connect");
         connectButton->setEnabled(true);
         connectButton->setToolTip("Open connection");
@@ -399,25 +407,29 @@ void ConnectionWidget::setupUI()
     // Control
     nameEdit = new QLineEdit("Connection 1");
     nameEdit->setToolTip("Enter a connection name");
-    nameEdit->setMinimumWidth(200);
+    nameEdit->setMinimumWidth(150);
     nameEdit->setFixedHeight(24);
 
 
-//    connectButton = new QPushButton;
-//    connectButton->setIcon(QIcon(connOffIconPixmap));
+    //    connectButton = new QPushButton;
+    //    connectButton->setIcon(QIcon(connOffIconPixmap));
     connectButton = new QPushButton("Connect");
     connectButton->setToolTip("Open connection");
-//    connectButton->setFixedWidth(24);
+    //    connectButton->setFixedWidth(24);
     connectButton->setFixedWidth(76);
     connectButton->setFixedHeight(24);
-    viewButton = new QPushButton;
-    viewButton->setIcon(QIcon(moreIconPixmap));
-    viewButton->setFixedWidth(24);
+    //    viewButton = new QPushButton;
+    //    viewButton->setIcon(QIcon(moreIconPixmap));
+    //    viewButton->setFixedWidth(24);
+    viewButton = new QPushButton("Less");
+    viewButton->setFixedWidth(50);
     viewButton->setFixedHeight(24);
     viewButton->setToolTip("Hide or show connection properties");
-    removeButton = new QPushButton;
-    removeButton->setIcon(QIcon(delIconPixmap));
-    removeButton->setFixedWidth(24);
+    //    removeButton = new QPushButton;
+    //    removeButton->setIcon(QIcon(delIconPixmap));
+    //    removeButton->setFixedWidth(24);
+    removeButton = new QPushButton("Delete");
+    removeButton->setFixedWidth(60);
     removeButton->setFixedHeight(24);
     removeButton->setToolTip("Remove connection");
 
@@ -433,12 +445,14 @@ void ConnectionWidget::setupUI()
     portLabel->setFixedHeight(24);
     portLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     portLabel->setAlignment(Qt::AlignCenter);
-    typeButton = new QPushButton;
-    typeButton->setToolTip("Toggle between TCP, UDP, and COM connection");
-    typeButton->setFixedWidth(30);
+    //    typeButton = new QPushButton;
+    //    typeButton->setIcon(QIcon(tcpIconPixmap));
+    typeButton = new QPushButton("Delete");
+    typeButton->setFixedWidth(36);
     typeButton->setFixedHeight(24);
-    typeButton->setIcon(QIcon(tcpIconPixmap));
-    typeButton->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+typeButton->setToolTip("Toggle between TCP, UDP, and COM connection");
+
+    //    typeButton->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     addressEdit = new QLineEdit("127.0.0.1");
     addressEdit->setToolTip("Enter an IP adress or serial port");
     addressEdit->setMinimumWidth(80);
@@ -447,6 +461,7 @@ void ConnectionWidget::setupUI()
     serialPortCombo = new QComboBox;
     serialPortCombo->setItemDelegate(new QStyledItemDelegate);
     serialPortCombo->setMinimumWidth(100);
+    serialPortCombo->setFixedHeight(24);
     // Populate with available serial ports
     QList<QSerialPortInfo> spinfo = QSerialPortInfo::availablePorts();
     QStringList portNames;
@@ -466,9 +481,9 @@ void ConnectionWidget::setupUI()
     statusBar = new QLabel("Click the Connect button");
     statusBar->setFixedHeight(24);
     statusBar->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-dataIcon = new QPushButton("IO");
+    dataIcon = new QPushButton("IO");
     //    dataIcon = new QPushButton;
-//    dataIcon->setIcon(QIcon(inOutIconPixmap));
+    //    dataIcon->setIcon(QIcon(inOutIconPixmap));
     dataIcon->setFixedHeight(24);
     dataIcon->setFixedWidth(24);
     dataIconShade = 255;
