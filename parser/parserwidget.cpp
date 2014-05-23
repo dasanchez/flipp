@@ -18,25 +18,31 @@ ParserWidget::ParserWidget(QWidget *parent) :
     nameEdit = new QLineEdit("Parser 1");
     nameEdit->setFixedHeight(24);
     statusBar = new QLabel("Ready");
-    statusBar->setFixedHeight(24);
-    addByteButton = new QPushButton;
+    statusBar->setFixedHeight(88);
+    //    addByteButton = new QPushButton;
+    //    addByteButton->setIcon(QIcon(addByteIconPixmap));
+    addByteButton = new QPushButton("Add bytes");
     addByteButton->setFixedHeight(24);
-    addByteButton->setFixedWidth(24);
-    addByteButton->setIcon(QIcon(addByteIconPixmap));
-    addNumberButton = new QPushButton;
+    addByteButton->setFixedWidth(88);
+    //    addNumberButton = new QPushButton;
+    //    addNumberButton->setIcon(QIcon(addNumberIconPixmap));
+    addNumberButton = new QPushButton("Add number");
     addNumberButton->setFixedHeight(24);
-    addNumberButton->setFixedWidth(24);
-    addNumberButton->setIcon(QIcon(addNumberIconPixmap));
-    addVectorButton = new QPushButton;
+    addNumberButton->setFixedWidth(88);
+    //    addVectorButton = new QPushButton;
+    //    addVectorButton->setIcon(QIcon(addVectorIconPixmap));
+    addVectorButton = new QPushButton("Add vector");
     addVectorButton->setFixedHeight(24);
-    addVectorButton->setFixedWidth(24);
-    addVectorButton->setIcon(QIcon(addVectorIconPixmap));
-    expandButton = new QPushButton;
-    expandButton->setFixedSize(24,24);
-    expandButton->setIcon(QIcon(moreIconPixmap));
-    deleteButton = new QPushButton;
-    deleteButton->setFixedSize(24,24);
-    deleteButton->setIcon(QIcon(delIconPixmap));
+    addVectorButton->setFixedWidth(88);
+    //    expandButton = new QPushButton;
+    //    expandButton->setIcon(QIcon(moreIconPixmap));
+    expandButton = new QPushButton("Less");
+    expandButton->setFixedSize(40,24);
+    //    deleteButton = new QPushButton;
+    //    deleteButton->setIcon(QIcon(delIconPixmap));
+    deleteButton = new QPushButton("Delete");
+    deleteButton->setFixedSize(60,24);
+
 
     vwList = new QList<VariableWidget*>;
     lw = new LiveListWidget(this);
@@ -111,13 +117,15 @@ void ParserWidget::toggleExpand()
     {
         mainLayout->addWidget(lw);
         lw->setVisible(true);
-        expandButton->setIcon(QIcon(moreIconPixmap));
+        //        expandButton->setIcon(QIcon(moreIconPixmap));
+        expandButton->setText("Less");
     }
     else
     {
         mainLayout->removeWidget(lw);
         lw->setVisible(false);
-        expandButton->setIcon(QIcon(lessIconPixmap));
+        //        expandButton->setIcon(QIcon(lessIconPixmap));
+        expandButton->setText("More");
     }
     emit update();
     emit changeSize(this->sizeHint());
@@ -218,7 +226,7 @@ void ParserWidget::itemRemoved(int row)
 
 void ParserWidget::printList()
 {
-//    qDebug() << "variables:";
+    //    qDebug() << "variables:";
     foreach(ComplexVariable item, variableList)
     {
         QString outString = item.name;
@@ -296,7 +304,7 @@ void ParserWidget::printList()
                 outString.append("match: no");
             }
         }
-//        qDebug() << outString;
+        //        qDebug() << outString;
     }
 }
 

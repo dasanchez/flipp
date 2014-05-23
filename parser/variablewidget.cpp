@@ -183,7 +183,8 @@ void VariableWidget::toggleType()
 
 void VariableWidget::setByte()
 {
-    typeButton->setIcon(QIcon(byteIconPixmap));
+//    typeButton->setIcon(QIcon(byteIconPixmap));
+    typeButton->setText("BYT");
 
     mainLayout->removeItem(vectorListLayout);
 
@@ -214,8 +215,8 @@ void VariableWidget::setByte()
 
 void VariableWidget::setNumber()
 {
-    typeButton->setIcon(QIcon(numberIconPixmap));
-
+//    typeButton->setIcon(QIcon(numberIconPixmap));
+typeButton->setText("NUM");
     // Widgets
     mainLayout->removeItem(vectorListLayout);
 
@@ -245,7 +246,8 @@ void VariableWidget::setNumber()
 
 void VariableWidget::setVector()
 {
-    typeButton->setIcon(QIcon(vectorIconPixmap));
+//    typeButton->setIcon(QIcon(vectorIconPixmap));
+    typeButton->setText("VEC");
     moreButton->setIcon(QIcon(moreIconPixmap));
     isExpanded=true;
 
@@ -608,10 +610,12 @@ void VariableWidget::setupUI()
     nameEdit->setFixedHeight(24);
     nameEdit->setFrame(false);
     nameEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-    typeButton = new QPushButton;
+//    typeButton = new QPushButton;
+//    typeButton->setIcon(typeIcon);
+    typeButton = new QPushButton("BYT");
     typeButton->setToolTip("Toggle between byte, number, and vector type");
-    typeButton->setIcon(typeIcon);
-    typeButton->setFixedWidth(24);
+
+    typeButton->setFixedWidth(36);
     typeButton->setFixedHeight(24);
 
     // Single variable
