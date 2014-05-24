@@ -18,7 +18,8 @@ ParserWidget::ParserWidget(QWidget *parent) :
     nameEdit = new QLineEdit("Parser 1");
     nameEdit->setFixedHeight(24);
     statusBar = new QLabel("Ready");
-    statusBar->setFixedHeight(88);
+//    statusBar->setFixedWidth(88);
+    statusBar->setFixedHeight(24);
     //    addByteButton = new QPushButton;
     //    addByteButton->setIcon(QIcon(addByteIconPixmap));
     addByteButton = new QPushButton("Add bytes");
@@ -50,15 +51,19 @@ ParserWidget::ParserWidget(QWidget *parent) :
 
     controlLayout = new QHBoxLayout;
     controlLayout->addWidget(nameEdit);
-    controlLayout->addWidget(statusBar);
+//    controlLayout->addWidget(statusBar);
     controlLayout->addWidget(addByteButton);
     controlLayout->addWidget(addNumberButton);
     controlLayout->addWidget(addVectorButton);
     controlLayout->addWidget(expandButton);
     controlLayout->addWidget(deleteButton);
 
+    controlLayoutBottom = new QHBoxLayout;
+    controlLayoutBottom->addWidget(statusBar);
+
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(controlLayout);
+    mainLayout->addLayout(controlLayoutBottom);
     mainLayout->addWidget(lw);
     setLayout(mainLayout);
     setMinimumWidth(500);

@@ -34,6 +34,7 @@ public slots:
     void remVariable();
 private:
     QHBoxLayout *controlLayout;
+    QHBoxLayout *controlLayoutBottom;
 
     QVBoxLayout *mainLayout;
 
