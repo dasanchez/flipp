@@ -517,7 +517,7 @@ void Flipp::saveSettings()
     // Linkers
     settings.beginWriteArray("Linkers");
     int linkerCount=0;
-    qDebug() << linkers->linkerList.size();
+//    qDebug() << linkers->linkerList.size();
     foreach(LinkerWidget *lw, linkers->linkerList)
     {
         if(connections->connectionList.size()>0 && parsers->parserList->size()>0)
@@ -525,7 +525,7 @@ void Flipp::saveSettings()
             settings.setArrayIndex(linkerCount);
             settings.setValue("Connection", lw->getConnection());
             settings.setValue("Parser",lw->getParser());
-            qDebug() << lw->getConnection() << lw->getParser();
+//            qDebug() << lw->getConnection() << lw->getParser();
         }
         linkerCount++;
     }

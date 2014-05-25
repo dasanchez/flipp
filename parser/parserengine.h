@@ -58,7 +58,7 @@ public:
 };
 
 typedef QList<RepeatedVector> VariableList;
-
+bool listIsValid(QList<ComplexVariable>, QByteArray *);
 
 class ParserEngine : public QObject
 {
@@ -67,6 +67,7 @@ public:
     explicit ParserEngine(QObject *parent = 0);
     void setVariables(QList<ComplexVariable>);
     bool isValid(QByteArray *);
+
     QList<ComplexVariable> getVariables();
 
 signals:

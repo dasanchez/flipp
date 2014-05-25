@@ -98,13 +98,21 @@ bool ParserWidget::hasValidName()
 void ParserWidget::setNameValid(bool isValid)
 {
     validName = isValid;
-    if(validName)
+    QByteArray *ba = new QByteArray;
+    if(validName && listIsValid(variableList,ba))
     {
         statusBar->setText("Ready");
     }
     else
     {
+        if(validName)
+        {
+         statusBar->setText(*ba);
+        }
+        else
+        {
         statusBar->setText("Name is not valid");
+        }
     }
 }
 
@@ -142,6 +150,10 @@ void ParserWidget::variableListChanged()
     {
         variableList[i]=vwList->at(i)->variable;
     }
+
+    QByteArray *validResponse = new QByteArray;
+    listIsValid(variableList, validResponse);
+    statusBar->setText(*validResponse);
 
     printList();
     emit updateVariableList(variableList);
