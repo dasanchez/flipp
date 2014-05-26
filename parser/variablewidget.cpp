@@ -102,13 +102,15 @@ void VariableWidget::setMatched(bool matchOn)
 
     if(matched)
     {
-        matchIcon=matchonIconPixmap;
+//        matchIcon=matchonIconPixmap;
+        matchButton->setChecked(true);
     }
     else
     {
-        matchIcon=matchoffIconPixmap;
+//        matchIcon=matchoffIconPixmap;
+        matchButton->setChecked(false);
     }
-    matchButton->setIcon(matchIcon);
+//    matchButton->setIcon(matchIcon);
     variable.match=matched;
     emit variableChanged();
     emit matchToggle(matched);
@@ -303,13 +305,15 @@ void VariableWidget::toggleMatch()
 
     if(matched)
     {
-        matchIcon=matchonIconPixmap;
+//        matchIcon=matchonIconPixmap;
+        matchButton->setChecked(true);
     }
     else
     {
-        matchIcon=matchoffIconPixmap;
+//        matchIcon=matchoffIconPixmap;
+        matchButton->setChecked(false);
     }
-    matchButton->setIcon(matchIcon);
+//    matchButton->setIcon(matchIcon);
     variable.match=matched;
     emit variableChanged();
     emit matchToggle(matched);
@@ -630,11 +634,15 @@ void VariableWidget::setupUI()
     lengthSpin->setMinimum(1);
     lengthSpin->setFixedWidth(40);
     lengthSpin->setFixedHeight(24);
-    matchButton = new QPushButton;
+//    matchButton = new QPushButton;
+//    matchButton->setIcon(matchoffIcon);
+    matchButton = new QPushButton("Match");
     matchButton->setToolTip("Toggle match on or off");
-    matchButton->setFixedWidth(24);
+    matchButton->setFixedWidth(48);
     matchButton->setFixedHeight(24);
-    matchButton->setIcon(matchoffIcon);
+    matchButton->setCheckable(true);
+    matchButton->setChecked(false);
+    matchButton->setObjectName("matchButton");
     matchEdit = new QLineEdit;
     matchEdit->setToolTip("Enter the byte array to match");
     matchEdit->setFixedHeight(24);

@@ -75,9 +75,13 @@ color: black;
 QGroupBox {
 color: rgb(250,250,250);
 border: 1px solid rgb(10,10,10);
-
-
 }
+
+ QHeaderView::section {
+ background-color: rgb(0,0,0);
+ color: rgb(200,200,200);
+ border: 1px solid rgb(10,10,10);
+ }
 
   
 QLabel {
@@ -221,7 +225,15 @@ border-bottom-width: 2px;
 border-bottom-color: rgb(100,100,100);
 }
 
-QPushButton#asciiButton::checked, QPushButton#hexButton::checked, QPushButton#yAxisRangeButton::checked, QPushButton#showPlotSettingsBtn::checked, QPushButton#xTicksButton::checked, QPushButton#echoButton::checked, QPushButton#pauseButton::checked{
+QPushButton#asciiButton::checked,
+QPushButton#hexButton::checked,
+QPushButton#yAxisRangeButton::checked,
+QPushButton#showPlotSettingsBtn::checked,
+QPushButton#xTicksButton::checked,
+QPushButton#echoButton::checked,
+QPushButton#pauseButton::checked,
+QPushButton#matchButton::checked
+{
 background-color: rgb(100,100,100);
 }
 
@@ -383,8 +395,8 @@ background: black;
 /*border: 2px solid rgb(100,100,100);*/
 }
 
- QHeaderView::section {
- background-color: rgb(0,0,0);
- color: rgb(200,200,200);
- border: 1px solid rgb(10,10,10);
- }
+QToolTip{
+border-color: rgb(100,100,100);
+color: rgb(200,200,200);
+padding: 2px;
+}
