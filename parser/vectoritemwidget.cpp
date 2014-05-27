@@ -64,18 +64,20 @@ void VectorItemWidget::setLength(int newLength)
 
 void VectorItemWidget::setMatch(bool newMatched)
 {
-   QIcon matchIcon;
+    QIcon matchIcon;
     variable.match = newMatched;
     matched = newMatched;
     if(matched)
     {
-        matchIcon=matchonIconPixmap;
+        //        matchIcon=matchonIconPixmap;
+        matchButton->setChecked(true);
     }
     else
     {
-        matchIcon=matchoffIconPixmap;
+        //        matchIcon=matchoffIconPixmap;
+        matchButton->setChecked(false);
     }
-    matchButton->setIcon(matchIcon);
+    //    matchButton->setIcon(matchIcon);
 }
 
 void VectorItemWidget::setMatchBytes(QByteArray newBytes)
@@ -114,8 +116,8 @@ void VectorItemWidget::toggleType()
 
 void VectorItemWidget::setByte()
 {
-    typeButton->setIcon(QIcon(byteIconPixmap));
-
+    //    typeButton->setIcon(QIcon(byteIconPixmap));
+    typeButton->setText("BYT");
     matchButton->setEnabled(true);
     matchEdit->setEnabled(true);
     hexButton->setEnabled(true);
@@ -127,8 +129,8 @@ void VectorItemWidget::setByte()
 
 void VectorItemWidget::setNumber()
 {
-    typeButton->setIcon(QIcon(numberIconPixmap));
-
+    //    typeButton->setIcon(QIcon(numberIconPixmap));
+    typeButton->setText("NUM");
     // Widgets
     matchButton->setEnabled(false);
     matchEdit->setEnabled(false);
@@ -172,13 +174,15 @@ void VectorItemWidget::toggleMatch()
 
     if(matched)
     {
-        matchIcon=matchonIconPixmap;
+        //        matchIcon=matchonIconPixmap;
+        matchButton->setChecked(true);
     }
     else
     {
-        matchIcon=matchoffIconPixmap;
+        //        matchIcon=matchoffIconPixmap;
+        matchButton->setChecked(false);
     }
-    matchButton->setIcon(matchIcon);
+    //    matchButton->setIcon(matchIcon);
     variable.match = matched;
     emit variableChanged();
     emit matchToggle(matched);
@@ -296,10 +300,11 @@ void VectorItemWidget::setupUi()
     nameEdit->setMinimumWidth(40);
     nameEdit->setFixedHeight(24);
     nameEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-    typeButton = new QPushButton;
+    //    typeButton = new QPushButton;
+    //    typeButton->setIcon(typeIcon);
+    typeButton = new QPushButton("BYT");
     typeButton->setToolTip("Toggle between byte, number, and vector type");
-    typeButton->setIcon(typeIcon);
-    typeButton->setFixedWidth(24);
+    typeButton->setFixedWidth(36);
     typeButton->setFixedHeight(24);
 
     // Single variable
@@ -314,11 +319,16 @@ void VectorItemWidget::setupUi()
     lengthSpin->setMinimum(1);
     lengthSpin->setFixedWidth(40);
     lengthSpin->setFixedHeight(24);
-    matchButton = new QPushButton;
+    //    matchButton = new QPushButton;
+    //    matchButton->setIcon(matchoffIcon);
+    matchButton = new QPushButton("Match");
     matchButton->setToolTip("Toggle match on or off");
-    matchButton->setFixedWidth(24);
+    matchButton->setFixedWidth(48);
     matchButton->setFixedHeight(24);
-    matchButton->setIcon(matchoffIcon);
+    matchButton->setCheckable(true);
+    matchButton->setChecked(false);
+    matchButton->setObjectName("matchButton");
+
     matchEdit = new QLineEdit;
     matchEdit->setToolTip("Enter the byte array to match");
     matchEdit->setFixedHeight(24);
