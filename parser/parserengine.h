@@ -79,6 +79,7 @@ public slots:
     void parseData(QByteArray);
     void clearVariables();
     void resetVariables();
+    void setParser(bool);
     //    void newData(QByteArray);
 
 private:
@@ -93,6 +94,7 @@ private:
     bool validList;
     bool listComplete;
     bool packetRemains;
+    bool active;
     QRegExp numRegex;
     // Look for an array of bytes that can contain +/-, spaces, and decimal points.
 

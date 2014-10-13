@@ -14,6 +14,7 @@ ParserEngine::ParserEngine(QObject *parent) :
     validList=false;
     listComplete = false;
     packetRemains = false;
+    active=false;
 
     // Look for an array of bytes that can contain +/-, spaces, and decimal points.
     numRegex.setPattern("( *[-+]? *\\d+\\.?\\d*)|( *[-+]? *\\d*\\.?\\d+)| +| *[+-]| *[+-] +| *[+-]? *\\.");
@@ -32,72 +33,74 @@ QList<ComplexVariable> ParserEngine::getVariables()
     return targetVars;
 }
 
-//void ParserEngine::newData(QByteArray newDataIn)
-//{
-//    buffer.append(newDataIn);
-//    parseData();
-//}
+void ParserEngine::setParser(bool on)
+{
+    active =on;
+}
 
 void ParserEngine::parseData(QByteArray dataIn)
 {
     quint16 i=0;
-    if(!dataIn.isEmpty() && validList==true)
-        //    if(!buffer.isEmpty() && validList==true)
+    if(active)
     {
-        while(dataIn.size()>0)
-            //        while(buffer.size()>0)
+        if(!dataIn.isEmpty() && validList==true)
+            //    if(!buffer.isEmpty() && validList==true)
         {
-            char ch = dataIn.at(i);
-            //            char ch = buffer.at(i);
-            // Loop while there is data in the incoming buffer.
-            switch(checkByte(ch))
+            while(dataIn.size()>0)
+                //        while(buffer.size()>0)
             {
-            case BYTE_INVALID:
-                // Eliminate left-most byte from buffer and try again.
-                if(packetRemains)
+                char ch = dataIn.at(i);
+                //            char ch = buffer.at(i);
+                // Loop while there is data in the incoming buffer.
+                switch(checkByte(ch))
                 {
-                    packetRemains=false;
-                }
-                else
-                {
-                    dataIn = dataIn.right(dataIn.size()-1);
-                    //                    buffer = buffer.right(buffer.size()-1);
-                    i=0;
-                }
-                break;
-            default:
-                // The new byte was handled without any problems.
-                if(listComplete)
-                {
-                    // The listComplete flag is true, so the part of the buffer
-                    // known to be fully parsed is removed.
-                    listComplete=false;
-                    dataIn = dataIn.right(dataIn.size()-i);
-                    //                    buffer = buffer.right(buffer.size()-i);
-                    i=0;
-                }
-                else
-                {
-                    // Move to the next byte in the buffer. Finish looping
-                    // if the end of the buffer is reached.
-                    i++;
-                    if(i==dataIn.size())
-                        //                    if(i==buffer.size())
+                case BYTE_INVALID:
+                    // Eliminate left-most byte from buffer and try again.
+                    if(packetRemains)
                     {
-                        dataIn.clear();
-                        //                        buffer.clear();
-                        if(vecIndex!=0 || varIndex!=0)
+                        packetRemains=false;
+                    }
+                    else
+                    {
+                        dataIn = dataIn.right(dataIn.size()-1);
+                        //                    buffer = buffer.right(buffer.size()-1);
+                        i=0;
+                    }
+                    break;
+                default:
+                    // The new byte was handled without any problems.
+                    if(listComplete)
+                    {
+                        // The listComplete flag is true, so the part of the buffer
+                        // known to be fully parsed is removed.
+                        listComplete=false;
+                        dataIn = dataIn.right(dataIn.size()-i);
+                        //                    buffer = buffer.right(buffer.size()-i);
+                        i=0;
+                    }
+                    else
+                    {
+                        // Move to the next byte in the buffer. Finish looping
+                        // if the end of the buffer is reached.
+                        i++;
+                        if(i==dataIn.size())
+                            //                    if(i==buffer.size())
                         {
-                            packetRemains=true;
+                            dataIn.clear();
+                            //                        buffer.clear();
+                            if(vecIndex!=0 || varIndex!=0)
+                            {
+                                packetRemains=true;
+                            }
                         }
                     }
+                    break;
                 }
-                break;
             }
-        }
 
+        }
+        //    emit bufferEmpty();
     }
-    //    emit bufferEmpty();
 }
 
 // CheckByte receives a single byte, and allocates it to the corresponding variable.

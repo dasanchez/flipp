@@ -62,7 +62,6 @@ LinkerWidget::~LinkerWidget()
 
 void LinkerWidget::threadStarted()
 {
-    //    qDebug() << "Thread started";
 }
 
 void LinkerWidget::updateConnections(QStringList connectionNames)
@@ -93,9 +92,6 @@ QString LinkerWidget::getParser()
 
 void LinkerWidget::changeConnection(QString connection)
 {
-    disconnect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
-    connectionBox->setCurrentText(connection);
-    connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
     emit linkerConnectionRequest(connection);
 }
 
@@ -114,29 +110,32 @@ void LinkerWidget::detachConnection()
 
 void LinkerWidget::changeParser(QString parserName)
 {
-    disconnect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
-    parserBox->setCurrentText(parserName);
-    connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
+    parserEngine->setParser(false);
+    disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
+    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     emit linkerParserRequest(parserName);
- }
+}
 
 void LinkerWidget::assignParser(ParserWidget *parser)
 {
-    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     parserEngine->setVariables(parser->variableList);
-    parserEngine->clearVariables();
     populateParserTable();
     connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
     connect(parser,SIGNAL(deleteParser()),this,SLOT(detachParser()));
     connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
+    parserEngine->setParser(true);
 }
 
 void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
-{
+{    
     disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     parserEngine->setVariables(newVars);
-    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    parserEngine->clearVariables();
     populateParserTable();
+    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
 }
 
 void LinkerWidget::detachParser()
@@ -183,24 +182,13 @@ void LinkerWidget::populateParserTable()
                     item2->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
                     item2->setFlags(Qt::NoItemFlags);
                     tableWidget->setItem(i,1,item2);
-                    // Checkbox
-                    //                                QWidget *container = new QWidget;
-                    //                                QHBoxLayout *layout = new QHBoxLayout;
-                    //                                layout->setSpacing(0);
-                    //                                layout->setMargin(0);
-                    //                                QCheckBox *checkBox = new QCheckBox;
-                    //                                layout->addStretch(1);
-                    //                                layout->addWidget(checkBox);
-                    //                                layout->addStretch(1);
-                    //                                container->setLayout(layout);
-                    //                                tableWidget->setCellWidget(i,1,container);
                     i++;
 
                 }
             }
             else
             {
-                //            qDebug() << var.name;
+
                 QTableWidgetItem *item = new QTableWidgetItem(var.name);
                 item->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
                 item->setFlags(Qt::NoItemFlags);
@@ -210,12 +198,8 @@ void LinkerWidget::populateParserTable()
                 item2->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
                 item2->setFlags(Qt::NoItemFlags);
                 tableWidget->setItem(i,1,item2);
-                // Checkbox
-                //            QTableWidgetItem *cbItem = new QTableWidgetItem;
-                //            cbItem->setCheckState(Qt::Unchecked);
-                //            cbItem->setTextAlignment(Qt::AlignRight);
-                //            tableWidget->setItem(i,2,cbItem);
-                // v2:
+
+
                 QWidget *container = new QWidget;
                 QHBoxLayout *layout = new QHBoxLayout;
                 layout->setSpacing(0);
@@ -232,7 +216,6 @@ void LinkerWidget::populateParserTable()
             }
         }
         tableWidget->setColumnWidth(2,50);
-        //    tableWidget->set
 
         // Set up parser engine with the new parser properties
         // parserEngine->setVariables(parserEngine->getVariables());
@@ -270,36 +253,37 @@ void LinkerWidget::testThread(int value)
 
 void LinkerWidget::parsedDataReady(VariableList parsedData)
 {
-    QString output;
-    output.append("List found:\n");
     int complexCount=0;
     int numberCount=0;
 
-    foreach(RepeatedVector repVector, parsedData)
+    if(parsedData.size()==tableWidget->rowCount())
     {
-        QTableWidgetItem *item = tableWidget->item(complexCount,1);
-        if(repVector.vectors.size()<2)
+        foreach(RepeatedVector repVector, parsedData)
         {
-            // Single variable
-            if(repVector.vectors.at(0).vector.at(0).varType==BYTTYPE)
+            QTableWidgetItem *item = tableWidget->item(complexCount,1);
+            if(repVector.vectors.size()<2)
             {
-                item->setText(repVector.vectors.at(0).vector.at(0).varBytes);
+                // Single variable
+                if(repVector.vectors.at(0).vector.at(0).varType==BYTTYPE)
+                {
+                    item->setText(repVector.vectors.at(0).vector.at(0).varBytes);
+                }
+                else
+                {
+                    // Number variable
+                    double numVal = repVector.vectors.at(0).vector.at(0).varValue;
+                    item->setText(QString("%1").arg(numVal));
+                    numberCount++;
+                }
+
             }
             else
             {
-                // Number variable
-                double numVal = repVector.vectors.at(0).vector.at(0).varValue;
-                item->setText(QString("%1").arg(numVal));
-                numberCount++;
+                // Vector
+                item->setText("OK");
             }
-
+            complexCount++;
         }
-        else
-        {
-            // Vector
-            item->setText("OK");
-        }
-        complexCount++;
     }
 }
 
