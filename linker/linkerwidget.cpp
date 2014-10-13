@@ -118,15 +118,16 @@ void LinkerWidget::changeParser(QString parserName)
     parserBox->setCurrentText(parserName);
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
     emit linkerParserRequest(parserName);
-}
+ }
 
 void LinkerWidget::assignParser(ParserWidget *parser)
 {
     disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     parserEngine->setVariables(parser->variableList);
+    parserEngine->clearVariables();
+    populateParserTable();
     connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
     connect(parser,SIGNAL(deleteParser()),this,SLOT(detachParser()));
-    populateParserTable();
     connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
 }
 
