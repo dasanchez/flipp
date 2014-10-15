@@ -13,7 +13,7 @@
 #include <QHeaderView>
 #include <QDebug>
 
-#include <parser/parserengine.h>
+#include "../parser/parserengine.h"
 
 #define BYTTYPE 0
 #define NUMTYPE 1

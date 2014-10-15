@@ -14,7 +14,7 @@
 #include <QTimer>
 #include <QStyledItemDelegate>
 
-#include <connection/qdataconnection.h>
+#include "qdataconnection.h"
 
 class ConnectionWidget : public QWidget
 {

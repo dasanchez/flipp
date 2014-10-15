@@ -8,11 +8,11 @@
 #include <QMenuBar>
 #include <QSettings>
 #include <QShortcut>
-#include <connection/connectionlistwidget.h>
-#include <terminal/terminallistwidget.h>
-#include <parser/parserlistwidget.h>
-#include <plotter/plotterlistwidget.h>
-#include <linker/linkerlistwidget.h>
+#include "connection/connectionlistwidget.h"
+#include "terminal/terminallistwidget.h"
+#include "parser/parserlistwidget.h"
+#include "plotter/plotterlistwidget.h"
+#include "linker/linkerlistwidget.h"
 
 class Flipp : public QMainWindow
 {
