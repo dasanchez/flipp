@@ -9,8 +9,8 @@
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <QList>
-#include "connectionwidget.h"
-#include "../livelistwidget/livelistwidget.h"
+#include <connection/connectionwidget.h>
+#include <livelistwidget/livelistwidget.h>
 
 class ConnectionListWidget : public QWidget
 {

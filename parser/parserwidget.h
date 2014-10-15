@@ -6,7 +6,7 @@
 #include <QList>
 #include <QModelIndexList>
 #include <QListWidgetItem>
-#include "../livelistwidget/livelistwidget.h"
+#include <livelistwidget/livelistwidget.h>
 
 class ParserWidget : public QWidget
 {

@@ -11,8 +11,8 @@
 #include <QVBoxLayout>
 #include <QDialog>
 #include <QStyledItemDelegate>
-#include "qterminaledit.h"
-#include "../connection/connectionwidget.h"
+#include <terminal/qterminaledit.h>
+#include <connection/connectionwidget.h>
 
 #define BOTH_VIEWS 0
 #define ASCII_ONLY 1

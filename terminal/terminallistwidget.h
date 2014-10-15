@@ -10,7 +10,7 @@
 #include <QSplitter>
 #include <QList>
 
-#include "terminalwidget.h"
+#include <terminal/terminalwidget.h>
 
 class TerminalListWidget : public QWidget
 {

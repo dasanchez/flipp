@@ -8,8 +8,8 @@
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QScrollArea>
-#include "../livelistwidget/livelistwidget.h"
-#include "../linker/linkerwidget.h"
+#include <livelistwidget/livelistwidget.h>
+#include <linker/linkerwidget.h>
 
 class LinkerListWidget : public QWidget
 {
