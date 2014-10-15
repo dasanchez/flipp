@@ -16,11 +16,11 @@
 #include <QSplitter>
 #include <QGroupBox>
 #include <QStyledItemDelegate>
-#include <connection/connectionwidget.h>
-#include <parser/parserwidget.h>
-#include <parser/parserengine.h>
-#include <plotter/qcustomplot.h>
-#include <livelistwidget/livelistwidget.h>
+#include "../connection/connectionwidget.h"
+#include "../parser/parserwidget.h"
+#include "../parser/parserengine.h"
+#include "../plotter/qcustomplot.h"
+#include "../livelistwidget/livelistwidget.h"
 
 class PlotterWidget : public QWidget
 {

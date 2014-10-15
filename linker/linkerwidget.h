@@ -10,9 +10,9 @@
 #include <QScrollArea>
 #include <QComboBox>
 #include <QTableWidget>
-#include <parser/parserwidget.h>
-#include <parser/parserengine.h>
-#include <connection/connectionwidget.h>
+#include "../parser/parserwidget.h"
+#include "../parser/parserengine.h"
+#include "../connection/connectionwidget.h"
 #include <QThread>
 
 //typedef QList<RepeatedVector> VariableList;

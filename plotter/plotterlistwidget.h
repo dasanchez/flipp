@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QSplitter>
-#include <plotter/plotterwidget.h>
+#include "../plotter/plotterwidget.h"
 
 class PlotterListWidget : public QWidget
 {

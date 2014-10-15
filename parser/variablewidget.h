@@ -13,9 +13,9 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QDebug>
-#include <livelistwidget/livelistwidget.h>
-#include <parser/vectoritemwidget.h>
-#include <parser/parserengine.h>
+#include "../livelistwidget/livelistwidget.h"
+#include "../parser/vectoritemwidget.h"
+#include "../parser/parserengine.h"
 
 class VariableWidget : public QWidget
 {
