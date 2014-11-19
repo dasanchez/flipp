@@ -13,6 +13,7 @@
 #include "parser/parserlistwidget.h"
 #include "plotter/plotterlistwidget.h"
 #include "linker/linkerlistwidget.h"
+#include "plotter/plotterwidget.h"
 
 class Flipp : public QMainWindow
 {
@@ -26,13 +27,15 @@ private:
     ConnectionListWidget *connections;
     TerminalListWidget *terminals;
     ParserListWidget *parsers;
-    PlotterListWidget *plotters;
+    PlotterWidget *plotter;
+//    PlotterListWidget *plotters;
     LinkerListWidget *linkers;
     // Dock Widgets:
     QDockWidget *connectionDock;
     QDockWidget *parserDock;
     QDockWidget *terminalDock;
     QDockWidget *linkerDock;
+
     //    QHBoxLayout *mainLayout;
     // Actions:
     QAction *exitAct;
@@ -52,8 +55,8 @@ private slots:
     void handleLinkerConnectionRequest(LinkerWidget*, QString);
     void handleLinkerParserRequest(LinkerWidget*,QString);
     void handleTerminalRequest(TerminalWidget*,QString);
-    void handlePlotterConnectionRequest(PlotterWidget*,QString);
-    void handlePlotterParserRequest(PlotterWidget*,QString);
+//    void handlePlotterConnectionRequest(PlotterWidget*,QString);
+//    void handlePlotterParserRequest(PlotterWidget*,QString);
     void saveSettings();
     void dockWidgets();
 

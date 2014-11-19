@@ -16,21 +16,14 @@ public:
     explicit PlotterListWidget(QWidget *parent = 0);
     ~PlotterListWidget();
     QList<PlotterWidget*> plotterList;
-    QStringList parserNamesList;
-    QStringList connectionNamesList;
     QSplitter *splitter;
 
 signals:
-    void plotterConnectionRequest(PlotterWidget*,QString);
-    void plotterParserRequest(PlotterWidget*,QString);
+
     
 public slots:
     void newPlotter(void);
-    void updateConnections(QStringList);
-    void updateParsers(QStringList);
 
-    void plotterRequestedConnection(QString);
-    void plotterRequestedParser(QString);
 
 private:
     QVBoxLayout *mainLayout;

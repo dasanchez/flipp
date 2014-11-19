@@ -59,6 +59,10 @@ void LinkerListWidget::newLinker()
     connect(linker,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
     connect(linker,SIGNAL(removeLinker()),this,SLOT(linkerRemoved()));
 
+//    qDebug() << "Linker lists: " << linkerList.count();
+
+    emit linkerListChanged(linkerList);
+
 //    connect(parser,SIGNAL(nameChange()),this,SLOT(nameChanged()));
 //    connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
 //    connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
@@ -73,6 +77,10 @@ void LinkerListWidget::addLinker(LinkerWidget *liw)
     connect(liw,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(linkerRequestedConnection(QString)));
     connect(liw,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
     connect(liw,SIGNAL(removeLinker()),this,SLOT(linkerRemoved()));
+
+//    qDebug() << "Linker lists: " << linkerList.count();
+
+    emit linkerListChanged(linkerList);
 }
 
 void LinkerListWidget::linkerRemoved()
@@ -82,6 +90,8 @@ void LinkerListWidget::linkerRemoved()
     disconnect(linker,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
     linkerList.removeAt(linkerList.indexOf(linker));
     linker->deleteLater();
+//    qDebug() << "Linker lists: " << linkerList.count();
+    emit linkerListChanged(linkerList);
 }
 
 void LinkerListWidget::updateConnections(QStringList connectionNames)

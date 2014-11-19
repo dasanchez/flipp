@@ -52,23 +52,14 @@ public slots:
 
 private:
     QVBoxLayout *mainLayout;
-//    QHBoxLayout *topLayout;
-//    QPushButton *newVariableButton;
-//    QLabel *bottomLabel;
-//    QLabel *widgetNameLabel;
+    QHBoxLayout *dataSourceLayout;
 
     QComboBox *connectionBox;
     QComboBox *parserBox;
     QPushButton *removeButton;
-
     QTableWidget *tableWidget;
+    QList<QCheckBox*> *boxList;
 
-    QHBoxLayout *dataSourceLayout;
-
-    //    QScrollArea *scrollArea;
-    //    QVBoxLayout *scrollAreaVLayout;
-    //    QWidget *saWidgetContents;
-//    ParserWidget *parserWidget;
     ParserEngine *parserEngine;
     QThread *thread;
     ConnectionWidget *connectionWidget;

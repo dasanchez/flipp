@@ -47,51 +47,18 @@ void PlotterListWidget::newPlotter()
 {
     PlotterWidget *plotWidget = new PlotterWidget;
 
-    plotWidget->updateConnections(connectionNamesList);
-    plotWidget->updateParsers(parserNamesList);
     plotterList.append(plotWidget);
     splitter->addWidget(plotWidget);
 
-    connect(plotWidget,SIGNAL(plotterConnectionRequest(QString)),this,SLOT(plotterRequestedConnection(QString)));
-    connect(plotWidget,SIGNAL(plotterParserRequest(QString)),this,SLOT(plotterRequestedParser(QString)));
     connect(plotWidget,SIGNAL(removePlotter()),this,SLOT(plotterRemoved()));
 }
 
 void PlotterListWidget::plotterRemoved()
 {
     PlotterWidget* plotter = qobject_cast<PlotterWidget *>(QObject::sender());
-    disconnect(plotter,SIGNAL(plotterConnectionRequest(QString)),this,SLOT(plotterRequestedConnection(QString)));
-    disconnect(plotter,SIGNAL(plotterParserRequest(QString)),this,SLOT(plotterRequestedParser(QString)));
+
     plotterList.removeAt(plotterList.indexOf(plotter));
     plotter->deleteLater();
 }
 
-void PlotterListWidget::updateConnections(QStringList connectionNames)
-{
-    connectionNamesList = connectionNames;
-    foreach(PlotterWidget *plotter,plotterList)
-    {
-        plotter->updateConnections(connectionNamesList);
-    }
-}
 
-void PlotterListWidget::updateParsers(QStringList parserNames)
-{
-    parserNamesList = parserNames;
-    foreach(PlotterWidget *plotter,plotterList)
-    {
-        plotter->updateParsers(parserNamesList);
-    }
-}
-
-void PlotterListWidget::plotterRequestedConnection(QString connectionName)
-{
-    PlotterWidget* plotter = qobject_cast<PlotterWidget *>(QObject::sender());
-    emit plotterConnectionRequest(plotter,connectionName);
-}
-
-void PlotterListWidget::plotterRequestedParser(QString parserName)
-{
-    PlotterWidget* plotter = qobject_cast<PlotterWidget *>(QObject::sender());
-    emit plotterParserRequest(plotter,parserName);
-}

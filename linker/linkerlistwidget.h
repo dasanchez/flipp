@@ -23,6 +23,7 @@ public:
 signals:
     void linkerConnectionRequest(LinkerWidget*,QString);
     void linkerParserRequest(LinkerWidget*,QString);
+    void linkerListChanged(QList<LinkerWidget*>);
 
 public slots:
     void newLinker();

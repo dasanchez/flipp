@@ -24,6 +24,8 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
     tableWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
+    boxList = new QList<QCheckBox*>;
+
     QHeaderView *hv = tableWidget->horizontalHeader();
 
     hv->setSectionsClickable(false);
@@ -157,6 +159,7 @@ void LinkerWidget::detachParser()
 void LinkerWidget::populateParserTable()
 {
     quint8 i=0;
+    boxList->clear();
 
     tableWidget->setRowCount(calcRowCount());
     if(parserEngine->getVariables().size()>0)
@@ -210,7 +213,7 @@ void LinkerWidget::populateParserTable()
                 layout->addStretch(1);
                 container->setLayout(layout);
                 tableWidget->setCellWidget(i,2,container);
-
+                boxList->append(checkBox);
 
                 i++;
             }
@@ -273,7 +276,11 @@ void LinkerWidget::parsedDataReady(VariableList parsedData)
                     // Number variable
                     double numVal = repVector.vectors.at(0).vector.at(0).varValue;
                     item->setText(QString("%1").arg(numVal));
-                    numberCount++;
+                    if(boxList->at(complexCount)->isChecked())
+                        qDebug() << numVal << " will be plotted";
+//                    if(tableWidget->cellWidget(complexCount,2)->layout();//
+//                    tableWidget->setCellWidget(i,2,container)
+                        numberCount++;
                 }
 
             }
