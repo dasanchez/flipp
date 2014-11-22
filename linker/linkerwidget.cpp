@@ -120,6 +120,7 @@ void LinkerWidget::changeParser(QString parserName)
 
 void LinkerWidget::assignParser(ParserWidget *parser)
 {
+    variables = parser->variableList;
     parserEngine->setVariables(parser->variableList);
     populateParserTable();
     connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
@@ -131,6 +132,7 @@ void LinkerWidget::assignParser(ParserWidget *parser)
 
 void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
 {    
+    variables = newVars;
     disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     parserEngine->setVariables(newVars);
@@ -277,7 +279,14 @@ void LinkerWidget::parsedDataReady(VariableList parsedData)
                     double numVal = repVector.vectors.at(0).vector.at(0).varValue;
                     item->setText(QString("%1").arg(numVal));
                     if(boxList->at(complexCount)->isChecked())
-                        qDebug() << numVal << " will be plotted";
+                    {
+//                        qDebug() << numVal << " will be plotted";
+                        ParsedVariable dataPoint;
+                        dataPoint.content = repVector.vectors.at(0).vector.at(0).varBytes;
+                        dataPoint.name = variables.at(complexCount).name;
+                        dataPoint.value = repVector.vectors.at(0).vector.at(0).varValue;
+                        emit newDataPoint(dataPoint);
+                    }
 //                    if(tableWidget->cellWidget(complexCount,2)->layout();//
 //                    tableWidget->setCellWidget(i,2,container)
                         numberCount++;

@@ -16,8 +16,6 @@
 enum parsingstate{START,PARSE};
 enum byteDecision{BYTE_HANDLED,BYTE_COMPLETES,BYTE_INVALID};
 
-
-
 class BaseVariable{
 public:
     QString name;
@@ -45,6 +43,7 @@ public:
     QByteArray varBytes;
     double varValue;
     int varType;
+    QString name;
 };
 
 class SingleVector{

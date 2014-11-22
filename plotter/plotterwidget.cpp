@@ -4,11 +4,11 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     : QWidget(parent)
 {
     plotTimer = new QTimer;
-    plotTimer->setInterval(10);
+    plotTimer->setInterval(5);
     plotTimer->start();
     setupUI();
-//    yAxisAutoRange = false;
-//    connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
+    //    yAxisAutoRange = false;
+    connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
 }
 
 //void PlotterWidget::updatePlot()
@@ -23,7 +23,8 @@ PlotterWidget::~PlotterWidget()
 
 void PlotterWidget::updateLinkerList(QList<LinkerWidget*> list)
 {
-//    qDebug() << "Linker lists: " << list.count();
+    linkerList = list;
+    //    qDebug() << "Linker lists: " << list.count();
     linkerBox->clear();
     foreach(LinkerWidget *lw, list)
     {
@@ -32,8 +33,45 @@ void PlotterWidget::updateLinkerList(QList<LinkerWidget*> list)
         linkerName.append(":");
         linkerName.append(lw->getParser());
         linkerBox->addItem(linkerName);
-//        linkerBox->addItem(QString("[%1]:[%2]").arg(lw->getConnection()).arg(lw->getParser()));
-//        qDebug() << "Connection: " << lw->getConnection() << ", parser: " << lw->getParser();
+        //        linkerBox->addItem(QString("[%1]:[%2]").arg(lw->getConnection()).arg(lw->getParser()));
+        //        qDebug() << "Connection: " << lw->getConnection() << ", parser: " << lw->getParser();
+    }
+    updateVariableBox();
+}
+
+void PlotterWidget::updateVariableBox()
+{
+    if(linkerList.count()>0)
+    {
+        LinkerWidget *linker = linkerList.at(linkerBox->currentIndex());
+        connect(linker,SIGNAL(newDataPoint(ParsedVariable)),this,SLOT(newData(ParsedVariable)));
+        variableBox->clear();
+        foreach(ComplexVariable var,linker->variables)
+        {
+            variableBox->addItem(var.name);
+        }
+    }
+}
+
+void PlotterWidget::updatePlot()
+{
+            customPlot->replot();
+}
+
+void PlotterWidget::newData(ParsedVariable dataPoint)
+{
+    QCPGraph *graph = customPlot->graph(0);
+
+    double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+//qDebug() << "updating plot, data point:" << dataPoint.name << ", current variable:" << variableBox->currentText();
+    // add data to lines:
+
+    if(dataPoint.name == variableBox->currentText())
+    {
+        graph->addData(key, dataPoint.value);
+        graph->removeDataBefore(key-5);
+        customPlot->xAxis->setRange(key+0.1, 5, Qt::AlignRight);
+        graph->rescaleValueAxis();
     }
 }
 
@@ -169,18 +207,26 @@ void PlotterWidget::updateLinkerList(QList<LinkerWidget*> list)
 
 void PlotterWidget::setupUI()
 {
-//    delIconPixmap = QPixmap(":/images/delete_icon.png");
-//    xMax=100;
-//    yMin = 0;
-//    yMax = 70;
-//    for(quint16 i=0;i<(quint16) xMax;i++)
-//    {
-//        keys.append(i);
-//    }
+    //    delIconPixmap = QPixmap(":/images/delete_icon.png");
+    //    xMax=100;
+    //    yMin = 0;
+    //    yMax = 70;
+    //    for(quint16 i=0;i<(quint16) xMax;i++)
+    //    {
+    //        keys.append(i);
+    //    }
     linkerBox = new QComboBox;
+    variableBox = new QComboBox;
 
     customPlot = new QCustomPlot;
-//    customPlot->yAxis->setRange(yMin,yMax);
+    //    customPlot->yAxis->setRange(yMin,yMax);
+
+    customPlot->addGraph();
+QPen mypen;
+mypen.setWidth(2);
+mypen.setColor(QColor(0,0,250));
+customPlot->graph(0)->setPen(mypen);
+
 
     customPlot->setBackground(QBrush("black"));
 
@@ -191,6 +237,7 @@ void PlotterWidget::setupUI()
 
     gridPen = customPlot->xAxis->basePen();
     gridPen.setColor(QColor(50,50,50));
+
     customPlot->xAxis->setBasePen(gridPen);
     customPlot->yAxis->setBasePen(gridPen);
     //customPlot->xAxis->setLabelColor(QColor(50,50,50));
@@ -211,144 +258,149 @@ void PlotterWidget::setupUI()
     customPlot->xAxis->setTickStep(5);
     //customPlot->axisRect()->setupFullAxesBox();
 
-//    showPlotSettingsButton = new QPushButton("Hide Settings");
-//    showPlotSettingsButton->setFixedHeight(24);
-//    showPlotSettingsButton->setCheckable(true);
-//    showPlotSettingsButton->setChecked(true);
-//    showPlotSettingsButton->setObjectName("showPlotSettingsBtn");
+    //    showPlotSettingsButton = new QPushButton("Hide Settings");
+    //    showPlotSettingsButton->setFixedHeight(24);
+    //    showPlotSettingsButton->setCheckable(true);
+    //    showPlotSettingsButton->setChecked(true);
+    //    showPlotSettingsButton->setObjectName("showPlotSettingsBtn");
 
-//    xRangeLabel = new QLabel("History");
-//    xRangeLabel->setFixedHeight(24);
-//    xRangeSpin = new QDoubleSpinBox;
-//    xRangeSpin->setFixedHeight(24);
-//    xRangeSpin->setDecimals(0);
-//    xRangeSpin->setValue(xMax);
-//    xRangeSpin->setMinimum(1);
-//    xRangeSpin->setMaximum(10000);
+    //    xRangeLabel = new QLabel("History");
+    //    xRangeLabel->setFixedHeight(24);
+    //    xRangeSpin = new QDoubleSpinBox;
+    //    xRangeSpin->setFixedHeight(24);
+    //    xRangeSpin->setDecimals(0);
+    //    xRangeSpin->setValue(xMax);
+    //    xRangeSpin->setMinimum(1);
+    //    xRangeSpin->setMaximum(10000);
 
-//    xTicksLabel = new QLabel("Ticks");
-//    xTicksLabel->setFixedHeight(24);
-//    xTicksButton = new QPushButton("Auto");
-//    xTicksButton->setFixedHeight(24);
-//    xTicksButton->setObjectName("xTicksButton");
-//    xTicksButton->setCheckable(true);
-//    xTicksButton->setChecked(false);
-//    xTicksSpin = new QSpinBox;
-//    xTicksSpin->setFixedHeight(24);
-//    xTicksSpin->setValue(5);
-//    xTicksSpin->setMinimum(1);
-//    xTicksSpin->setMaximum(20);
+    //    xTicksLabel = new QLabel("Ticks");
+    //    xTicksLabel->setFixedHeight(24);
+    //    xTicksButton = new QPushButton("Auto");
+    //    xTicksButton->setFixedHeight(24);
+    //    xTicksButton->setObjectName("xTicksButton");
+    //    xTicksButton->setCheckable(true);
+    //    xTicksButton->setChecked(false);
+    //    xTicksSpin = new QSpinBox;
+    //    xTicksSpin->setFixedHeight(24);
+    //    xTicksSpin->setValue(5);
+    //    xTicksSpin->setMinimum(1);
+    //    xTicksSpin->setMaximum(20);
 
-//    yAxisRangeButton = new QPushButton("Auto-range");
-//    yAxisRangeButton->setFixedHeight(24);
-//    yAxisRangeButton->setCheckable(true);
-//    yAxisRangeButton->setChecked(false);
-//    yAxisRangeButton->setObjectName("yAxisRangeButton");
+    //    yAxisRangeButton = new QPushButton("Auto-range");
+    //    yAxisRangeButton->setFixedHeight(24);
+    //    yAxisRangeButton->setCheckable(true);
+    //    yAxisRangeButton->setChecked(false);
+    //    yAxisRangeButton->setObjectName("yAxisRangeButton");
 
-//    yMinLabel = new QLabel("Y Min");
-//    yMinLabel->setFixedHeight(24);
-//    yMinSpin = new QSpinBox;
-//    yMinSpin->setFixedHeight(24);
-//    yMinSpin->setValue(yMin);
-//    yMinSpin->setMinimum(-100000);
-//    yMinSpin->setMaximum(100000);
+    //    yMinLabel = new QLabel("Y Min");
+    //    yMinLabel->setFixedHeight(24);
+    //    yMinSpin = new QSpinBox;
+    //    yMinSpin->setFixedHeight(24);
+    //    yMinSpin->setValue(yMin);
+    //    yMinSpin->setMinimum(-100000);
+    //    yMinSpin->setMaximum(100000);
 
-//    yMaxLabel = new QLabel("Y Max");
-//    yMaxLabel->setFixedHeight(24);
-//    yMaxSpin = new QSpinBox;
-//    yMaxSpin->setFixedHeight(24);
-//    yMaxSpin->setValue(yMax);
-//    yMaxSpin->setMinimum(-100000);
-//    yMaxSpin->setMaximum(100000);
+    //    yMaxLabel = new QLabel("Y Max");
+    //    yMaxLabel->setFixedHeight(24);
+    //    yMaxSpin = new QSpinBox;
+    //    yMaxSpin->setFixedHeight(24);
+    //    yMaxSpin->setValue(yMax);
+    //    yMaxSpin->setMinimum(-100000);
+    //    yMaxSpin->setMaximum(100000);
 
-//    tableWidget = new QTableWidget(this);
-//    tableWidget->setColumnCount(3);
-//    QStringList tableHeaders;
-//    tableHeaders.append("Field");
-//    tableHeaders.append("Plot");
-//    tableHeaders.append("Value");
-//    tableWidget->setHorizontalHeaderLabels(tableHeaders);
-//    tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
+    //    tableWidget = new QTableWidget(this);
+    //    tableWidget->setColumnCount(3);
+    //    QStringList tableHeaders;
+    //    tableHeaders.append("Field");
+    //    tableHeaders.append("Plot");
+    //    tableHeaders.append("Value");
+    //    tableWidget->setHorizontalHeaderLabels(tableHeaders);
+    //    tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
 
-//    QHeaderView *hv = tableWidget->horizontalHeader();
-//    hv->setStretchLastSection(true);
-//    hv->setSectionsClickable(false);
-//    hv->setFixedHeight(24);
-//    hv->setSectionResizeMode(1,QHeaderView::ResizeToContents);
+    //    QHeaderView *hv = tableWidget->horizontalHeader();
+    //    hv->setStretchLastSection(true);
+    //    hv->setSectionsClickable(false);
+    //    hv->setFixedHeight(24);
+    //    hv->setSectionResizeMode(1,QHeaderView::ResizeToContents);
 
-//    hv = tableWidget->verticalHeader();
-//    hv->setSectionsClickable(false);
+    //    hv = tableWidget->verticalHeader();
+    //    hv->setSectionsClickable(false);
 
-//    dataSourceLayout = new QHBoxLayout;
+    dataSourceLayout = new QHBoxLayout;
 
-//    xRangeLayout = new QHBoxLayout;
-//    xRangeLayout->addWidget(xRangeLabel);
-//    xRangeLayout->addWidget(xRangeSpin);
+    //    xRangeLayout = new QHBoxLayout;
+    //    xRangeLayout->addWidget(xRangeLabel);
+    //    xRangeLayout->addWidget(xRangeSpin);
 
-//    xTicksLayout = new QHBoxLayout;
-//    xTicksLayout->addWidget(xTicksLabel);
-//    xTicksLayout->addWidget(xTicksButton);
-//    xTicksLayout->addWidget(xTicksSpin);
+    //    xTicksLayout = new QHBoxLayout;
+    //    xTicksLayout->addWidget(xTicksLabel);
+    //    xTicksLayout->addWidget(xTicksButton);
+    //    xTicksLayout->addWidget(xTicksSpin);
 
-//    xAxisLayout = new QVBoxLayout;
-//    xAxisLayout->addLayout(xRangeLayout);
-//    xAxisLayout->addLayout(xTicksLayout);
+    //    xAxisLayout = new QVBoxLayout;
+    //    xAxisLayout->addLayout(xRangeLayout);
+    //    xAxisLayout->addLayout(xTicksLayout);
 
-//    xAxisSettingsBox = new QGroupBox("X Axis");
-//    xAxisSettingsBox->setLayout(xAxisLayout);
-//    xAxisSettingsBox->setFixedHeight(100);
+    //    xAxisSettingsBox = new QGroupBox("X Axis");
+    //    xAxisSettingsBox->setLayout(xAxisLayout);
+    //    xAxisSettingsBox->setFixedHeight(100);
 
-//    yAxisMinLayout = new QHBoxLayout;
-//    yAxisMinLayout->addWidget(yMinLabel);
-//    yAxisMinLayout->addWidget(yMinSpin);
-//    yAxisMaxLayout = new QHBoxLayout;
-//    yAxisMaxLayout->addWidget(yMaxLabel);
-//    yAxisMaxLayout->addWidget(yMaxSpin);
+    //    yAxisMinLayout = new QHBoxLayout;
+    //    yAxisMinLayout->addWidget(yMinLabel);
+    //    yAxisMinLayout->addWidget(yMinSpin);
+    //    yAxisMaxLayout = new QHBoxLayout;
+    //    yAxisMaxLayout->addWidget(yMaxLabel);
+    //    yAxisMaxLayout->addWidget(yMaxSpin);
 
-//    yAxisLayout = new QVBoxLayout;
-//    yAxisLayout->addWidget(yAxisRangeButton);
-//    yAxisLayout->addLayout(yAxisMinLayout);
-//    yAxisLayout->addLayout(yAxisMaxLayout);
-//    yAxisSettingsBox = new QGroupBox("Y Axis");
-//    yAxisSettingsBox->setLayout(yAxisLayout);
-//    yAxisSettingsBox->setFixedHeight(130);
+    //    yAxisLayout = new QVBoxLayout;
+    //    yAxisLayout->addWidget(yAxisRangeButton);
+    //    yAxisLayout->addLayout(yAxisMinLayout);
+    //    yAxisLayout->addLayout(yAxisMaxLayout);
+    //    yAxisSettingsBox = new QGroupBox("Y Axis");
+    //    yAxisSettingsBox->setLayout(yAxisLayout);
+    //    yAxisSettingsBox->setFixedHeight(130);
 
-//    plotSettingsLayout = new QVBoxLayout;
-//    plotSettingsLayout->addWidget(xAxisSettingsBox);
-//    plotSettingsLayout->addWidget(yAxisSettingsBox);
+    //    plotSettingsLayout = new QVBoxLayout;
+    //    plotSettingsLayout->addWidget(xAxisSettingsBox);
+    //    plotSettingsLayout->addWidget(yAxisSettingsBox);
 
-//    plotLayout = new QVBoxLayout;
-//    plotLayout->addWidget(customPlot);
-//    plotLayout->addWidget(showPlotSettingsButton);
-//    plotLayout->addLayout(plotSettingsLayout);
+    //    plotLayout = new QVBoxLayout;
+    //    plotLayout->addWidget(customPlot);
+    //    plotLayout->addWidget(showPlotSettingsButton);
+    //    plotLayout->addLayout(plotSettingsLayout);
 
-//    QWidget *plotWidgetContainer = new QWidget;
-//    plotWidgetContainer->setLayout(plotLayout);
+    //    QWidget *plotWidgetContainer = new QWidget;
+    //    plotWidgetContainer->setLayout(plotLayout);
 
-//    tableLayout = new QHBoxLayout;
-//    tableLayout->addWidget(tableWidget);
+    //    tableLayout = new QHBoxLayout;
+    //    tableLayout->addWidget(tableWidget);
 
-//    QWidget *tableWidgetContainer = new QWidget;
-//    tableWidgetContainer->setLayout(tableLayout);
+    //    QWidget *tableWidgetContainer = new QWidget;
+    //    tableWidgetContainer->setLayout(tableLayout);
 
-//    contentSplitter = new QSplitter(this);
-//    contentSplitter->addWidget(tableWidgetContainer);
-//    contentSplitter->addWidget(plotWidgetContainer);
+    //    contentSplitter = new QSplitter(this);
+    //    contentSplitter->addWidget(tableWidgetContainer);
+    //    contentSplitter->addWidget(plotWidgetContainer);
+
+    dataSourceLayout->addWidget(linkerBox);
+    dataSourceLayout->addWidget(variableBox);
 
     mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(linkerBox);
-//    mainLayout->addLayout(dataSourceLayout);
-//    mainLayout->addWidget(contentSplitter);
+    mainLayout->addLayout(dataSourceLayout);
+    //    mainLayout->addLayout(dataSourceLayout);
+    //    mainLayout->addWidget(contentSplitter);
 
-       mainLayout->addWidget(customPlot);
+    mainLayout->addWidget(customPlot);
     this->setLayout(mainLayout);
 
-//    connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removePlotter()));
-//    connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
-//    connect(xTicksButton,SIGNAL(clicked(bool)),this,SLOT(togglexAxisAutoTicks(bool)));
-//    connect(xTicksSpin,SIGNAL(valueChanged(int)),this,SLOT(xTicksChanged(int)));
-//    connect(yMinSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMin(QString)));
-//    connect(yMaxSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMax(QString)));
-//    connect(yAxisRangeButton,SIGNAL(clicked(bool)),this,SLOT(toggleyAxisAutoRange(bool)));
-//    connect(showPlotSettingsButton,SIGNAL(clicked(bool)),this,SLOT(toggleSettingsVisible(bool)));
+    connect(linkerBox,SIGNAL(activated(int)),this,SLOT(updateVariableBox()));
+
+    //    connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removePlotter()));
+    //    connect(xRangeSpin,SIGNAL(valueChanged(double)),this,SLOT(setXRange(double)));
+    //    connect(xTicksButton,SIGNAL(clicked(bool)),this,SLOT(togglexAxisAutoTicks(bool)));
+    //    connect(xTicksSpin,SIGNAL(valueChanged(int)),this,SLOT(xTicksChanged(int)));
+    //    connect(yMinSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMin(QString)));
+    //    connect(yMaxSpin,SIGNAL(valueChanged(QString)),this,SLOT(setYMax(QString)));
+    //    connect(yAxisRangeButton,SIGNAL(clicked(bool)),this,SLOT(toggleyAxisAutoRange(bool)));
+    //    connect(showPlotSettingsButton,SIGNAL(clicked(bool)),this,SLOT(toggleSettingsVisible(bool)));
 }

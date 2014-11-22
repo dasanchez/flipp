@@ -32,7 +32,8 @@ public:
 
 public slots:
     void updateLinkerList(QList<LinkerWidget*>);
-//    void setXRange(double);
+void updateVariableBox();
+    //    void setXRange(double);
 //    void setYMin(QString);
 //    void setYMax(QString);
 
@@ -41,6 +42,8 @@ signals:
 
 private:
     QComboBox *linkerBox;
+    QComboBox *variableBox;
+    QList<LinkerWidget*> linkerList;
 //    QPushButton *toggleTableButton;
 //    QPushButton *removeButton;
 //    QPixmap delIconPixmap;
@@ -68,7 +71,7 @@ private:
 
 //    QHBoxLayout *tableLayout;
 
-//    QHBoxLayout *dataSourceLayout;
+    QHBoxLayout *dataSourceLayout;
 //    QVBoxLayout *plotLayout;
 //    QSplitter *contentSplitter;
 
@@ -100,7 +103,8 @@ private:
     
 private slots:
 //    void populatePlotArea();
-//    void updatePlot();
+    void newData(ParsedVariable);
+    void updatePlot();
 //    void togglexAxisAutoTicks(bool);
 //    void xTicksChanged(int);
 //    void toggleyAxisAutoRange(bool);

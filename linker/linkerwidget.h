@@ -15,6 +15,14 @@
 #include "../connection/connectionwidget.h"
 #include <QThread>
 
+class ParsedVariable{
+public:
+    QString name;
+    int type;
+    double value;
+    QByteArray content;
+};
+
 //typedef QList<RepeatedVector> VariableList;
 
 class LinkerWidget : public QWidget
@@ -28,11 +36,13 @@ public:
     ~LinkerWidget();
     QString getConnection(void);
     QString getParser(void);
+    QList<ComplexVariable> variables;
 
 signals:
     void linkerConnectionRequest(QString);
     void linkerParserRequest(QString);
     void removeLinker();
+    void newDataPoint(ParsedVariable);
 public slots:
 
     void updateConnections(QStringList);
