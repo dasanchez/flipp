@@ -121,6 +121,13 @@ void LinkerWidget::changeParser(QString parserName)
 void LinkerWidget::assignParser(ParserWidget *parser)
 {
     variables = parser->variableList;
+    results.clear();
+    foreach(ComplexVariable cv,variables)
+    {
+        ParsedVariable i;
+        i.type=cv.type;
+        results.append(i);
+    }
     parserEngine->setVariables(parser->variableList);
     populateParserTable();
     connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
@@ -133,6 +140,14 @@ void LinkerWidget::assignParser(ParserWidget *parser)
 void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
 {    
     variables = newVars;
+    results.clear();
+    foreach(ComplexVariable cv,newVars)
+    {
+        ParsedVariable i;
+        i.type=cv.type;
+        results.append(i);
+    }
+
     disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     parserEngine->setVariables(newVars);
@@ -259,7 +274,7 @@ void LinkerWidget::testThread(int value)
 void LinkerWidget::parsedDataReady(VariableList parsedData)
 {
     int complexCount=0;
-    int numberCount=0;
+//    int numberCount=0;
 
     if(parsedData.size()==tableWidget->rowCount())
     {
@@ -278,18 +293,11 @@ void LinkerWidget::parsedDataReady(VariableList parsedData)
                     // Number variable
                     double numVal = repVector.vectors.at(0).vector.at(0).varValue;
                     item->setText(QString("%1").arg(numVal));
-                    if(boxList->at(complexCount)->isChecked())
-                    {
-//                        qDebug() << numVal << " will be plotted";
-                        ParsedVariable dataPoint;
-                        dataPoint.content = repVector.vectors.at(0).vector.at(0).varBytes;
-                        dataPoint.name = variables.at(complexCount).name;
-                        dataPoint.value = repVector.vectors.at(0).vector.at(0).varValue;
-                        emit newDataPoint(dataPoint);
-                    }
+                    results[complexCount].content = repVector.vectors.at(0).vector.at(0).varBytes;
+                    results[complexCount].value = repVector.vectors.at(0).vector.at(0).varValue;
 //                    if(tableWidget->cellWidget(complexCount,2)->layout();//
 //                    tableWidget->setCellWidget(i,2,container)
-                        numberCount++;
+//                        numberCount++;
                 }
 
             }
@@ -300,6 +308,7 @@ void LinkerWidget::parsedDataReady(VariableList parsedData)
             }
             complexCount++;
         }
+        emit newDataPoint();
     }
 }
 

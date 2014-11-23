@@ -103,7 +103,7 @@ private:
     
 private slots:
 //    void populatePlotArea();
-    void newData(ParsedVariable);
+    void newData();
     void updatePlot();
 //    void togglexAxisAutoTicks(bool);
 //    void xTicksChanged(int);

@@ -4,7 +4,7 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     : QWidget(parent)
 {
     plotTimer = new QTimer;
-    plotTimer->setInterval(5);
+    plotTimer->setInterval(10);
     plotTimer->start();
     setupUI();
     //    yAxisAutoRange = false;
@@ -44,7 +44,7 @@ void PlotterWidget::updateVariableBox()
     if(linkerList.count()>0)
     {
         LinkerWidget *linker = linkerList.at(linkerBox->currentIndex());
-        connect(linker,SIGNAL(newDataPoint(ParsedVariable)),this,SLOT(newData(ParsedVariable)));
+        connect(linker,SIGNAL(newDataPoint()),this,SLOT(newData()));
         variableBox->clear();
         foreach(ComplexVariable var,linker->variables)
         {
@@ -55,22 +55,25 @@ void PlotterWidget::updateVariableBox()
 
 void PlotterWidget::updatePlot()
 {
-            customPlot->replot();
+    customPlot->replot();
 }
 
-void PlotterWidget::newData(ParsedVariable dataPoint)
+void PlotterWidget::newData()
 {
     QCPGraph *graph = customPlot->graph(0);
 
     double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-//qDebug() << "updating plot, data point:" << dataPoint.name << ", current variable:" << variableBox->currentText();
+    //qDebug() << "updating plot, data point:" << dataPoint.name << ", current variable:" << variableBox->currentText();
     // add data to lines:
+    LinkerWidget *linker = qobject_cast<LinkerWidget *>(QObject::sender());
 
-    if(dataPoint.name == variableBox->currentText())
+//    qDebug() << "type: " << linker->results.at(variableBox->currentIndex()).type;
+
+    if(linker->results.at(variableBox->currentIndex()).type == NUMTYPE)
     {
-        graph->addData(key, dataPoint.value);
-        graph->removeDataBefore(key-5);
-        customPlot->xAxis->setRange(key+0.1, 5, Qt::AlignRight);
+        graph->addData(key, linker->results.at(variableBox->currentIndex()).value);
+        graph->removeDataBefore(key-4);
+        customPlot->xAxis->setRange(key+0.1, 4, Qt::AlignRight);
         graph->rescaleValueAxis();
     }
 }
@@ -222,10 +225,10 @@ void PlotterWidget::setupUI()
     //    customPlot->yAxis->setRange(yMin,yMax);
 
     customPlot->addGraph();
-QPen mypen;
-mypen.setWidth(2);
-mypen.setColor(QColor(0,0,250));
-customPlot->graph(0)->setPen(mypen);
+    QPen mypen;
+    mypen.setWidth(1);
+    mypen.setColor(QColor(100,100,250));
+    customPlot->graph(0)->setPen(mypen);
 
 
     customPlot->setBackground(QBrush("black"));

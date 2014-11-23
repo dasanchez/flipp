@@ -17,7 +17,6 @@
 
 class ParsedVariable{
 public:
-    QString name;
     int type;
     double value;
     QByteArray content;
@@ -37,12 +36,13 @@ public:
     QString getConnection(void);
     QString getParser(void);
     QList<ComplexVariable> variables;
+    QList<ParsedVariable> results;
 
 signals:
     void linkerConnectionRequest(QString);
     void linkerParserRequest(QString);
     void removeLinker();
-    void newDataPoint(ParsedVariable);
+    void newDataPoint();
 public slots:
 
     void updateConnections(QStringList);
