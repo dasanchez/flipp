@@ -72,8 +72,8 @@ void PlotterWidget::newData()
     if(linker->results.at(variableBox->currentIndex()).type == NUMTYPE)
     {
         graph->addData(key, linker->results.at(variableBox->currentIndex()).value);
-        graph->removeDataBefore(key-4);
-        customPlot->xAxis->setRange(key+0.1, 4, Qt::AlignRight);
+        graph->removeDataBefore(key-5);
+        customPlot->xAxis->setRange(key+0.1, 5, Qt::AlignRight);
         graph->rescaleValueAxis();
     }
 }

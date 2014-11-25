@@ -57,7 +57,6 @@ public slots:
     void newParserVariables(QList<ComplexVariable>);
     void populateParserTable();
     void parsedDataReady(VariableList parsedData);
-    void testThread(int);
     void threadStarted();
 
 private:

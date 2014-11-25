@@ -15,11 +15,10 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     connectionWidget = new ConnectionWidget;
 
     tableWidget = new QTableWidget(this);
-    tableWidget->setColumnCount(3);
+    tableWidget->setColumnCount(2);
     QStringList tableHeaders;
     tableHeaders.append("Variable");
     tableHeaders.append("Value");
-    tableHeaders.append("Plot");
     tableWidget->setHorizontalHeaderLabels(tableHeaders);
     tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
     tableWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -29,7 +28,6 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     QHeaderView *hv = tableWidget->horizontalHeader();
 
     hv->setSectionsClickable(false);
-    hv->setSectionResizeMode(2,QHeaderView::Fixed);
 
     dataSourceLayout = new QHBoxLayout;
     dataSourceLayout->addWidget(connectionBox);
@@ -42,7 +40,7 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
 
     this->setLayout(mainLayout);
 
-    setMinimumWidth(200);
+    setMinimumWidth(100);
 
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
@@ -52,7 +50,6 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
     connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removeLinker()));
     connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
-    connect(parserEngine,SIGNAL(intOut(int)),this,SLOT(testThread(int)));
     connect(thread,SIGNAL(started()),this,SLOT(threadStarted()));
     thread->start();
 }
@@ -220,29 +217,13 @@ void LinkerWidget::populateParserTable()
                 tableWidget->setItem(i,1,item2);
 
 
-                QWidget *container = new QWidget;
-                QHBoxLayout *layout = new QHBoxLayout;
-                layout->setSpacing(0);
-                layout->setMargin(0);
-                QCheckBox *checkBox = new QCheckBox;
-                layout->addStretch(1);
-                layout->addWidget(checkBox);
-                layout->addStretch(1);
-                container->setLayout(layout);
-                tableWidget->setCellWidget(i,2,container);
-                boxList->append(checkBox);
-
                 i++;
             }
         }
-        tableWidget->setColumnWidth(2,50);
 
-        // Set up parser engine with the new parser properties
-        // parserEngine->setVariables(parserEngine->getVariables());
         QByteArray *check = new QByteArray;
         if(!parserEngine->isValid(check))
         {
-
             qDebug() << *check;
         }
     }
@@ -266,15 +247,9 @@ quint8 LinkerWidget::calcRowCount()
     return total;
 }
 
-void LinkerWidget::testThread(int value)
-{
-    qDebug() << value;
-}
-
 void LinkerWidget::parsedDataReady(VariableList parsedData)
 {
     int complexCount=0;
-//    int numberCount=0;
 
     if(parsedData.size()==tableWidget->rowCount())
     {
@@ -295,17 +270,14 @@ void LinkerWidget::parsedDataReady(VariableList parsedData)
                     item->setText(QString("%1").arg(numVal));
                     results[complexCount].content = repVector.vectors.at(0).vector.at(0).varBytes;
                     results[complexCount].value = repVector.vectors.at(0).vector.at(0).varValue;
-//                    if(tableWidget->cellWidget(complexCount,2)->layout();//
-//                    tableWidget->setCellWidget(i,2,container)
-//                        numberCount++;
                 }
 
             }
-            else
-            {
-                // Vector
-                item->setText("OK");
-            }
+//            else
+//            {
+//                // Vector
+//                item->setText("OK");
+//            }
             complexCount++;
         }
         emit newDataPoint();
