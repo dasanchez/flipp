@@ -52,14 +52,23 @@ void LinkerListWidget::newLinker()
     linker->updateConnections(connectionNamesList);
     linker->updateParsers(parserNamesList);
 
-    linkerList.append(linker);
-    splitter->addWidget(linker);
-
     connect(linker,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(linkerRequestedConnection(QString)));
     connect(linker,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
     connect(linker,SIGNAL(removeLinker()),this,SLOT(linkerRemoved()));
 
 //    qDebug() << "Linker lists: " << linkerList.count();
+
+    if(connectionNamesList.count()>0)
+    {
+        linker->changeConnection(connectionNamesList.at(0));
+    }
+
+    if(parserNamesList.count()>0)
+    {
+    linker->changeParser(parserNamesList.at(0));
+    }
+    linkerList.append(linker);
+    splitter->addWidget(linker);
 
     emit linkerListChanged(linkerList);
 
