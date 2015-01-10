@@ -11,8 +11,10 @@ ConnectionListWidget::ConnectionListWidget(QWidget *parent)
     font.setPointSize(font.pointSize()+4);
     widgetNameLabel->setFont(font);
     newConnBtn = new QPushButton("New");
-    newConnBtn->setFixedHeight(24);
-    newConnBtn->setFixedWidth(100);
+//    font.setPointSize(font.pointSize()-2);
+    newConnBtn->setFont(font);
+//    newConnBtn->setFixedHeight(24);
+    newConnBtn->setFixedWidth(90);
 
     topLayout = new QHBoxLayout;
     topLayout->addWidget(widgetNameLabel);
@@ -27,10 +29,10 @@ ConnectionListWidget::ConnectionListWidget(QWidget *parent)
     mainLayout->addWidget(listWidget);
 
     this->setLayout(mainLayout);
-    setFixedWidth(410);
+    setFixedWidth(550);
     connect(newConnBtn,SIGNAL(clicked()),this,SLOT(newConnection()));
     connect(listWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
-    connect(listWidget,SIGNAL(itemMoved(int, int, QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
+    connect(listWidget,SIGNAL(itemMoved(int, int, QListWidgetItem*)),this,SLOT(resorted(int,int)));
 }
 
 ConnectionListWidget::~ConnectionListWidget()
@@ -50,7 +52,7 @@ void ConnectionListWidget::itemRemoved(int row)
     connectionList.removeAt(row);
 }
 
-void ConnectionListWidget::resorted(int src, int dest, QListWidgetItem* item)
+void ConnectionListWidget::resorted(int src, int dest)
 {
       connectionList.insert(dest, connectionList.takeAt(src));
 }

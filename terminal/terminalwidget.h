@@ -12,13 +12,13 @@
 #include <QDialog>
 #include <QStyledItemDelegate>
 #include "qterminaledit.h"
-#include "../connection/connectionwidget.h"
+#include "../connection/connectionunit.h"
 
 #define BOTH_VIEWS 0
 #define ASCII_ONLY 1
 #define HEX_ONLY 2
 
-class ConnectionWidget;
+class ConnectionUnit;
 
 class TerminalWidget : public QWidget
 {
@@ -41,7 +41,7 @@ public:
 public slots:
     void dataReceived(QByteArray);
     void updateConnections(QStringList);
-    void assignConnection(ConnectionWidget *);
+    void assignConnection(ConnectionUnit *);
 
     void asciiTermToggled(bool);
     void hexTermToggled(bool);
@@ -64,7 +64,7 @@ private:
     QString char2hex(QString);
 
 
-    ConnectionWidget *connectionWidget;
+    ConnectionUnit *connectionUnit;
 
     // UI controls:
     // Control

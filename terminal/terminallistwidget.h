@@ -46,7 +46,7 @@ private slots:
 
     void terminalRemoved(void);
 
-    void sizeChanged(QSize);
+    void sizeChanged();
 };
 
 #endif // TERMINALLISTWIDGET_H

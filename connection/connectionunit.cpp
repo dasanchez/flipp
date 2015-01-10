@@ -1,6 +1,6 @@
-#include "qdataconnection.h"
+#include "connectionunit.h"
 
-QDataConnection::QDataConnection(QWidget *parent) :
+ConnectionUnit::ConnectionUnit(QWidget *parent) :
     QWidget(parent)
 {
 
@@ -25,48 +25,58 @@ QDataConnection::QDataConnection(QWidget *parent) :
     connect(tcpSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(errorHandler(QAbstractSocket::SocketError)));
 }
 
-connectionType QDataConnection::getType()
+QString ConnectionUnit::getName()
+{
+    return connConfig.connName;
+}
+
+connectionType ConnectionUnit::getType()
 {
     return connConfig.connType;
 }
 
-QString QDataConnection::getAddress_Port()
+QString ConnectionUnit::getAddress_Port()
 {
     return connConfig.addr_port;
 }
 
-quint32 QDataConnection::getPort_Baud()
+quint32 ConnectionUnit::getPort_Baud()
 {
     return connConfig.port_baud;
 }
 
-connectionState QDataConnection::getState()
+connectionState ConnectionUnit::getState()
 {
     return connConfig.connState;
 }
 
-void QDataConnection::setType(connectionType newType)
+void ConnectionUnit::setName(QString newName)
+{
+    connConfig.connName = newName;
+}
+
+void ConnectionUnit::setType(connectionType newType)
 {
     connConfig.connType = newType;
 }
 
-void QDataConnection::setAddress_Port(QString newAddress)
+void ConnectionUnit::setAddress_Port(QString newAddress)
 {
     connConfig.addr_port = newAddress;
 }
 
-void QDataConnection::setPort_Baud(quint32 newPort)
+void ConnectionUnit::setPort_Baud(quint32 newPort)
 {
     connConfig.port_baud = newPort;
 }
 
-void QDataConnection::tcpConnected(void)
+void ConnectionUnit::tcpConnected(void)
 {
     connConfig.connState = ACTIVE;
     connectionChanged();
 }
 
-void QDataConnection::dataConnect()
+void ConnectionUnit::dataConnect()
 {
     QString serialName = serialPrefix;
     switch(connConfig.connType)
@@ -125,7 +135,7 @@ void QDataConnection::dataConnect()
     connectionChanged();
 }
 
-void QDataConnection::dataDisconnect()
+void ConnectionUnit::dataDisconnect()
 {
     switch(connConfig.connType)
     {
@@ -151,7 +161,7 @@ void QDataConnection::dataDisconnect()
     connectionChanged();
 }
 
-void QDataConnection::dataAvailable()
+void ConnectionUnit::dataAvailable()
 {
     QByteArray bytebuf;
     QHostAddress sender;
@@ -183,7 +193,7 @@ void QDataConnection::dataAvailable()
     emit dataIn(bytebuf);
 }
 
-void QDataConnection::dataOut(QByteArray dataout)
+void ConnectionUnit::dataOut(QByteArray dataout)
 {
     switch(connConfig.connType)
     {
@@ -206,18 +216,18 @@ void QDataConnection::dataOut(QByteArray dataout)
     }
 }
 
-void QDataConnection::disconnected()
+void ConnectionUnit::disconnected()
 {
     connConfig.connState = INACTIVE;
     connectionChanged();
 }
 
-void QDataConnection::connectionChanged()
+void ConnectionUnit::connectionChanged()
 {
     emit connectionStatus(connConfig.connState);
 }
 
-void QDataConnection::errorHandler(QAbstractSocket::SocketError error)
+void ConnectionUnit::errorHandler(QAbstractSocket::SocketError error)
 {
     switch(error)
     {

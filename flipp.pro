@@ -15,7 +15,6 @@ TEMPLATE = app
 SOURCES += main.cpp\
         flipp.cpp \
     livelistwidget/livelistwidget.cpp \
-    connection/qdataconnection.cpp \
     connection/connectionlistwidget.cpp \
     connection/connectionwidget.cpp \
     terminal/terminallistwidget.cpp \
@@ -30,11 +29,11 @@ SOURCES += main.cpp\
     plotter/qcustomplot.cpp \
     plotter/plotterlistwidget.cpp \
     linker/linkerwidget.cpp \
-    linker/linkerlistwidget.cpp
+    linker/linkerlistwidget.cpp \
+    connection/connectionunit.cpp
 
 HEADERS  += flipp.h \
     livelistwidget/livelistwidget.h \
-    connection/qdataconnection.h \
     connection/connectionlistwidget.h \
     connection/connectionwidget.h \
     terminal/terminallistwidget.h \
@@ -49,7 +48,8 @@ HEADERS  += flipp.h \
     plotter/qcustomplot.h \
     plotter/plotterlistwidget.h \
     linker/linkerwidget.h \
-    linker/linkerlistwidget.h
+    linker/linkerlistwidget.h \
+    connection/connectionunit.h
 
 RESOURCES += \
     resources.qrc

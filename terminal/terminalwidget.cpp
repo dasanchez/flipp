@@ -4,17 +4,7 @@ TerminalWidget::TerminalWidget(QWidget *parent) :
     QWidget(parent)
 {
 
-    delIconPixmap = QPixmap(":/images/delete_icon.png");
-    echoOnIconPixmap = QPixmap(":/images/echoon_icon.png");
-    echoOffIconPixmap = QPixmap(":/images/echooff_icon.png");
-    playIconPixmap = QPixmap(":/images/play_icon.png");
-    pauseIconPixmap = QPixmap(":/images/pause_icon.png");
-    clearIconPixmap = QPixmap(":/images/clear_icon.png");
-    ascIconPixmap = QPixmap(":/images/asc_icon.png");
-    hexIconPixmap = QPixmap(":/images/hex_icon.png");
-    sendIconPixmap = QPixmap(":/images/send_icon.png");
-
-    connectionWidget = new ConnectionWidget;
+    connectionUnit = new ConnectionUnit;
     paused = false;
     echoing=false;
     hexPacket=false;
@@ -142,8 +132,8 @@ void TerminalWidget::changeConnection(QString connection)
     connectionBox->setCurrentText(connection);
     connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
 
-    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
-    disconnect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
+    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),this,SLOT(dataReceived(QByteArray)));
+    disconnect(this,SIGNAL(sendData(QByteArray)),connectionUnit,SLOT(dataOut(QByteArray)));
     emit terminalConnectionRequest(connection);
 }
 
@@ -192,7 +182,7 @@ void TerminalWidget::updateConnections(QStringList connectionNames)
 {
     connectionBox->clear();
     connectionBox->addItems(connectionNames);
-    int index = connectionBox->findText(connectionWidget->getName());
+    int index = connectionBox->findText(connectionUnit->getName());
     if(index>=0)
         connectionBox->setCurrentIndex(index);
     changeConnection(connectionBox->currentText());
@@ -357,17 +347,17 @@ QString TerminalWidget::hex2char(QString hexChars)
     return characters;
 }
 
-void TerminalWidget::assignConnection(ConnectionWidget *connWidget)
+void TerminalWidget::assignConnection(ConnectionUnit *newConnection)
 {
-    connectionWidget=connWidget;
-    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),this,SLOT(dataReceived(QByteArray)));
-    connect(this,SIGNAL(sendData(QByteArray)),connectionWidget,SLOT(dataTx(QByteArray)));
-    connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
+    connectionUnit=newConnection;
+    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),this,SLOT(dataReceived(QByteArray)));
+    connect(this,SIGNAL(sendData(QByteArray)),connectionUnit,SLOT(dataOut(QByteArray)));
+    connect(connectionUnit,SIGNAL(destroyed()),this,SLOT(detachConnection()));
 }
 
 void TerminalWidget::detachConnection()
 {
-    connectionWidget = new ConnectionWidget;
+    connectionUnit = new ConnectionUnit;
 }
 
 void TerminalWidget::setupUI()

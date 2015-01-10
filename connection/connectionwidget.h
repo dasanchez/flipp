@@ -14,7 +14,7 @@
 #include <QTimer>
 #include <QStyledItemDelegate>
 
-#include "qdataconnection.h"
+#include "connectionunit.h"
 
 class ConnectionWidget : public QWidget
 {
@@ -22,6 +22,7 @@ class ConnectionWidget : public QWidget
 public:
     ConnectionWidget(QWidget *parent = 0);
     ~ConnectionWidget();
+    ConnectionUnit *connectionUnit;
     QString getName(void);
     int getType(void);
     QString getIPAddress(void);
@@ -46,13 +47,13 @@ signals:
 public slots:
     void setNameValid(bool);
     void dataTx(QByteArray);
-
     void toggleView(void);
     void signalData(void);
     void animateDataIcon(void);
     void remove();
     void togglePropertyFields(bool);
     void toggleType();
+
     // Data connection
     void typeChanged(QString newType);
     void addressChanged(QString);
@@ -73,8 +74,9 @@ private:
     QPushButton *viewButton;
 
     // Connection
-    QDataConnection *dataConnection;
+
     QComboBox *serialPortCombo;
+    QLabel *nameLabel;
     QLabel *addressLabel;
     QLabel *portLabel;
     QPushButton *typeButton;
@@ -97,18 +99,7 @@ private:
 
     bool isExpanded;
 
-    // Assets
-    QPixmap tcpIconPixmap;
-    QPixmap udpIconPixmap;
-    QPixmap comIconPixmap;
-    QPixmap moreIconPixmap;
-    QPixmap lessIconPixmap;
-    QPixmap delIconPixmap;
-    QPixmap connOffIconPixmap;
-    QPixmap connOnIconPixmap;
-    QPixmap inOutIconPixmap;
-
-
+    void readType();
 };
 
 #endif // CONNECTIONWIDGET_H

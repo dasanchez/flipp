@@ -1,5 +1,5 @@
-#ifndef QDATACONNECTION_H
-#define QDATACONNECTION_H
+#ifndef CONNECTIONUNIT_H
+#define CONNECTIONUNIT_H
 
 #include <QWidget>
 #include <QTcpSocket>
@@ -17,22 +17,25 @@ enum connectionState{INACTIVE,CONNECTING,ACTIVE};
 
 struct connectionInfo
 {
+    QString connName;
     connectionType connType;
     QString addr_port;
     quint32 port_baud;
     connectionState connState;
 };
 
-class QDataConnection : public QWidget
+class ConnectionUnit : public QWidget
 {
     Q_OBJECT
 public:
-    QDataConnection(QWidget *parent = 0);
+    ConnectionUnit(QWidget *parent = 0);
+    QString getName();
     connectionType getType();
     QString getAddress_Port();
     quint32 getPort_Baud();
     connectionState getState();
 
+    void setName(QString);
     void setType(connectionType);
     void setAddress_Port(QString);
     void setPort_Baud(quint32);
@@ -67,4 +70,4 @@ private slots:
 
 };
 
-#endif // QDATACONNECTION_H
+#endif // ConnectionUnit_H

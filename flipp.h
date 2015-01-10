@@ -24,7 +24,8 @@ public:
     ~Flipp();
 private:
 
-    ConnectionListWidget *connections;
+    QList<ConnectionUnit*> *connections;
+    ConnectionListWidget *connectionListWidget;
     TerminalListWidget *terminals;
     ParserListWidget *parsers;
     PlotterWidget *plotter;

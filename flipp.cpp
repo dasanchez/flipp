@@ -3,7 +3,8 @@
 Flipp::Flipp(QWidget *parent)
     : QMainWindow(parent)
 {
-    connections = new ConnectionListWidget(this);
+    connectionListWidget = new ConnectionListWidget(this);
+    connections = new QList<ConnectionUnit*>;
     terminals = new TerminalListWidget(this);
     parsers = new ParserListWidget(this);
     //    plotters = new PlotterListWidget(this);
@@ -15,17 +16,17 @@ Flipp::Flipp(QWidget *parent)
     //        initSettings();
 
 
-    connect(connections,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
+    connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
 
-    connect(connections,SIGNAL(connectionListChanged(QStringList)),linkers,SLOT(updateConnections(QStringList)));
+    connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),linkers,SLOT(updateConnections(QStringList)));
     connect(parsers,SIGNAL(parserListChanged(QStringList)),linkers,SLOT(updateParsers(QStringList)));
     connect(linkers,SIGNAL(linkerConnectionRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerConnectionRequest(LinkerWidget*, QString)));
     connect(linkers,SIGNAL(linkerParserRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerParserRequest(LinkerWidget*, QString)));
     connect(linkers,SIGNAL(linkerListChanged(QList<LinkerWidget*>)),plotter,SLOT(updateLinkerList(QList<LinkerWidget*>)));
 
 
-    //    connect(connections,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
+    //    connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
     //    connect(parsers,SIGNAL(parserListChanged(QStringList)),plotters,SLOT(updateParsers(QStringList)));
     //    connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
     //    connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
@@ -58,7 +59,7 @@ Flipp::~Flipp()
 
 void Flipp::handleLinkerConnectionRequest(LinkerWidget* linker, QString name)
 {
-    foreach(ConnectionWidget *connection,connections->connectionList)
+    foreach(ConnectionWidget *connection,connectionListWidget->connectionList)
     {
         if(connection->getName()==name)
         {
@@ -84,11 +85,11 @@ void Flipp::handleLinkerParserRequest(LinkerWidget* linker, QString name)
 
 void Flipp::handleTerminalRequest(TerminalWidget *terminal,QString name)
 {
-    foreach(ConnectionWidget *connection,connections->connectionList)
+    foreach(ConnectionWidget *connection,connectionListWidget->connectionList)
     {
         if(connection->getName()==name)
         {
-            terminal->assignConnection(connection);
+            terminal->assignConnection(connection->connectionUnit);
         }
     }
 }
@@ -99,7 +100,7 @@ void Flipp::createDocks()
 {
     connectionDock = new QDockWidget(tr("Connection list"));
     connectionDock->setObjectName("Connections_Dock");
-    connectionDock->setWidget(connections);
+    connectionDock->setWidget(connectionListWidget);
     connectionDock->setFeatures(QDockWidget::DockWidgetClosable|
                                 QDockWidget::DockWidgetMovable|
                                 QDockWidget::DockWidgetFloatable);
@@ -133,8 +134,6 @@ void Flipp::createDocks()
                             QDockWidget::DockWidgetFloatable);
     linkerDock->setAllowedAreas(Qt::AllDockWidgetAreas);
     addDockWidget(Qt::TopDockWidgetArea,linkerDock);
-
-    //    plo
 
     setTabPosition(Qt::AllDockWidgetAreas,QTabWidget::North);
 }
@@ -261,7 +260,7 @@ void Flipp::restoreSettings()
     {
         settings.setArrayIndex(i);
         connectionNames.append(settings.value("Name").toString());
-        connections->addConnection(settings.value("Name").toString(),settings.value("Type").toInt(),settings.value("Address").toString(),settings.value("Port").toString());
+        connectionListWidget->addConnection(settings.value("Name").toString(),settings.value("Type").toInt(),settings.value("Address").toString(),settings.value("Port").toString());
     }
     settings.endArray();
 
@@ -408,21 +407,21 @@ void Flipp::saveSettings()
 
     // Connections
     settings.beginWriteArray("Connections");
-    for(int i=0;i<connections->connectionList.size();i++)
+    for(int i=0;i<connectionListWidget->connectionList.size();i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("Name",connections->connectionList.at(i)->getName());
-        int vartype = connections->connectionList.at(i)->getType();
+        settings.setValue("Name",connectionListWidget->connectionList.at(i)->getName());
+        int vartype = connectionListWidget->connectionList.at(i)->getType();
         settings.setValue("Type",vartype);
         if(vartype==SERIAL)
         {
-            settings.setValue("Address",connections->connectionList.at(i)->getSerialPort());
-            settings.setValue("Port",connections->connectionList.at(i)->getBaudRate());
+            settings.setValue("Address",connectionListWidget->connectionList.at(i)->getSerialPort());
+            settings.setValue("Port",connectionListWidget->connectionList.at(i)->getBaudRate());
         }
         else
         {
-            settings.setValue("Address",connections->connectionList.at(i)->getIPAddress());
-            settings.setValue("Port",connections->connectionList.at(i)->getIPPort());
+            settings.setValue("Address",connectionListWidget->connectionList.at(i)->getIPAddress());
+            settings.setValue("Port",connectionListWidget->connectionList.at(i)->getIPPort());
         }
     }
     settings.endArray();
@@ -507,7 +506,7 @@ void Flipp::saveSettings()
     //    qDebug() << linkers->linkerList.size();
     foreach(LinkerWidget *lw, linkers->linkerList)
     {
-        if(connections->connectionList.size()>0 && parsers->parserList->size()>0)
+        if(connectionListWidget->connectionList.size()>0 && parsers->parserList->size()>0)
         {
             settings.setArrayIndex(linkerCount);
             settings.setValue("Connection", lw->getConnection());

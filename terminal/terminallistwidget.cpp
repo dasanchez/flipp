@@ -44,7 +44,7 @@ TerminalListWidget::~TerminalListWidget()
 
 }
 
-void TerminalListWidget::sizeChanged(QSize newSize)
+void TerminalListWidget::sizeChanged()
 {
 
 }

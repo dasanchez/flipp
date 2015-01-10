@@ -31,7 +31,7 @@ public slots:
         void connectionRemoved(void);
         void itemRemoved(int row);
         void sizeChanged(QSize);
-        void resorted(int src, int dest, QListWidgetItem* item);
+        void resorted(int src, int dest);
 signals:
     void connectionListChanged(QStringList);
     void dataReceived(quint8, QByteArray);
