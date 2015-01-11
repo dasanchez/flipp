@@ -18,8 +18,6 @@ TerminalWidget::TerminalWidget(QWidget *parent) :
     connect(hexButton,SIGNAL(toggled(bool)),this,SLOT(hexTermToggled(bool)));
     connect(asciiButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
     connect(hexButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
-    //    connect(echoButton,SIGNAL(clicked()),asciiTerminal,SLOT(toggleEcho()));
-    //    connect(echoButton,SIGNAL(clicked()),hexTerminal,SLOT(toggleEcho()));
     connect(echoButton,SIGNAL(clicked()),this,SLOT(toggleEcho()));
     connect(pauseButton,SIGNAL(clicked()),this,SLOT(togglePause()));
     connect(clearButton,SIGNAL(clicked()),asciiTerminal,SLOT(clear()));
@@ -39,13 +37,10 @@ void TerminalWidget::updateEchoButton()
 {
     if(echoing)
     {
-//        echoButton->setIcon(QIcon(echoOnIconPixmap));
-//        echoButton->setText("E");
         echoButton->setChecked(true);
     }
     else
     {
-//        echoButton->setIcon(QIcon(echoOffIconPixmap));
         echoButton->setChecked(false);
     }
 }
@@ -70,12 +65,10 @@ void TerminalWidget::updatePauseButton()
 {
     if(paused)
     {
-//        pauseButton->setIcon(QIcon(pauseIconPixmap));
         pauseButton->setChecked(true);
     }
     else
     {
-//        pauseButton->setIcon(QIcon(playIconPixmap));
         pauseButton->setChecked(false);
     }
 }
@@ -102,15 +95,13 @@ void TerminalWidget::updatePacketButton()
     if(hexPacket)
     {
         packetEdit->setText(char2hex(packetEdit->text()));
-//        hexPacketButton->setIcon(QIcon(hexIconPixmap));
-        hexPacketButton->setText("Hex");
+        hexPacketButton->setText("HEX");
     }
     else
     {
 
         packetEdit->setText(hex2char(packetEdit->text()));
-//        hexPacketButton->setIcon(QIcon(ascIconPixmap));
-        hexPacketButton->setText("Ascii");
+        hexPacketButton->setText("ASCII");
     }
 }
 
@@ -372,70 +363,50 @@ void TerminalWidget::setupUI()
     connectionBox = new QComboBox;
     connectionBox->setItemDelegate(new QStyledItemDelegate);
     connectionBox->setToolTip("Select a connection");
-    connectionBox->setFixedHeight(24);
     connectionBox->setMinimumWidth(100);
 
-    asciiButton = new QPushButton("Ascii");
+    asciiButton = new QPushButton("ASCII");
     asciiButton->setToolTip("Show or hide the ASCII terminal");
     asciiButton->setCheckable(true);
     asciiButton->setChecked(true);
-    asciiButton->setFixedHeight(24);
     asciiButton->setObjectName("asciiButton");
-    hexButton = new QPushButton("Hex");
+
+    hexButton = new QPushButton("HEX");
     hexButton->setToolTip("Show or hide the hex terminal");
     hexButton->setCheckable(true);
     hexButton->setChecked(true);
-    hexButton->setFixedHeight(24);
     hexButton->setObjectName("hexButton");
-    //    echoButton = new QPushButton;
-    //    echoButton->setIcon(QIcon(echoOffIconPixmap));
+
     echoButton = new QPushButton("Echo");
     echoButton->setToolTip("Toggle echo");
-    echoButton->setFixedHeight(24);
-    echoButton->setFixedWidth(36);
+    echoButton->setFixedWidth(60);
     echoButton->setObjectName("echoButton");
     echoButton->setCheckable(true);
-//    pauseButton = new QPushButton;
-    //    pauseButton->setIcon(QIcon(playIconPixmap));
+
     pauseButton = new QPushButton("Pause");
     pauseButton->setToolTip("Pause terminal display");
+    pauseButton->setFixedWidth(60);
+    pauseButton->setCheckable(true);
+    pauseButton->setObjectName("pauseButton");
 
-    pauseButton->setFixedHeight(24);
-    pauseButton->setFixedWidth(40);
-pauseButton->setCheckable(true);
-pauseButton->setObjectName("pauseButton");
+    clearButton = new QPushButton("Clear");
+    clearButton->setToolTip("Clear terminal views");
+    clearButton->setFixedWidth(60);
 
-//    clearButton = new QPushButton;
-//clearButton->setIcon(QIcon(clearIconPixmap));
-clearButton = new QPushButton("Clear");
-clearButton->setToolTip("Clear terminal views");
-
-    clearButton->setFixedHeight(24);
-    clearButton->setFixedWidth(40);
-//    removeButton = new QPushButton;
-//    removeButton->setIcon(QIcon(delIconPixmap));
     removeButton = new QPushButton("Delete");
     removeButton->setToolTip("Remove terminal");
-
-    removeButton->setFixedHeight(24);
     removeButton->setFixedWidth(60);
 
     packetEdit = new QLineEdit;
     packetEdit->setToolTip("Enter packet to transmit");
-    packetEdit->setFixedHeight(24);
-//    hexPacketButton = new QPushButton;
-//    hexPacketButton->setIcon(QIcon(ascIconPixmap));
-    hexPacketButton = new QPushButton("Ascii");
-    hexPacketButton->setFixedHeight(24);
-    hexPacketButton->setFixedWidth(40);
+
+    hexPacketButton = new QPushButton("HEX");
+    hexPacketButton->setFixedWidth(60);
     hexPacketButton->setToolTip("Toggle hex display");
-//    sendButton = new QPushButton;
-//    sendButton->setIcon(QIcon(sendIconPixmap));
+
     sendButton = new QPushButton("Send");
     sendButton->setToolTip("Transmit packet");
-
-    sendButton->setFixedHeight(24);
-    sendButton->setFixedWidth(40);
+    sendButton->setFixedWidth(50);
 
     // Layout:
     controlLayout = new QHBoxLayout;

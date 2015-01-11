@@ -3,8 +3,8 @@
 Flipp::Flipp(QWidget *parent)
     : QMainWindow(parent)
 {
-    connectionListWidget = new ConnectionListWidget(this);
     connections = new QList<ConnectionUnit*>;
+    connectionListWidget = new ConnectionListWidget(this, connections);
     terminals = new TerminalListWidget(this);
     parsers = new ParserListWidget(this);
     //    plotters = new PlotterListWidget(this);
@@ -259,8 +259,15 @@ void Flipp::restoreSettings()
     for(int i=0;i<connCount;i++)
     {
         settings.setArrayIndex(i);
-        connectionNames.append(settings.value("Name").toString());
-        connectionListWidget->addConnection(settings.value("Name").toString(),settings.value("Type").toInt(),settings.value("Address").toString(),settings.value("Port").toString());
+        ConnectionUnit *connectionUnit = new ConnectionUnit;
+        connectionUnit->setName(settings.value("Name").toString());
+        connectionUnit->setType((connectionType) settings.value("Type").toInt());
+        connectionUnit->setAddress_Port(settings.value("Address").toString());
+        connectionUnit->setPort_Baud(settings.value("Port").toString().toLong());
+
+        connections->append(connectionUnit);
+        connectionNames.append(connectionUnit->getName());
+        connectionListWidget->addConnection(connectionUnit);
     }
     settings.endArray();
 
@@ -407,22 +414,15 @@ void Flipp::saveSettings()
 
     // Connections
     settings.beginWriteArray("Connections");
-    for(int i=0;i<connectionListWidget->connectionList.size();i++)
+    for(int i=0;i<connections->size();i++)
     {
         settings.setArrayIndex(i);
-        settings.setValue("Name",connectionListWidget->connectionList.at(i)->getName());
-        int vartype = connectionListWidget->connectionList.at(i)->getType();
+        settings.setValue("Name",connections->at(i)->getName());
+        int vartype = connections->at(i)->getType();
         settings.setValue("Type",vartype);
-        if(vartype==SERIAL)
-        {
-            settings.setValue("Address",connectionListWidget->connectionList.at(i)->getSerialPort());
-            settings.setValue("Port",connectionListWidget->connectionList.at(i)->getBaudRate());
-        }
-        else
-        {
-            settings.setValue("Address",connectionListWidget->connectionList.at(i)->getIPAddress());
-            settings.setValue("Port",connectionListWidget->connectionList.at(i)->getIPPort());
-        }
+        settings.setValue("Address",connections->at(i)->getAddress_Port());
+        settings.setValue("Port",connections->at(i)->getPort_Baud());
+
     }
     settings.endArray();
 

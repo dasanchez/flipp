@@ -20,7 +20,8 @@ class ConnectionWidget : public QWidget
 {
     Q_OBJECT
 public:
-    ConnectionWidget(QWidget *parent = 0);
+    explicit ConnectionWidget(QWidget *parent=0);
+    ConnectionWidget(QWidget *parent, ConnectionUnit *cUnit = new ConnectionUnit);
     ~ConnectionWidget();
     ConnectionUnit *connectionUnit;
     QString getName(void);
@@ -46,6 +47,7 @@ signals:
     
 public slots:
     void setNameValid(bool);
+    void nameEditChanged(QString);
     void dataTx(QByteArray);
     void toggleView(void);
     void signalData(void);
@@ -64,6 +66,7 @@ public slots:
     
 private:
     void setupUI();
+    void setupUI_fromConnection();
 
     // Control
     QPushButton *removeButton;

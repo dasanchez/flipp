@@ -17,14 +17,14 @@ class ConnectionListWidget : public QWidget
     Q_OBJECT
 
 public:
-    ConnectionListWidget(QWidget *parent = 0);
+    ConnectionListWidget(QWidget *parent = 0, QList<ConnectionUnit*> *conns = 0);
     ~ConnectionListWidget();
     QList<ConnectionWidget*> connectionList;
     QStringList nameList;
     void sendData(quint8, QByteArray);
 public slots:
         void newConnection(void);
-        void addConnection(ConnectionWidget *);
+        void addConnection(ConnectionUnit *);
         void addConnection(QString name, int connType, QString address, QString port);
 
         void nameChanged(void);
@@ -48,7 +48,7 @@ private:
     QString newConnectionName(void);
     void checkAllNames(void);
     void updateList(void);
-
+    QList<ConnectionUnit*> *connections;
 
 };
 

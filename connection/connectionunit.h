@@ -22,6 +22,7 @@ struct connectionInfo
     QString addr_port;
     quint32 port_baud;
     connectionState connState;
+    bool valid;
 };
 
 class ConnectionUnit : public QWidget
@@ -34,12 +35,15 @@ public:
     QString getAddress_Port();
     quint32 getPort_Baud();
     connectionState getState();
+    bool isValid();
 
-    void setName(QString);
+
     void setType(connectionType);
     void setAddress_Port(QString);
     void setPort_Baud(quint32);
     void setID(quint16);
+    void setValid();
+    void setInvalid();
 
 signals:
     void dataIn(QByteArray);
@@ -48,8 +52,10 @@ signals:
     void connectionStatus(connectionState);
     void overrideBaud(QString);
     void connectionError(QString);
+    void validChange(bool);
 
 public slots:
+    void setName(QString);
     void dataConnect();
     void dataDisconnect();
     void dataOut(QByteArray);

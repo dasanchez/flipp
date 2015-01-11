@@ -16,6 +16,7 @@ ConnectionUnit::ConnectionUnit(QWidget *parent) :
     connConfig.addr_port = QString("127.0.0.1");
     connConfig.port_baud = 50500;
     connConfig.connState = INACTIVE;
+    connConfig.valid = true;
     connect(tcpSocket,SIGNAL(connected()),this,SLOT(tcpConnected()));
     connect(tcpSocket,SIGNAL(readyRead()),this,SLOT(dataAvailable()));
     connect(tcpSocket,SIGNAL(disconnected()),this,SLOT(disconnected()));
@@ -50,6 +51,11 @@ connectionState ConnectionUnit::getState()
     return connConfig.connState;
 }
 
+bool ConnectionUnit::isValid()
+{
+    return connConfig.valid;
+}
+
 void ConnectionUnit::setName(QString newName)
 {
     connConfig.connName = newName;
@@ -68,6 +74,18 @@ void ConnectionUnit::setAddress_Port(QString newAddress)
 void ConnectionUnit::setPort_Baud(quint32 newPort)
 {
     connConfig.port_baud = newPort;
+}
+
+void ConnectionUnit::setValid()
+{
+    connConfig.valid = true;
+    emit validChange(true);
+}
+
+void ConnectionUnit::setInvalid()
+{
+    connConfig.valid = false;
+    emit validChange(false);
 }
 
 void ConnectionUnit::tcpConnected(void)

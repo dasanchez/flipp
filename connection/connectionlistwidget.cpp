@@ -1,19 +1,17 @@
 #include "connectionlistwidget.h"
 
 
-ConnectionListWidget::ConnectionListWidget(QWidget *parent)
+ConnectionListWidget::ConnectionListWidget(QWidget *parent, QList<ConnectionUnit*> *conns)
     : QWidget(parent)
 {
-//    nameList = new QStringList;
-
+    //    nameList = new QStringList;
+    connections = conns;
     widgetNameLabel = new QLabel("Connections");
     QFont font = widgetNameLabel->font();
     font.setPointSize(font.pointSize()+4);
     widgetNameLabel->setFont(font);
     newConnBtn = new QPushButton("New");
-//    font.setPointSize(font.pointSize()-2);
     newConnBtn->setFont(font);
-//    newConnBtn->setFixedHeight(24);
     newConnBtn->setFixedWidth(90);
 
     topLayout = new QHBoxLayout;
@@ -43,8 +41,8 @@ ConnectionListWidget::~ConnectionListWidget()
 void ConnectionListWidget::sizeChanged(QSize newSize)
 {
     ConnectionWidget* conn = static_cast<ConnectionWidget*>(QObject::sender());
-     int row = connectionList.indexOf(conn);
-     listWidget->item(row)->setSizeHint(newSize);
+    int row = connectionList.indexOf(conn);
+    listWidget->item(row)->setSizeHint(newSize);
 }
 
 void ConnectionListWidget::itemRemoved(int row)
@@ -54,13 +52,16 @@ void ConnectionListWidget::itemRemoved(int row)
 
 void ConnectionListWidget::resorted(int src, int dest)
 {
-      connectionList.insert(dest, connectionList.takeAt(src));
+    connectionList.insert(dest, connectionList.takeAt(src));
 }
 
 void ConnectionListWidget::newConnection()
 {
-    ConnectionWidget *connWidget = new ConnectionWidget;
-    connWidget->setName(newConnectionName());
+    ConnectionUnit *connectionUnit = new ConnectionUnit;
+    connectionUnit->setName(newConnectionName());
+    connections->append(connectionUnit);
+
+    ConnectionWidget *connWidget = new ConnectionWidget(this, connectionUnit);
     connectionList.append(connWidget);
 
     QListWidgetItem *item = new QListWidgetItem;
@@ -74,8 +75,9 @@ void ConnectionListWidget::newConnection()
     updateList();
 }
 
-void ConnectionListWidget::addConnection(ConnectionWidget *cw)
+void ConnectionListWidget::addConnection(ConnectionUnit *cUnit)
 {
+    ConnectionWidget *cw = new ConnectionWidget(this,cUnit);
     connectionList.append(cw);
     QListWidgetItem *item = new QListWidgetItem;
     listWidget->addItem(item);
@@ -90,19 +92,14 @@ void ConnectionListWidget::addConnection(ConnectionWidget *cw)
 
 void ConnectionListWidget::addConnection(QString name, int connType, QString address, QString port)
 {
-    ConnectionWidget *connWidget = new ConnectionWidget;
-    connWidget->setName(name);
-    connWidget->setType(connType);
-    if(connType==SERIAL)
-    {
-        connWidget->setSerialPort(address);
-        connWidget->setSerialBaud(port);
-    }
-    else
-    {
-        connWidget->setIPAddress(address);
-        connWidget->setIPPort(port);
-    }
+    ConnectionUnit *cUnit  = new ConnectionUnit;
+    cUnit->setName(name);
+    cUnit->setType((connectionType) connType);
+    cUnit->setAddress_Port(address);
+    cUnit->setPort_Baud(port.toLong());
+    connections->append(cUnit);
+
+    ConnectionWidget *connWidget = new ConnectionWidget(this,cUnit);
     connectionList.append(connWidget);
 
     QListWidgetItem *item = new QListWidgetItem;
@@ -120,41 +117,45 @@ void ConnectionListWidget::addConnection(QString name, int connType, QString add
 void ConnectionListWidget::updateList()
 {
     nameList.clear();
-    foreach(ConnectionWidget *connection,connectionList)
+    for(quint16 i=0;i<connections->size();i++)
     {
-        nameList.append(connection->getName());
+        nameList.append(connections->at(i)->getName());
     }
+
     emit connectionListChanged(nameList);
 }
 
 void ConnectionListWidget::connectionRemoved()
 {
     ConnectionWidget* conn = static_cast<ConnectionWidget*>(QObject::sender());
-     int row = connectionList.indexOf(conn);
-     QListWidgetItem *item = listWidget->item(row);
-     connectionList.removeAt(row);
-     listWidget->removeItemWidget(item);
-     listWidget->takeItem(row);
+    connections->removeAt(connections->indexOf(conn->connectionUnit));
+
+    int row = connectionList.indexOf(conn);
+    QListWidgetItem *item = listWidget->item(row);
+    connectionList.removeAt(row);
+    listWidget->removeItemWidget(item);
+    listWidget->takeItem(row);
 
     // Check the remaining connection names
     checkAllNames();
     updateList();
 }
 
+// Generate a valid name for a new connection. //
 QString ConnectionListWidget::newConnectionName()
 {
     QString newName;
     quint16 nameCounter=1;
     bool match;
-    if(connectionList.size()>0)
+    if(connections->size()>0)
     {
         while(nameCounter<999)
         {
             match=false;
             newName=QString("Connection %1").arg(nameCounter);
-            foreach(ConnectionWidget *conn,connectionList)
+            for(quint16 i=0;i<connections->size();i++)
             {
-                if(newName==conn->getName())
+                if(newName == connections->at(i)->getName())
                 {
                     match=true;
                     nameCounter++;
@@ -176,19 +177,19 @@ void ConnectionListWidget::nameChanged()
 {
     ConnectionWidget* conn = qobject_cast<ConnectionWidget *>(QObject::sender());
     // Compare sender string against other connections
-    quint16 index = connectionList.indexOf(conn);
-    for(quint16 i=0;i<connectionList.size();i++)
+    quint16 index = connections->indexOf(conn->connectionUnit);
+    for(quint16 i=0;i<connections->size();i++)
     {
         if(i!=index)
         {
-            if(conn->getName() == connectionList.at(i)->getName())
+            if(conn->connectionUnit->getName() == connections->at(i)->getName())
             {
-                conn->setNameValid(false);
+                conn->connectionUnit->setInvalid();
                 return;
             }
         }
     }
-    conn->setNameValid(true);
+    conn->connectionUnit->setValid();
 
     checkAllNames();
     updateList();
@@ -198,20 +199,20 @@ void ConnectionListWidget::checkAllNames()
 {
     bool valid;
     // Compare all connections to see if there are any we can validate
-    for(quint16 i=0;i<connectionList.size();i++)
+    for(quint16 i=0;i<connections->size();i++)
     {
         valid=true;
-        if(!connectionList.at(i)->nameIsValid())
+        if(!connections->at(i)->isValid())
         {
-            for(quint16 j=0;j<connectionList.size();j++)
+            for(quint16 j=0;j<connections->size();j++)
             {
                 if(j==i) break;
-                if(connectionList.at(i)->getName() == connectionList.at(j)->getName())
+                if(connections->at(i)->getName() == connections->at(j)->getName())
                 {
                     valid=false;
                 }
             }
-            connectionList.at(i)->setNameValid(valid);
+            valid ? connections->at(i)->setValid() : connections->at(i)->setInvalid();
         }
     }
 }

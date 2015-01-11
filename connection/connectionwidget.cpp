@@ -21,8 +21,35 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(connectionUnit,SIGNAL(dataIn(QByteArray)),this,SIGNAL(dataRx(QByteArray)));
     connect(connectionUnit,SIGNAL(overrideBaud(QString)),portEdit,SLOT(setText(QString)));
     connect(connectionUnit,SIGNAL(connectionError(QString)),this,SLOT(errorReceived(QString)));
+    connect(connectionUnit,SIGNAL(validChange(bool)),this,SLOT(setNameValid(bool)));
 
     emit sizeChange(this->sizeHint());
+}
+
+ConnectionWidget::ConnectionWidget(QWidget *parent, ConnectionUnit *cUnit) :
+    QWidget(parent),
+    connectionUnit(cUnit)
+{
+    isExpanded=true;
+
+    setupUI_fromConnection();
+
+    // Data connection Signals
+    connect(typeButton,SIGNAL(clicked()),this,SLOT(toggleType()));
+    connect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged(QString)));
+    connect(serialPortCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(addressChanged(QString)));
+    connect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
+    connect(connectButton,SIGNAL(clicked()),this,SLOT(toggleConnection()));
+    connect(connectionUnit,SIGNAL(connectionStatus(connectionState)),this,SLOT(connectionChanged(connectionState)));
+    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),this,SLOT(signalData()));
+    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),this,SIGNAL(dataRx(QByteArray)));
+    connect(connectionUnit,SIGNAL(overrideBaud(QString)),portEdit,SLOT(setText(QString)));
+    connect(connectionUnit,SIGNAL(connectionError(QString)),this,SLOT(errorReceived(QString)));
+    connect(connectionUnit,SIGNAL(validChange(bool)),this,SLOT(setNameValid(bool)));
+
+    emit sizeChange(this->sizeHint());
+
+
 }
 
 ConnectionWidget::~ConnectionWidget()
@@ -66,6 +93,14 @@ quint32 ConnectionWidget::getBaudRate()
     return connectionUnit->getPort_Baud();
 }
 
+void ConnectionWidget::nameEditChanged(QString newName)
+{
+    disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameEditChanged(QString)));
+    connectionUnit->setName(newName);
+    emit nameChange();
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameEditChanged(QString)));
+}
+
 bool ConnectionWidget::nameIsValid(void)
 {
     return validName;
@@ -84,13 +119,11 @@ void ConnectionWidget::toggleView()
     if(isExpanded)
     {
         mainLayout->addLayout(controlLayout);
-        //        viewButton->setIcon(QIcon(moreIconPixmap));
         viewButton->setText("Less");
     }
     else
     {
         mainLayout->removeItem(controlLayout);
-        //        viewButton->setIcon(QIcon(lessIconPixmap));
         viewButton->setText("More");
     }
     mainLayout->addLayout(bottomLayout);
@@ -146,14 +179,6 @@ void ConnectionWidget::setNameValid(bool valid)
     }
 }
 
-void ConnectionWidget::setName(QString newName)
-{
-    disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
-    nameEdit->setText(newName);
-    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
-    connectionUnit->setName(newName);
-}
-
 void ConnectionWidget::setType(int newType)
 {
     switch(newType)
@@ -199,7 +224,6 @@ void ConnectionWidget::setType(int newType)
     }
 
 }
-
 
 void ConnectionWidget::toggleType()
 {
@@ -327,8 +351,6 @@ void ConnectionWidget::setSerialBaud(QString serBaud)
 
 void ConnectionWidget::portChanged(QString newPort)
 {
-    //    QString r = "\\D";
-    //    newPort = newPort.remove(QRegExp(r));
     portEdit->setText(newPort);
     connectionUnit->setPort_Baud(newPort.toLong());
 }
@@ -407,6 +429,121 @@ void ConnectionWidget::setExpanded(bool expand)
     emit sizeChange(this->sizeHint());
 
 }
+
+void ConnectionWidget::setupUI_fromConnection()
+{
+    // Control
+    connectButton = new QPushButton("Connect");
+    connectButton->setToolTip("Open connection");
+    connectButton->setFixedWidth(96);
+
+    nameLabel = new QLabel("Name:");
+    nameLabel->setFixedWidth(78);
+    nameLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    nameLabel->setAlignment(Qt::AlignRight);
+
+    nameEdit = new QLineEdit(connectionUnit->getName());
+    nameEdit->setToolTip("Enter a connection name");
+    nameEdit->setMinimumWidth(92);
+    nameEdit->setAlignment(Qt::AlignCenter);
+
+    viewButton = new QPushButton("Less");
+    viewButton->setFixedWidth(50);
+    viewButton->setToolTip("Hide or show connection properties");
+
+    removeButton = new QPushButton("Delete");
+    removeButton->setFixedWidth(80);
+    removeButton->setToolTip("Remove connection");
+
+    typeButton = new QPushButton;
+    typeButton->setFixedWidth(96);
+    readType();
+    typeButton->setToolTip("Toggle between TCP, UDP, and COM connection");
+
+    addressLabel = new QLabel("Address:");
+    addressLabel->setFixedWidth(78);
+    addressLabel->setAlignment(Qt::AlignRight);
+
+    portLabel = new QLabel("Port:");
+    portLabel->setFixedWidth(50);
+    portLabel->setAlignment(Qt::AlignRight);
+
+    addressEdit = new QLineEdit(connectionUnit->getAddress_Port());
+    addressEdit->setToolTip("Enter an IP adress or serial port");
+    addressEdit->setMinimumWidth(160);
+    addressEdit->setAlignment(Qt::AlignHCenter);
+
+    serialPortCombo = new QComboBox;
+    serialPortCombo->setItemDelegate(new QStyledItemDelegate);
+    serialPortCombo->setMinimumWidth(160);
+    // Populate with available serial ports
+    QList<QSerialPortInfo> spinfo = QSerialPortInfo::availablePorts();
+    QStringList portNames;
+    foreach(QSerialPortInfo info,spinfo)
+    {
+        portNames.append(info.portName());
+    }
+    serialPortCombo->addItems(portNames);
+    serialPortCombo->setVisible(false);
+    serialPortCombo->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+
+    portEdit = new QLineEdit(QString("%1").arg(connectionUnit->getPort_Baud()));
+    portEdit->setToolTip("Enter an IP port or baud rate");
+    portEdit->setFixedWidth(80);
+    portEdit->setAlignment(Qt::AlignHCenter);
+
+    // Status
+    statusBar = new QLabel("Click the Connect button");
+    statusBar->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    dataIcon = new QPushButton("IO");
+    dataIcon->setFixedWidth(32);
+    dataIconShade = 255;
+    iconTimer = new QTimer;
+    iconTimer->setInterval(50);
+    validName = true;
+
+    // Layout
+    topLayout = new QHBoxLayout;
+    topLayout->addWidget(connectButton);
+    topLayout->addWidget(nameLabel);
+    topLayout->addWidget(nameEdit);
+    topLayout->addWidget(viewButton);
+    topLayout->addWidget(removeButton);
+    topLayout->setMargin(2);
+
+    controlLayout = new QHBoxLayout;
+    controlLayout->addWidget(typeButton);
+    controlLayout->addWidget(addressLabel);
+    controlLayout->addWidget(addressEdit);
+    controlLayout->addWidget(serialPortCombo);
+    controlLayout->addWidget(portLabel);
+    controlLayout->addWidget(portEdit);
+
+    bottomLayout = new QHBoxLayout;
+    bottomLayout->addWidget(statusBar);
+    bottomLayout->addWidget(dataIcon);
+    bottomLayout->setMargin(0);
+
+    mainLayout = new QVBoxLayout;
+
+    mainLayout->addLayout(topLayout);
+    mainLayout->addLayout(controlLayout);
+    mainLayout->addLayout(bottomLayout);
+
+    this->setLayout(mainLayout);
+    mainLayout->setSpacing(5);
+    mainLayout->setMargin(5);
+    this->setFixedWidth(500);
+
+
+    // UI SIGNALS
+    connect(viewButton,SIGNAL(clicked()),this,SLOT(toggleView()));
+    connect(iconTimer,SIGNAL(timeout()),this,SLOT(animateDataIcon()));
+    connect(removeButton,SIGNAL(clicked()),this,SLOT(remove()));
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameEditChanged(QString)));
+}
+
+
 
 void ConnectionWidget::setupUI()
 {
@@ -519,5 +656,5 @@ void ConnectionWidget::setupUI()
     connect(viewButton,SIGNAL(clicked()),this,SLOT(toggleView()));
     connect(iconTimer,SIGNAL(timeout()),this,SLOT(animateDataIcon()));
     connect(removeButton,SIGNAL(clicked()),this,SLOT(remove()));
-    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameEditChanged(QString)));
 }
