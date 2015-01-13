@@ -583,7 +583,6 @@ void ConnectionWidget::setupUI()
     portLabel->setFixedWidth(50);
     portLabel->setAlignment(Qt::AlignRight);
 
-
     addressEdit = new QLineEdit("127.0.0.1");
     addressEdit->setToolTip("Enter an IP adress or serial port");
     addressEdit->setMinimumWidth(160);

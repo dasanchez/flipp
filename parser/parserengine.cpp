@@ -601,7 +601,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
     // Check list size
     if(targetVars.size()<2)
     {
-        testout.append("Parser will only work with two or more variables");
+//        testout.append("Parser will only work with two or more variables");
         checkOutput->append(testout);
         validList=false;
         return validList;
@@ -613,7 +613,7 @@ bool ParserEngine::isValid(QByteArray *checkOutput)
         // Make sure vectors are not empty
         if(targetVars.at(i).type==VECTYPE && targetVars.at(i).vector.isEmpty())
         {
-            testout.append("Vector is empty.");
+//            testout.append("Vector is empty.");
             checkOutput->append(testout);
             validList=false;
             return validList;

@@ -126,7 +126,6 @@ void QTerminalEdit::appendText(QByteArray newText, bool internal)
                     data.append(ch);
                 }
             }
-
             tc.setCharFormat(tcf);
             tc.insertText(data);
             tc.movePosition(QTextCursor::End);
@@ -139,4 +138,3 @@ void QTerminalEdit::appendText(QByteArray newText, bool internal)
         appendText(newText);
     }
 }
-

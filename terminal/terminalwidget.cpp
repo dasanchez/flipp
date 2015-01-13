@@ -3,7 +3,6 @@
 TerminalWidget::TerminalWidget(QWidget *parent) :
     QWidget(parent)
 {
-
     connectionUnit = new ConnectionUnit;
     paused = false;
     echoing=false;
@@ -374,7 +373,7 @@ void TerminalWidget::setupUI()
     hexButton = new QPushButton("HEX");
     hexButton->setToolTip("Show or hide the hex terminal");
     hexButton->setCheckable(true);
-    hexButton->setChecked(true);
+    hexButton->setChecked(false);
     hexButton->setObjectName("hexButton");
 
     echoButton = new QPushButton("Echo");
@@ -431,6 +430,7 @@ void TerminalWidget::setupUI()
     terminalLayout = new QHBoxLayout;
     terminalLayout->addWidget(asciiTerminal);
     terminalLayout->addWidget(hexTerminal);
+    hexTerminal->setVisible(false);
 
     frame = new QFrame;
     frame->setFrameStyle(QFrame::HLine | QFrame::Raised);

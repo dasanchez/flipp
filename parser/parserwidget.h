@@ -35,7 +35,7 @@ public slots:
 private:
     QHBoxLayout *controlLayout;
     QHBoxLayout *controlLayoutBottom;
-
+    QHBoxLayout *newItemLayout;
     QVBoxLayout *mainLayout;
 
     QLineEdit *nameEdit;
@@ -52,12 +52,12 @@ private:
     bool expanded;
 
     // Assets
-    QPixmap addByteIconPixmap;
-    QPixmap addNumberIconPixmap;
-    QPixmap addVectorIconPixmap;
-    QPixmap moreIconPixmap;
-    QPixmap lessIconPixmap;
-    QPixmap delIconPixmap;
+//    QPixmap addByteIconPixmap;
+//    QPixmap addNumberIconPixmap;
+//    QPixmap addVectorIconPixmap;
+//    QPixmap moreIconPixmap;
+//    QPixmap lessIconPixmap;
+//    QPixmap delIconPixmap;
 private slots:
     // Widget handling
 

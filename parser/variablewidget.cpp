@@ -102,15 +102,12 @@ void VariableWidget::setMatched(bool matchOn)
 
     if(matched)
     {
-//        matchIcon=matchonIconPixmap;
         matchButton->setChecked(true);
     }
     else
     {
-//        matchIcon=matchoffIconPixmap;
         matchButton->setChecked(false);
     }
-//    matchButton->setIcon(matchIcon);
     variable.match=matched;
     emit variableChanged();
     emit matchToggle(matched);
@@ -124,7 +121,6 @@ void VariableWidget::setMatchBytes(QByteArray newMatch)
     if(hexed)
     {
         // Change all hex data back to ascii representation
-
         hexRegex.indexIn(newMatch);
         QString temp = hexRegex.cap();
 
@@ -185,8 +181,7 @@ void VariableWidget::toggleType()
 
 void VariableWidget::setByte()
 {
-//    typeButton->setIcon(QIcon(byteIconPixmap));
-    typeButton->setText("BYT");
+    typeButton->setText("BYTES");
 
     mainLayout->removeItem(vectorListLayout);
 
@@ -217,8 +212,7 @@ void VariableWidget::setByte()
 
 void VariableWidget::setNumber()
 {
-//    typeButton->setIcon(QIcon(numberIconPixmap));
-typeButton->setText("NUM");
+    typeButton->setText("NUMBER");
     // Widgets
     mainLayout->removeItem(vectorListLayout);
 
@@ -248,8 +242,7 @@ typeButton->setText("NUM");
 
 void VariableWidget::setVector()
 {
-//    typeButton->setIcon(QIcon(vectorIconPixmap));
-    typeButton->setText("VEC");
+    typeButton->setText("VECTOR");
     moreButton->setIcon(QIcon(moreIconPixmap));
     isExpanded=true;
 
@@ -305,15 +298,12 @@ void VariableWidget::toggleMatch()
 
     if(matched)
     {
-//        matchIcon=matchonIconPixmap;
         matchButton->setChecked(true);
     }
     else
     {
-//        matchIcon=matchoffIconPixmap;
         matchButton->setChecked(false);
     }
-//    matchButton->setIcon(matchIcon);
     variable.match=matched;
     emit variableChanged();
     emit matchToggle(matched);
@@ -345,7 +335,6 @@ void VariableWidget::changeMatch(QString newMatch)
     if(hexed)
     {
         // Change all hex data back to ascii representation
-
         hexRegex.indexIn(newMatch);
         QString temp = hexRegex.cap();
 
@@ -461,8 +450,6 @@ void VariableWidget::addVectorVariable(BaseVariable bvar)
     iw->setMatchBytes(bvar.matchBytes);
     itemList->append(iw);
 
-//    iw->variable->name = bvar->name;
-//    qDebug() << iw->variable->name;
     variable.vector.append(bvar);
     connect(iw,SIGNAL(deleteVar()),this,SLOT(vectorItemRemoved()));
     connect(iw,SIGNAL(nameChange(QString)),this,SLOT(vectorItemNameChanged(QString)));
@@ -611,46 +598,44 @@ void VariableWidget::setupUI()
     nameEdit = new QLineEdit("variable");
     nameEdit->setToolTip("Enter the variable name");
     nameEdit->setMinimumWidth(40);
-    nameEdit->setFixedHeight(24);
     nameEdit->setFrame(false);
     nameEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-//    typeButton = new QPushButton;
-//    typeButton->setIcon(typeIcon);
-    typeButton = new QPushButton("BYT");
-    typeButton->setToolTip("Toggle between byte, number, and vector type");
 
-    typeButton->setFixedWidth(36);
-    typeButton->setFixedHeight(24);
+    typeButton = new QPushButton("BYTES");
+    typeButton->setToolTip("Toggle between byte, number, and vector type");
+    typeButton->setFixedWidth(90);
+//    typeButton->setFixedHeight(24);
 
     // Single variable
     lengthButton= new QPushButton;
     lengthButton->setToolTip("Toggle fixed length on or off");
     lengthButton->setIcon(lengthIcon);
     lengthButton->setFixedWidth(24);
-    lengthButton->setFixedHeight(24);
+//    lengthButton->setFixedHeight(24);
+
     lengthSpin = new QSpinBox;
     lengthSpin->setToolTip("Enter a fixed length");
     lengthSpin->setValue(1);
     lengthSpin->setMinimum(1);
     lengthSpin->setFixedWidth(40);
-    lengthSpin->setFixedHeight(24);
-//    matchButton = new QPushButton;
-//    matchButton->setIcon(matchoffIcon);
+//    lengthSpin->setFixedHeight(24);
     matchButton = new QPushButton("Match");
     matchButton->setToolTip("Toggle match on or off");
     matchButton->setFixedWidth(48);
-    matchButton->setFixedHeight(24);
+//    matchButton->setFixedHeight(24);
     matchButton->setCheckable(true);
     matchButton->setChecked(false);
     matchButton->setObjectName("matchButton");
+
     matchEdit = new QLineEdit;
     matchEdit->setToolTip("Enter the byte array to match");
-    matchEdit->setFixedHeight(24);
+//    matchEdit->setFixedHeight(24);
     matchEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+
     hexButton = new QPushButton;
     hexButton->setToolTip("Toggle between ASCII and hexadecimal display");
     hexButton->setFixedWidth(24);
-    hexButton->setFixedHeight(24);
+//    hexButton->setFixedHeight(24);
     hexButton->setIcon(hexoffIcon);
 
     // Repeat
@@ -658,35 +643,37 @@ void VariableWidget::setupUI()
     repeatLabel->setPixmap(cycleIconPixmap);
     repeatLabel->setFixedSize(24,24);
     repeatLabel->setVisible(false);
+
     repeatSpin = new QSpinBox;
     repeatSpin->setToolTip("Enter the number of times the vector will be received");
     repeatSpin->setMinimum(1);
     repeatSpin->setValue(5);
     repeatSpin->setVisible(false);
     repeatSpin->setFixedWidth(40);
-    repeatSpin->setFixedHeight(24);
+//    repeatSpin->setFixedHeight(24);
     addByteButton = new QPushButton;
     addByteButton->setToolTip("Add byte variable");
     addByteButton->setIcon(addbyteIcon);
-    addByteButton->setFixedSize(24,24);
+    addByteButton->setFixedWidth(30);
     addByteButton->setVisible(false);
+
     addNumberButton = new QPushButton;
     addNumberButton->setToolTip("Add number variable");
     addNumberButton->setIcon(addnumberIcon);
-    addNumberButton->setFixedSize(24,24);
+    addNumberButton->setFixedWidth(30);
     addNumberButton->setVisible(false);
 
     // Expand / Delete Buttons
     moreButton = new QPushButton;
     moreButton->setToolTip("Show or hide variable details");
-    moreButton->setFixedWidth(24);
-    moreButton->setFixedHeight(24);
+    moreButton->setFixedWidth(30);
+//    moreButton->setFixedHeight(24);
     moreButton->setIcon(moreIcon);
     moreButton->setVisible(false);
     delButton = new QPushButton;
     delButton->setToolTip("Remove variable");
-    delButton->setFixedWidth(24);
-    delButton->setFixedHeight(24);
+    delButton->setFixedWidth(30);
+//    delButton->setFixedHeight(24);
     delButton->setIcon(deleteIcon);
 
     titleLayout = new QHBoxLayout;

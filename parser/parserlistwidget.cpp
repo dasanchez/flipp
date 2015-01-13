@@ -13,8 +13,8 @@ ParserListWidget::ParserListWidget(QWidget *parent) :
     widgetNameLabel->setFont(font);
 
     newParserButton = new QPushButton("New");
-    newParserButton->setFixedHeight(24);
-    newParserButton->setFixedWidth(100);
+    newParserButton->setFont(font);
+    newParserButton->setFixedWidth(90);
 
     splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);

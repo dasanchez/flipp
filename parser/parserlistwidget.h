@@ -41,6 +41,7 @@ private:
     QVBoxLayout *mainLayout;
     QHBoxLayout *topLayout;
 
+
     QSplitter *splitter;
     QScrollArea *scrollArea;
     QVBoxLayout *scrollAreaVLayout;
