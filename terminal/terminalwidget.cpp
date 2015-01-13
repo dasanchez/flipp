@@ -94,13 +94,13 @@ void TerminalWidget::updatePacketButton()
     if(hexPacket)
     {
         packetEdit->setText(char2hex(packetEdit->text()));
-        hexPacketButton->setText("HEX");
+        hexPacketButton->setText("ASCII");
     }
     else
     {
 
         packetEdit->setText(hex2char(packetEdit->text()));
-        hexPacketButton->setText("ASCII");
+        hexPacketButton->setText("HEX");
     }
 }
 
