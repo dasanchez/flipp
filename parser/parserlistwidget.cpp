@@ -43,7 +43,7 @@ ParserListWidget::ParserListWidget(QWidget *parent) :
     mainLayout->addWidget(scrollArea);
     setLayout(mainLayout);
 
-    setMinimumWidth(620);
+    setMinimumWidth(680);
     connect(newParserButton,SIGNAL(clicked()),this,SLOT(newParser()));
 }
 
