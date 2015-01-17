@@ -352,6 +352,8 @@ void TerminalWidget::detachConnection()
 
 void TerminalWidget::setupUI()
 {
+    quint8 controlHeight = 26;
+
     asciiTerminal = new QTerminalEdit;
     hexTerminal = new QTerminalEdit;
     hexTerminal->setHex(true);
@@ -363,6 +365,7 @@ void TerminalWidget::setupUI()
     connectionBox->setItemDelegate(new QStyledItemDelegate);
     connectionBox->setToolTip("Select a connection");
     connectionBox->setMinimumWidth(100);
+    connectionBox->setFixedHeight(controlHeight);
 
     asciiButton = new QPushButton("ASCII");
     asciiButton->setToolTip("Show or hide the ASCII terminal");

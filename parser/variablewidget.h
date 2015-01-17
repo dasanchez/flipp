@@ -48,9 +48,9 @@ private:
     QHBoxLayout *vectorListLayout;
 
     // Assets
-    QPixmap byteIconPixmap;
-    QPixmap numberIconPixmap;
-    QPixmap vectorIconPixmap;
+//    QPixmap byteIconPixmap;
+//    QPixmap numberIconPixmap;
+//    QPixmap vectorIconPixmap;
     QPixmap varlenIconPixmap;
     QPixmap fixlenIconPixmap;
     QPixmap matchoffIconPixmap;

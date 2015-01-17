@@ -250,6 +250,7 @@ void Flipp::restoreSettings()
     QSettings settings(m_sSettingsFile,QSettings::IniFormat);
 
     restoreState(settings.value("DOCK_LOCATIONS").toByteArray(),1);
+    connectionDock->setVisible(true);
 
     QStringList connectionNames;
     QStringList parserNames;

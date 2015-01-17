@@ -35,11 +35,6 @@ ConnectionWidget::ConnectionWidget(QWidget *parent, ConnectionUnit *cUnit) :
     setupUI_fromConnection();
 
     // Data connection Signals
-    connect(typeButton,SIGNAL(clicked()),this,SLOT(toggleType()));
-    connect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged(QString)));
-    connect(serialPortCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(addressChanged(QString)));
-    connect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
-    connect(connectButton,SIGNAL(clicked()),this,SLOT(toggleConnection()));
     connect(connectionUnit,SIGNAL(connectionStatus(connectionState)),this,SLOT(connectionChanged(connectionState)));
     connect(connectionUnit,SIGNAL(dataIn(QByteArray)),this,SLOT(signalData()));
     connect(connectionUnit,SIGNAL(dataIn(QByteArray)),this,SIGNAL(dataRx(QByteArray)));
@@ -191,8 +186,8 @@ void ConnectionWidget::setType(int newType)
             serialPortCombo->setVisible(false);
             addressEdit->setVisible(true);
         }
-        addressLabel->setText("Address:");
-        portLabel->setText("Port:");
+        addressLabel->setText("Address");
+        portLabel->setText("Port");
         addressChanged(addressEdit->text());
         break;
     case UDP:
@@ -203,8 +198,8 @@ void ConnectionWidget::setType(int newType)
             serialPortCombo->setVisible(false);
             addressEdit->setVisible(true);
         }
-        addressLabel->setText("Address:");
-        portLabel->setText("Port:");
+        addressLabel->setText("Address");
+        portLabel->setText("Port");
         addressChanged(addressEdit->text());
         break;
     case SERIAL:
@@ -215,8 +210,8 @@ void ConnectionWidget::setType(int newType)
             addressEdit->setVisible(false);
             serialPortCombo->setVisible(true);
         }
-        addressLabel->setText("Port:");
-        portLabel->setText("Baud:");
+        addressLabel->setText("Port");
+        portLabel->setText("Baud");
         addressChanged(serialPortCombo->currentText());
         break;
     default:
@@ -238,8 +233,8 @@ void ConnectionWidget::toggleType()
             addressEdit->setVisible(false);
             serialPortCombo->setVisible(true);
         }
-        addressLabel->setText("Port:");
-        portLabel->setText("Baud:");
+        addressLabel->setText("Port");
+        portLabel->setText("Baud");
         addressChanged(serialPortCombo->currentText());
         break;
     case SERIAL:
@@ -250,8 +245,8 @@ void ConnectionWidget::toggleType()
             serialPortCombo->setVisible(false);
             addressEdit->setVisible(true);
         }
-        addressLabel->setText("Address:");
-        portLabel->setText("Port:");
+        addressLabel->setText("Address");
+        portLabel->setText("Port");
         addressChanged(addressEdit->text());
         break;
     default:
@@ -267,20 +262,20 @@ void ConnectionWidget::typeChanged(QString newType)
     if(newType==QString("TCP"))
     {
         connectionUnit->setType(TCP);
-        addressLabel->setText("Address:");
-        portLabel->setText("Port:");
+        addressLabel->setText("Address");
+        portLabel->setText("Port");
     }
     if(newType==QString("UDP"))
     {
         connectionUnit->setType(UDP);
         addressLabel->setText("Address:");
-        portLabel->setText("Port:");
+        portLabel->setText("Port");
     }
     if(newType==QString("SERIAL"))
     {
         connectionUnit->setType(SERIAL);
-        addressLabel->setText("Port:");
-        portLabel->setText("Baud:");
+        addressLabel->setText("Port");
+        portLabel->setText("Baud");
     }
 
 }
@@ -432,50 +427,63 @@ void ConnectionWidget::setExpanded(bool expand)
 
 void ConnectionWidget::setupUI_fromConnection()
 {
+    quint8 controlHeight = 26;
     // Control
     connectButton = new QPushButton("Connect");
     connectButton->setToolTip("Open connection");
     connectButton->setFixedWidth(96);
+    connectButton->setFixedHeight(controlHeight);
 
-    nameLabel = new QLabel("Name:");
+    nameLabel = new QLabel("Name");
+    nameLabel->setObjectName("connNameLabel");
     nameLabel->setFixedWidth(78);
+    nameLabel->setFixedHeight(controlHeight);
     nameLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-    nameLabel->setAlignment(Qt::AlignRight);
+    nameLabel->setAlignment(Qt::AlignVCenter | Qt::AlignCenter);
+//    nameLabel->setAlignment(Qt::AlignRight);
 
     nameEdit = new QLineEdit(connectionUnit->getName());
+    nameEdit->setObjectName("connNameEdit");
     nameEdit->setToolTip("Enter a connection name");
-    nameEdit->setMinimumWidth(92);
+    nameEdit->setMinimumWidth(160);
+    nameEdit->setFixedHeight(controlHeight);
     nameEdit->setAlignment(Qt::AlignCenter);
 
     viewButton = new QPushButton("Less");
     viewButton->setFixedWidth(50);
+    viewButton->setFixedHeight(controlHeight);
     viewButton->setToolTip("Hide or show connection properties");
 
     removeButton = new QPushButton("Delete");
     removeButton->setFixedWidth(80);
+    removeButton->setFixedHeight(controlHeight);
     removeButton->setToolTip("Remove connection");
 
     typeButton = new QPushButton;
     typeButton->setFixedWidth(96);
+    typeButton->setFixedHeight(controlHeight);
     readType();
     typeButton->setToolTip("Toggle between TCP, UDP, and COM connection");
 
-    addressLabel = new QLabel("Address:");
+    addressLabel = new QLabel("Address");
+    addressLabel->setObjectName("connAddrLabel");
     addressLabel->setFixedWidth(78);
-    addressLabel->setAlignment(Qt::AlignRight);
-
-    portLabel = new QLabel("Port:");
-    portLabel->setFixedWidth(50);
-    portLabel->setAlignment(Qt::AlignRight);
+    addressLabel->setFixedHeight(controlHeight);
+    addressLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    addressLabel->setAlignment(Qt::AlignVCenter | Qt::AlignCenter);
 
     addressEdit = new QLineEdit(connectionUnit->getAddress_Port());
+    addressEdit->setObjectName("connAddrEdit");
     addressEdit->setToolTip("Enter an IP adress or serial port");
     addressEdit->setMinimumWidth(160);
+    addressEdit->setFixedHeight(controlHeight);
     addressEdit->setAlignment(Qt::AlignHCenter);
 
     serialPortCombo = new QComboBox;
+    serialPortCombo->setObjectName("connAddrCombo");
     serialPortCombo->setItemDelegate(new QStyledItemDelegate);
     serialPortCombo->setMinimumWidth(160);
+    serialPortCombo->setFixedHeight(controlHeight);
     // Populate with available serial ports
     QList<QSerialPortInfo> spinfo = QSerialPortInfo::availablePorts();
     QStringList portNames;
@@ -487,16 +495,27 @@ void ConnectionWidget::setupUI_fromConnection()
     serialPortCombo->setVisible(false);
     serialPortCombo->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
 
+    portLabel = new QLabel("Port");
+    portLabel->setObjectName("connPortLabel");
+    portLabel->setFixedWidth(50);
+    portLabel->setFixedHeight(controlHeight);
+    portLabel->setAlignment(Qt::AlignVCenter | Qt::AlignCenter);
+
     portEdit = new QLineEdit(QString("%1").arg(connectionUnit->getPort_Baud()));
+    portEdit->setObjectName("connPortEdit");
     portEdit->setToolTip("Enter an IP port or baud rate");
     portEdit->setFixedWidth(80);
+    portEdit->setFixedHeight(controlHeight);
     portEdit->setAlignment(Qt::AlignHCenter);
 
     // Status
     statusBar = new QLabel("Click the Connect button");
     statusBar->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    statusBar->setFixedHeight(controlHeight);
+
     dataIcon = new QPushButton("IO");
     dataIcon->setFixedWidth(32);
+    dataIcon->setFixedHeight(controlHeight);
     dataIconShade = 255;
     iconTimer = new QTimer;
     iconTimer->setInterval(50);
@@ -505,19 +524,30 @@ void ConnectionWidget::setupUI_fromConnection()
     // Layout
     topLayout = new QHBoxLayout;
     topLayout->addWidget(connectButton);
-    topLayout->addWidget(nameLabel);
-    topLayout->addWidget(nameEdit);
+//    topLayout->addWidget(nameLabel);
+//    topLayout->addWidget(nameEdit);
+    nameLayout = new QHBoxLayout;
+    nameLayout->addWidget(nameLabel);
+    nameLayout->addWidget(nameEdit);
+    nameLayout->setSpacing(0);
+    topLayout->addLayout(nameLayout);
     topLayout->addWidget(viewButton);
     topLayout->addWidget(removeButton);
     topLayout->setMargin(2);
 
     controlLayout = new QHBoxLayout;
     controlLayout->addWidget(typeButton);
-    controlLayout->addWidget(addressLabel);
-    controlLayout->addWidget(addressEdit);
-    controlLayout->addWidget(serialPortCombo);
-    controlLayout->addWidget(portLabel);
-    controlLayout->addWidget(portEdit);
+    addressLayout = new QHBoxLayout;
+    addressLayout->addWidget(addressLabel);
+    addressLayout->addWidget(addressEdit);
+    addressLayout->addWidget(serialPortCombo);
+    addressLayout->setSpacing(0);
+    controlLayout->addLayout(addressLayout);
+    portLayout = new QHBoxLayout;
+    portLayout->addWidget(portLabel);
+    portLayout->addWidget(portEdit);
+    portLayout->setSpacing(0);
+    controlLayout->addLayout(portLayout);
 
     bottomLayout = new QHBoxLayout;
     bottomLayout->addWidget(statusBar);
@@ -541,6 +571,11 @@ void ConnectionWidget::setupUI_fromConnection()
     connect(iconTimer,SIGNAL(timeout()),this,SLOT(animateDataIcon()));
     connect(removeButton,SIGNAL(clicked()),this,SLOT(remove()));
     connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameEditChanged(QString)));
+    connect(typeButton,SIGNAL(clicked()),this,SLOT(toggleType()));
+    connect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged(QString)));
+    connect(serialPortCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(addressChanged(QString)));
+    connect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
+    connect(connectButton,SIGNAL(clicked()),this,SLOT(toggleConnection()));
 }
 
 
@@ -551,15 +586,19 @@ void ConnectionWidget::setupUI()
     connectButton = new QPushButton("Connect");
     connectButton->setToolTip("Open connection");
     connectButton->setFixedWidth(96);
+    connectButton->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Maximum);
+    connectButton->setFixedHeight(100);
 
     nameLabel = new QLabel("Name:");
     nameLabel->setFixedWidth(78);
-    nameLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    nameLabel->setFixedHeight(36);
+//    nameLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     nameLabel->setAlignment(Qt::AlignRight);
 
     nameEdit = new QLineEdit("Connection 1");
     nameEdit->setToolTip("Enter a connection name");
     nameEdit->setMinimumWidth(92);
+    nameEdit->setFixedHeight(40);
     nameEdit->setAlignment(Qt::AlignCenter);
 
     viewButton = new QPushButton("Less");
@@ -609,7 +648,7 @@ void ConnectionWidget::setupUI()
 
     // Status
     statusBar = new QLabel("Click the Connect button");
-    statusBar->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+//    statusBar->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     dataIcon = new QPushButton("IO");
     dataIcon->setFixedWidth(32);
     dataIconShade = 255;
@@ -656,4 +695,9 @@ void ConnectionWidget::setupUI()
     connect(iconTimer,SIGNAL(timeout()),this,SLOT(animateDataIcon()));
     connect(removeButton,SIGNAL(clicked()),this,SLOT(remove()));
     connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameEditChanged(QString)));
+    connect(typeButton,SIGNAL(clicked()),this,SLOT(toggleType()));
+    connect(addressEdit,SIGNAL(textChanged(QString)),this,SLOT(addressChanged(QString)));
+    connect(serialPortCombo,SIGNAL(currentIndexChanged(QString)),this,SLOT(addressChanged(QString)));
+    connect(portEdit,SIGNAL(textChanged(QString)),this,SLOT(portChanged(QString)));
+    connect(connectButton,SIGNAL(clicked()),this,SLOT(toggleConnection()));
 }

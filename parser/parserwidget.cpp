@@ -9,38 +9,24 @@ ParserWidget::ParserWidget(QWidget *parent) :
     expanded=true;
 
     nameEdit = new QLineEdit("Parser 1");
-//    nameEdit->setFixedHeight(24);
+
     statusBar = new QLabel("Ready");
-//    statusBar->setFixedHeight(24);
 
     addByteButton = new QPushButton("Add bytes");
-//    addByteButton->setFixedHeight(24);
-//    addByteButton->setFixedWidth(100);
-
     addNumberButton = new QPushButton("Add number");
-//    addNumberButton->setFixedHeight(24);
-//    addNumberButton->setFixedWidth(100);
-
     addVectorButton = new QPushButton("Add vector");
-//    addVectorButton->setFixedHeight(24);
-//    addVectorButton->setFixedWidth(100);
 
     expandButton = new QPushButton("Less");
     expandButton->setFixedWidth(50);
-//    expandButton->setFixedSize(40,24);
 
     deleteButton = new QPushButton("Delete");
     deleteButton->setFixedWidth(80);
-    //    deleteButton->setFixedSize(60,24);
 
     vwList = new QList<VariableWidget*>;
     lw = new LiveListWidget(this);
 
     controlLayout = new QHBoxLayout;
     controlLayout->addWidget(nameEdit);
-//    controlLayout->addWidget(addByteButton);
-//    controlLayout->addWidget(addNumberButton);
-//    controlLayout->addWidget(addVectorButton);
     controlLayout->addWidget(expandButton);
     controlLayout->addWidget(deleteButton);
 

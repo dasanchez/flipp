@@ -96,6 +96,9 @@ private:
 
     // Layout
     QHBoxLayout *topLayout;
+    QHBoxLayout *nameLayout;
+    QHBoxLayout *addressLayout;
+    QHBoxLayout *portLayout;
     QHBoxLayout *bottomLayout;
     QHBoxLayout *controlLayout;
     QVBoxLayout *mainLayout;

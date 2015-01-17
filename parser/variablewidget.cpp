@@ -566,9 +566,9 @@ QString VariableWidget::hex2char(QString hexChars)
 
 void VariableWidget::setupUI()
 {
-    byteIconPixmap = QPixmap(":/images/byte_icon.png");
-    numberIconPixmap = QPixmap(":/images/number_icon.png");
-    vectorIconPixmap = QPixmap(":/images/vector_icon.png");
+//    byteIconPixmap = QPixmap(":/images/byte_icon.png");
+//    numberIconPixmap = QPixmap(":/images/number_icon.png");
+//    vectorIconPixmap = QPixmap(":/images/vector_icon.png");
     varlenIconPixmap = QPixmap(":/images/varlen_icon.png");
     fixlenIconPixmap = QPixmap(":/images/fixlen_icon.png");
     matchoffIconPixmap = QPixmap(":/images/matchoff_icon.png");
@@ -583,9 +583,9 @@ void VariableWidget::setupUI()
     deleteIconPixmap = QPixmap(":/images/delete_icon.png");
     cycleIconPixmap = cycleIconPixmap.scaled(20,20,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
 
-    QIcon typeIcon=byteIconPixmap;
+//    QIcon typeIcon=byteIconPixmap;
     QIcon lengthIcon=fixlenIconPixmap;
-    QIcon matchoffIcon = matchoffIconPixmap;
+//    QIcon matchoffIcon = matchoffIconPixmap;
     QIcon hexoffIcon = hexoffIconPixmap;
     QIcon addbyteIcon = addbyteIconPixmap;
     QIcon addnumberIcon = addnumberIconPixmap;
