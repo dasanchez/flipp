@@ -9,6 +9,7 @@ QTerminalEdit::QTerminalEdit(QWidget *parent) :
     setWordWrapMode(QTextOption::WrapAnywhere);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setMaximumBlockCount(100);
+
 }
 
 void QTerminalEdit::keyPressEvent(QKeyEvent *e)

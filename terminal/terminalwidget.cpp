@@ -166,6 +166,7 @@ void TerminalWidget::resizeTerminals()
 
         }
     }
+    this->update();
 }
 
 void TerminalWidget::updateConnections(QStringList connectionNames)
@@ -237,7 +238,7 @@ void TerminalWidget::setViews(int views)
     connect(hexButton,SIGNAL(toggled(bool)),this,SLOT(hexTermToggled(bool)));
     connect(asciiButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
     connect(hexButton,SIGNAL(toggled(bool)),this,SLOT(resizeTerminals()));
-
+    resizeTerminals();
 }
 
 void TerminalWidget::asciiTermToggled(bool on)
@@ -352,9 +353,10 @@ void TerminalWidget::detachConnection()
 
 void TerminalWidget::setupUI()
 {
-    quint8 controlHeight = 26;
+    quint8 controlHeight = 28;
 
     asciiTerminal = new QTerminalEdit;
+//    asciiTerminal->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
     hexTerminal = new QTerminalEdit;
     hexTerminal->setHex(true);
     hexRegex.setPattern(QString("([A-Fa-f0-9]{2}( )?)+"));
@@ -372,43 +374,54 @@ void TerminalWidget::setupUI()
     asciiButton->setCheckable(true);
     asciiButton->setChecked(true);
     asciiButton->setObjectName("asciiButton");
+    asciiButton->setFixedWidth(72);
+    asciiButton->setFixedHeight(controlHeight);
 
     hexButton = new QPushButton("HEX");
     hexButton->setToolTip("Show or hide the hex terminal");
     hexButton->setCheckable(true);
     hexButton->setChecked(false);
     hexButton->setObjectName("hexButton");
+    hexButton->setFixedWidth(72);
+    hexButton->setFixedHeight(controlHeight);
 
     echoButton = new QPushButton("Echo");
     echoButton->setToolTip("Toggle echo");
     echoButton->setFixedWidth(60);
+    echoButton->setFixedHeight(controlHeight);
     echoButton->setObjectName("echoButton");
     echoButton->setCheckable(true);
 
     pauseButton = new QPushButton("Pause");
     pauseButton->setToolTip("Pause terminal display");
     pauseButton->setFixedWidth(60);
+    pauseButton->setFixedHeight(controlHeight);
     pauseButton->setCheckable(true);
     pauseButton->setObjectName("pauseButton");
 
     clearButton = new QPushButton("Clear");
     clearButton->setToolTip("Clear terminal views");
     clearButton->setFixedWidth(60);
+    clearButton->setFixedHeight(controlHeight);
 
     removeButton = new QPushButton("Delete");
     removeButton->setToolTip("Remove terminal");
     removeButton->setFixedWidth(60);
+    removeButton->setFixedHeight(controlHeight);
 
     packetEdit = new QLineEdit;
     packetEdit->setToolTip("Enter packet to transmit");
+    packetEdit->setFixedHeight(controlHeight);
 
     hexPacketButton = new QPushButton("HEX");
     hexPacketButton->setFixedWidth(60);
+    hexPacketButton->setFixedHeight(controlHeight);
     hexPacketButton->setToolTip("Toggle hex display");
 
     sendButton = new QPushButton("Send");
     sendButton->setToolTip("Transmit packet");
     sendButton->setFixedWidth(50);
+    sendButton->setFixedHeight(controlHeight);
 
     // Layout:
     controlLayout = new QHBoxLayout;
@@ -433,6 +446,7 @@ void TerminalWidget::setupUI()
     terminalLayout = new QHBoxLayout;
     terminalLayout->addWidget(asciiTerminal);
     terminalLayout->addWidget(hexTerminal);
+//     asciiTerminal->set(this->size().width());
     hexTerminal->setVisible(false);
 
     frame = new QFrame;
@@ -443,6 +457,8 @@ void TerminalWidget::setupUI()
     mainLayout->addLayout(controlLayout);
     mainLayout->addLayout(packetLayout);
     mainLayout->addLayout(terminalLayout);
-    mainLayout->addWidget(frame);
+//    mainLayout->addWidget(frame);
     this->setLayout(mainLayout);
+//    resizeTerminals();
+
 }

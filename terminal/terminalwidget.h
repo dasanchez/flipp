@@ -50,6 +50,9 @@ public slots:
     void changeConnection(QString);
     void detachConnection(void);
     void togglePause();
+
+    void resizeTerminals(void);
+
 signals:
     void sendData(QByteArray);
     void widgetRemoved(void);
@@ -105,7 +108,7 @@ private:
 
 private slots:
     void textEntered(QString, bool);
-    void resizeTerminals(void);
+
     void sendPacket(void);
     void remove(void);
 

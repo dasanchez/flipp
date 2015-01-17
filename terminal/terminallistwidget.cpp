@@ -8,7 +8,8 @@ TerminalListWidget::TerminalListWidget(QWidget *parent) :
     font.setPointSize(font.pointSize()+4);
     widgetNameLabel->setFont(font);
     newTerminalButton = new QPushButton("New");
-    newTerminalButton->setFixedHeight(24);
+    newTerminalButton->setFont(font);
+//    newTerminalButton->setFixedHeight(24);
     newTerminalButton->setFixedWidth(100);
 
     topLayout = new QHBoxLayout;
@@ -35,7 +36,8 @@ TerminalListWidget::TerminalListWidget(QWidget *parent) :
     mainLayout->addWidget(scrollArea);
     this->setLayout(mainLayout);
 
-    setMinimumWidth(480);
+    setMinimumWidth(580);
+
     connect(newTerminalButton,SIGNAL(clicked()),this,SLOT(newTerminal()));
 }
 
@@ -57,7 +59,6 @@ void TerminalListWidget::newTerminal()
     terminalList.append(termWidget);
     connect(termWidget,SIGNAL(widgetRemoved()),this,SLOT(terminalRemoved()));
     splitter->addWidget(termWidget);
-
     connect(termWidget,SIGNAL(terminalConnectionRequest(QString)),this,SLOT(terminalConnectionRequest(QString)));
 }
 

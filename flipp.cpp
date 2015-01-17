@@ -39,6 +39,7 @@ Flipp::Flipp(QWidget *parent)
     createMenus();
 
     restoreSettings();
+//    terminals->update();
 
 
     this->setWindowTitle(tr("f l i p p"));
@@ -279,14 +280,17 @@ void Flipp::restoreSettings()
         settings.setArrayIndex(i);
         TerminalWidget *tw = new TerminalWidget;
 
-        // Set views
-
-        // Add terminal widget to terminal list
-        terminals->addTerminal(tw);
 
         // Set connections
         tw->updateConnections(connectionNames);
         tw->changeConnection(settings.value("Connection").toString());
+
+        // Set views
+        tw->resizeTerminals();
+
+        // Add terminal widget to terminal list
+        terminals->addTerminal(tw);
+
     }
 
     settings.endArray();

@@ -427,7 +427,7 @@ void ConnectionWidget::setExpanded(bool expand)
 
 void ConnectionWidget::setupUI_fromConnection()
 {
-    quint8 controlHeight = 26;
+    quint8 controlHeight = 28;
     // Control
     connectButton = new QPushButton("Connect");
     connectButton->setToolTip("Open connection");
