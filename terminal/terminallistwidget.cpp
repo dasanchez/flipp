@@ -36,7 +36,7 @@ TerminalListWidget::TerminalListWidget(QWidget *parent) :
     mainLayout->addWidget(scrollArea);
     this->setLayout(mainLayout);
 
-    setMinimumWidth(580);
+    setMinimumWidth(620);
 
     connect(newTerminalButton,SIGNAL(clicked()),this,SLOT(newTerminal()));
 }
