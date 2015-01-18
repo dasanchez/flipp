@@ -17,22 +17,13 @@ Flipp::Flipp(QWidget *parent)
 
 
     connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
-    connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
-
     connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),linkers,SLOT(updateConnections(QStringList)));
+    connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
     connect(parsers,SIGNAL(parserListChanged(QStringList)),linkers,SLOT(updateParsers(QStringList)));
     connect(linkers,SIGNAL(linkerConnectionRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerConnectionRequest(LinkerWidget*, QString)));
     connect(linkers,SIGNAL(linkerParserRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerParserRequest(LinkerWidget*, QString)));
     connect(linkers,SIGNAL(linkerListChanged(QList<LinkerWidget*>)),plotter,SLOT(updateLinkerList(QList<LinkerWidget*>)));
 
-
-    //    connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),plotters,SLOT(updateConnections(QStringList)));
-    //    connect(parsers,SIGNAL(parserListChanged(QStringList)),plotters,SLOT(updateParsers(QStringList)));
-    //    connect(plotters,SIGNAL(plotterConnectionRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterConnectionRequest(PlotterWidget*,QString)));
-    //    connect(plotters,SIGNAL(plotterParserRequest(PlotterWidget*,QString)),this,SLOT(handlePlotterParserRequest(PlotterWidget*,QString)));
-
-    //    plotters->newPlotter();
-    //    setCentralWidget(plotters);
     setCentralWidget(plotter);
 
     createDocks();
@@ -41,14 +32,16 @@ Flipp::Flipp(QWidget *parent)
     restoreSettings();
 //    terminals->update();
 
-
     this->setWindowTitle(tr("f l i p p"));
-
 
     QFile qss("../flipp/styles/flipp.css");
     qss.open(QFile::ReadOnly);
     setStyleSheet(qss.readAll());
     qss.close();
+
+//    this->show();
+
+//QApplication::processEvents();
 
     //    emit exit(0);
 }
@@ -280,17 +273,14 @@ void Flipp::restoreSettings()
         settings.setArrayIndex(i);
         TerminalWidget *tw = new TerminalWidget;
 
+        // Add terminal widget to terminal list
+        terminals->addTerminal(tw);
 
         // Set connections
         tw->updateConnections(connectionNames);
         tw->changeConnection(settings.value("Connection").toString());
 
         // Set views
-        tw->resizeTerminals();
-
-        // Add terminal widget to terminal list
-        terminals->addTerminal(tw);
-
     }
 
     settings.endArray();
@@ -304,7 +294,7 @@ void Flipp::restoreSettings()
         ParserWidget *pw = new ParserWidget;
         pw->setName(settings.value("Name").toString());
         parserNames.append(pw->getName());
-        //        settings.beginGroup(parserName);
+
         int varSize = settings.beginReadArray("Complex");
         for(int j=0;j<varSize;j++)
         {

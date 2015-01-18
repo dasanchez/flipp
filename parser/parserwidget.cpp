@@ -5,22 +5,31 @@
 ParserWidget::ParserWidget(QWidget *parent) :
     QWidget(parent)
 {
+    quint8 controlHeight = 28;
+
     // Assets
     expanded=true;
 
     nameEdit = new QLineEdit("Parser 1");
+    nameEdit->setFixedHeight(controlHeight);
 
     statusBar = new QLabel("Ready");
+    statusBar->setFixedHeight(controlHeight);
 
     addByteButton = new QPushButton("Add bytes");
+    addByteButton->setFixedHeight(controlHeight);
     addNumberButton = new QPushButton("Add number");
+    addNumberButton->setFixedHeight(controlHeight);
     addVectorButton = new QPushButton("Add vector");
+    addVectorButton->setFixedHeight(controlHeight);
 
     expandButton = new QPushButton("Less");
     expandButton->setFixedWidth(50);
+    expandButton->setFixedHeight(controlHeight);
 
     deleteButton = new QPushButton("Delete");
     deleteButton->setFixedWidth(80);
+    deleteButton->setFixedHeight(controlHeight);
 
     vwList = new QList<VariableWidget*>;
     lw = new LiveListWidget(this);

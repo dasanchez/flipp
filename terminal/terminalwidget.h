@@ -58,7 +58,7 @@ signals:
     void widgetRemoved(void);
     void terminalConnectionRequest(QString);
 private:
-    void resizeEvent(QResizeEvent *);
+
     void setupUI();
     QTerminalEdit *asciiTerminal;
     QTerminalEdit *hexTerminal;
@@ -105,7 +105,7 @@ private:
     void updateEchoButton();
     void updatePauseButton();
     void updatePacketButton();
-
+    void resizeEvent(QResizeEvent *);
 private slots:
     void textEntered(QString, bool);
 

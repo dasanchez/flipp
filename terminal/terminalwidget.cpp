@@ -356,7 +356,6 @@ void TerminalWidget::setupUI()
     quint8 controlHeight = 28;
 
     asciiTerminal = new QTerminalEdit;
-//    asciiTerminal->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
     hexTerminal = new QTerminalEdit;
     hexTerminal->setHex(true);
     hexRegex.setPattern(QString("([A-Fa-f0-9]{2}( )?)+"));
@@ -446,8 +445,8 @@ void TerminalWidget::setupUI()
     terminalLayout = new QHBoxLayout;
     terminalLayout->addWidget(asciiTerminal);
     terminalLayout->addWidget(hexTerminal);
-//     asciiTerminal->set(this->size().width());
     hexTerminal->setVisible(false);
+     asciiTerminal->setFixedWidth(this->size().width()-20);
 
     frame = new QFrame;
     frame->setFrameStyle(QFrame::HLine | QFrame::Raised);
@@ -457,8 +456,6 @@ void TerminalWidget::setupUI()
     mainLayout->addLayout(controlLayout);
     mainLayout->addLayout(packetLayout);
     mainLayout->addLayout(terminalLayout);
-//    mainLayout->addWidget(frame);
     this->setLayout(mainLayout);
-//    resizeTerminals();
 
 }

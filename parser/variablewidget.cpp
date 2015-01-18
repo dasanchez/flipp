@@ -566,6 +566,7 @@ QString VariableWidget::hex2char(QString hexChars)
 
 void VariableWidget::setupUI()
 {
+    quint8 controlHeight = 28;
 //    byteIconPixmap = QPixmap(":/images/byte_icon.png");
 //    numberIconPixmap = QPixmap(":/images/number_icon.png");
 //    vectorIconPixmap = QPixmap(":/images/vector_icon.png");
@@ -598,50 +599,52 @@ void VariableWidget::setupUI()
     nameEdit = new QLineEdit("variable");
     nameEdit->setToolTip("Enter the variable name");
     nameEdit->setMinimumWidth(40);
+    nameEdit->setFixedHeight(controlHeight);
     nameEdit->setFrame(false);
     nameEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
 
     typeButton = new QPushButton("BYTES");
     typeButton->setToolTip("Toggle between byte, number, and vector type");
     typeButton->setFixedWidth(90);
-//    typeButton->setFixedHeight(24);
+    typeButton->setFixedHeight(controlHeight);
 
     // Single variable
     lengthButton= new QPushButton;
     lengthButton->setToolTip("Toggle fixed length on or off");
     lengthButton->setIcon(lengthIcon);
     lengthButton->setFixedWidth(24);
-//    lengthButton->setFixedHeight(24);
+    lengthButton->setFixedHeight(controlHeight);
 
     lengthSpin = new QSpinBox;
     lengthSpin->setToolTip("Enter a fixed length");
     lengthSpin->setValue(1);
     lengthSpin->setMinimum(1);
     lengthSpin->setFixedWidth(40);
-//    lengthSpin->setFixedHeight(24);
+    lengthSpin->setFixedHeight(controlHeight);
+
     matchButton = new QPushButton("Match");
     matchButton->setToolTip("Toggle match on or off");
     matchButton->setFixedWidth(48);
-//    matchButton->setFixedHeight(24);
+    matchButton->setFixedHeight(controlHeight);
     matchButton->setCheckable(true);
     matchButton->setChecked(false);
     matchButton->setObjectName("matchButton");
 
     matchEdit = new QLineEdit;
     matchEdit->setToolTip("Enter the byte array to match");
-//    matchEdit->setFixedHeight(24);
+    matchEdit->setFixedHeight(controlHeight);
     matchEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
 
     hexButton = new QPushButton;
     hexButton->setToolTip("Toggle between ASCII and hexadecimal display");
     hexButton->setFixedWidth(24);
-//    hexButton->setFixedHeight(24);
+    hexButton->setFixedHeight(controlHeight);
     hexButton->setIcon(hexoffIcon);
 
     // Repeat
     repeatLabel = new QLabel;
     repeatLabel->setPixmap(cycleIconPixmap);
-    repeatLabel->setFixedSize(24,24);
+    repeatLabel->setFixedSize(24,controlHeight);
     repeatLabel->setVisible(false);
 
     repeatSpin = new QSpinBox;
@@ -650,30 +653,34 @@ void VariableWidget::setupUI()
     repeatSpin->setValue(5);
     repeatSpin->setVisible(false);
     repeatSpin->setFixedWidth(40);
-//    repeatSpin->setFixedHeight(24);
+    repeatSpin->setFixedHeight(controlHeight);
+
     addByteButton = new QPushButton;
     addByteButton->setToolTip("Add byte variable");
     addByteButton->setIcon(addbyteIcon);
     addByteButton->setFixedWidth(30);
+    addByteButton->setFixedHeight(controlHeight);
     addByteButton->setVisible(false);
 
     addNumberButton = new QPushButton;
     addNumberButton->setToolTip("Add number variable");
     addNumberButton->setIcon(addnumberIcon);
     addNumberButton->setFixedWidth(30);
+    addNumberButton->setFixedHeight(controlHeight);
     addNumberButton->setVisible(false);
 
     // Expand / Delete Buttons
     moreButton = new QPushButton;
     moreButton->setToolTip("Show or hide variable details");
     moreButton->setFixedWidth(30);
-//    moreButton->setFixedHeight(24);
+    moreButton->setFixedHeight(controlHeight);
     moreButton->setIcon(moreIcon);
     moreButton->setVisible(false);
+
     delButton = new QPushButton;
     delButton->setToolTip("Remove variable");
     delButton->setFixedWidth(30);
-//    delButton->setFixedHeight(24);
+    delButton->setFixedHeight(controlHeight);
     delButton->setIcon(deleteIcon);
 
     titleLayout = new QHBoxLayout;
@@ -696,7 +703,7 @@ void VariableWidget::setupUI()
     vectorItemList->setVisible(false);
     vectorItemList->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Maximum);
 
-//    addVectorByte();
+    //    addVectorByte();
 
     vectorListLayout = new QHBoxLayout;
     vectorListLayout->addSpacing(10);

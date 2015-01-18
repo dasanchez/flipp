@@ -200,12 +200,10 @@ void LinkerWidget::populateParserTable()
                     item2->setFlags(Qt::NoItemFlags);
                     tableWidget->setItem(i,1,item2);
                     i++;
-
                 }
             }
             else
             {
-
                 QTableWidgetItem *item = new QTableWidgetItem(var.name);
                 item->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
                 item->setFlags(Qt::NoItemFlags);
@@ -215,8 +213,6 @@ void LinkerWidget::populateParserTable()
                 item2->setTextAlignment(Qt::AlignVCenter | Qt::AlignRight);
                 item2->setFlags(Qt::NoItemFlags);
                 tableWidget->setItem(i,1,item2);
-
-
                 i++;
             }
         }

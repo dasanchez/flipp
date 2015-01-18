@@ -4,8 +4,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     QWidget(parent)
 {
     isExpanded=true;
-
-    // Connection
+    // Create connection
     connectionUnit = new ConnectionUnit;
 
     setupUI();
@@ -43,8 +42,6 @@ ConnectionWidget::ConnectionWidget(QWidget *parent, ConnectionUnit *cUnit) :
     connect(connectionUnit,SIGNAL(validChange(bool)),this,SLOT(setNameValid(bool)));
 
     emit sizeChange(this->sizeHint());
-
-
 }
 
 ConnectionWidget::~ConnectionWidget()
@@ -563,7 +560,7 @@ void ConnectionWidget::setupUI_fromConnection()
     this->setLayout(mainLayout);
     mainLayout->setSpacing(5);
     mainLayout->setMargin(5);
-    this->setFixedWidth(500);
+    this->setMinimumWidth(500);
 
 
     // UI SIGNALS
@@ -597,7 +594,7 @@ void ConnectionWidget::setupUI()
 
     nameEdit = new QLineEdit("Connection 1");
     nameEdit->setToolTip("Enter a connection name");
-    nameEdit->setMinimumWidth(92);
+//    nameEdit->setMinimumWidth(92);
     nameEdit->setFixedHeight(40);
     nameEdit->setAlignment(Qt::AlignCenter);
 
@@ -624,12 +621,12 @@ void ConnectionWidget::setupUI()
 
     addressEdit = new QLineEdit("127.0.0.1");
     addressEdit->setToolTip("Enter an IP adress or serial port");
-    addressEdit->setMinimumWidth(160);
+//    addressEdit->setMinimumWidth(160);
     addressEdit->setAlignment(Qt::AlignHCenter);
 
     serialPortCombo = new QComboBox;
     serialPortCombo->setItemDelegate(new QStyledItemDelegate);
-    serialPortCombo->setMinimumWidth(160);
+//    serialPortCombo->setMinimumWidth(160);
     // Populate with available serial ports
     QList<QSerialPortInfo> spinfo = QSerialPortInfo::availablePorts();
     QStringList portNames;
@@ -687,7 +684,7 @@ void ConnectionWidget::setupUI()
     this->setLayout(mainLayout);
     mainLayout->setSpacing(5);
     mainLayout->setMargin(5);
-    this->setFixedWidth(500);
+//    this->setFixedWidth(500);
 
 
     // UI SIGNALS

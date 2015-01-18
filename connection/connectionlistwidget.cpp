@@ -27,7 +27,7 @@ ConnectionListWidget::ConnectionListWidget(QWidget *parent, QList<ConnectionUnit
     mainLayout->addWidget(listWidget);
 
     this->setLayout(mainLayout);
-    setFixedWidth(550);
+    setMinimumWidth(550);
     connect(newConnBtn,SIGNAL(clicked()),this,SLOT(newConnection()));
     connect(listWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
     connect(listWidget,SIGNAL(itemMoved(int, int, QListWidgetItem*)),this,SLOT(resorted(int,int)));

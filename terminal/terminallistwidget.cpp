@@ -9,7 +9,6 @@ TerminalListWidget::TerminalListWidget(QWidget *parent) :
     widgetNameLabel->setFont(font);
     newTerminalButton = new QPushButton("New");
     newTerminalButton->setFont(font);
-//    newTerminalButton->setFixedHeight(24);
     newTerminalButton->setFixedWidth(100);
 
     topLayout = new QHBoxLayout;
@@ -30,13 +29,11 @@ TerminalListWidget::TerminalListWidget(QWidget *parent) :
     scrollAreaVLayout->addWidget(splitter);
     saWidgetContents->setLayout(scrollAreaVLayout);
 
-
     mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(topLayout);
     mainLayout->addWidget(scrollArea);
     this->setLayout(mainLayout);
-
-    setMinimumWidth(620);
+    setMinimumWidth(680);
 
     connect(newTerminalButton,SIGNAL(clicked()),this,SLOT(newTerminal()));
 }

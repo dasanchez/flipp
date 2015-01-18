@@ -67,7 +67,6 @@ private slots:
     void toggleExpand();
 
     // Variable data
-
     void variableListChanged();
     // Testing operation
     void printList();
