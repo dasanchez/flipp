@@ -6,13 +6,35 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     parserEngine = new ParserEngine;
     thread = new QThread;
 
-    connectionBox = new QComboBox;
-    parserBox = new QComboBox;
-    removeButton = new QPushButton("Remove");
-    removeButton->setFixedHeight(24);
+    connectionUnit = new ConnectionUnit;
 
-    parserEngine = new ParserEngine;
-    connectionWidget = new ConnectionWidget;
+    parserEngine->moveToThread(thread);
+
+    setupUI();
+
+    connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
+    connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
+    connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removeLinker()));
+    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
+    connect(thread,SIGNAL(started()),this,SLOT(threadStarted()));
+    thread->start();
+}
+
+LinkerWidget::~LinkerWidget()
+{
+
+}
+
+void LinkerWidget::setupUI()
+{
+    quint8 controlHeight = 28;
+
+    connectionBox = new QComboBox;
+    connectionBox->setFixedHeight(controlHeight);
+    parserBox = new QComboBox;
+    parserBox->setFixedHeight(controlHeight);
+    removeButton = new QPushButton("Delete");
+    removeButton->setFixedHeight(controlHeight);
 
     tableWidget = new QTableWidget(this);
     tableWidget->setColumnCount(2);
@@ -22,8 +44,6 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     tableWidget->setHorizontalHeaderLabels(tableHeaders);
     tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
     tableWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-    boxList = new QList<QCheckBox*>;
 
     QHeaderView *hv = tableWidget->horizontalHeader();
 
@@ -43,21 +63,8 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     setMinimumWidth(100);
 
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-    parserEngine->moveToThread(thread);
-
-    connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
-    connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
-    connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removeLinker()));
-    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
-    connect(thread,SIGNAL(started()),this,SLOT(threadStarted()));
-    thread->start();
 }
 
-LinkerWidget::~LinkerWidget()
-{
-
-}
 
 void LinkerWidget::threadStarted()
 {
@@ -89,29 +96,41 @@ QString LinkerWidget::getParser()
     return parserBox->currentText();
 }
 
+void LinkerWidget::setConnection(QString newConnection)
+{
+    connectionBox->setCurrentText(newConnection);
+    emit linkerConnectionRequest(newConnection);
+}
+
 void LinkerWidget::changeConnection(QString connection)
 {
+
     emit linkerConnectionRequest(connection);
 }
 
 
-void LinkerWidget::assignConnection(ConnectionWidget *connWidget)
+void LinkerWidget::assignConnection(ConnectionUnit *connUnit)
 {
-    connectionWidget=connWidget;
-    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
+    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    disconnect(connectionUnit,SIGNAL(destroyed()),this,SLOT(detachConnection()));
+    connectionUnit=connUnit;
+    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    connect(connectionUnit,SIGNAL(destroyed()),this,SLOT(detachConnection()));
+//    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    connect(connectionWidget,SIGNAL(widgetRemoved()),this,SLOT(detachConnection()));
 }
 
 void LinkerWidget::detachConnection()
 {
-    connectionWidget = new ConnectionWidget;
+    connectionUnit = new ConnectionUnit;
 }
 
 void LinkerWidget::changeParser(QString parserName)
 {
     parserEngine->setParser(false);
     disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
-    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     emit linkerParserRequest(parserName);
 }
 
@@ -129,7 +148,8 @@ void LinkerWidget::assignParser(ParserWidget *parser)
     populateParserTable();
     connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
     connect(parser,SIGNAL(deleteParser()),this,SLOT(detachParser()));
-    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     parserEngine->setParser(true);
 }
@@ -145,12 +165,14 @@ void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
         results.append(i);
     }
 
-    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     parserEngine->setVariables(newVars);
     parserEngine->clearVariables();
     populateParserTable();
-    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
 }
 
@@ -162,10 +184,12 @@ void LinkerWidget::detachParser()
     }
     else
     {
-        disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+        disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//        disconnect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
         QList<ComplexVariable> emptyList;
         parserEngine->setVariables(emptyList);
-        connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+        connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//        connect(connectionWidget,SIGNAL(dataRx(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     }
 
 }
@@ -173,12 +197,10 @@ void LinkerWidget::detachParser()
 void LinkerWidget::populateParserTable()
 {
     quint8 i=0;
-    boxList->clear();
 
     tableWidget->setRowCount(calcRowCount());
     if(parserEngine->getVariables().size()>0)
     {
-
         foreach(ComplexVariable var, parserEngine->getVariables())
         {
             if(var.type==VECTYPE)
@@ -215,6 +237,7 @@ void LinkerWidget::populateParserTable()
                 tableWidget->setItem(i,1,item2);
                 i++;
             }
+            tableWidget->setRowHeight(i,28);
         }
 
         QByteArray *check = new QByteArray;

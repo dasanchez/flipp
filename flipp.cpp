@@ -38,12 +38,6 @@ Flipp::Flipp(QWidget *parent)
     qss.open(QFile::ReadOnly);
     setStyleSheet(qss.readAll());
     qss.close();
-
-//    this->show();
-
-//QApplication::processEvents();
-
-    //    emit exit(0);
 }
 
 Flipp::~Flipp()
@@ -53,13 +47,11 @@ Flipp::~Flipp()
 
 void Flipp::handleLinkerConnectionRequest(LinkerWidget* linker, QString name)
 {
-    foreach(ConnectionWidget *connection,connectionListWidget->connectionList)
+    for(quint8 i=0;i<connections->count();i++)
     {
-        if(connection->getName()==name)
+        if(connections->at(i)->getName()==name)
         {
-
-            linker->assignConnection(connection);
-            plotter->updateLinkerList(linkers->linkerList);
+            linker->assignConnection(connections->at(i));
         }
     }
 }
@@ -164,7 +156,7 @@ void Flipp::createMenus()
 
     parserDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+E")));
     viewMenu->addAction(parserDock->toggleViewAction());
-    linkerDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+L")));
+    linkerDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+R")));
     viewMenu->addAction(linkerDock->toggleViewAction());
 }
 
@@ -373,7 +365,7 @@ void Flipp::restoreSettings()
         lw->updateConnections(connectionNames);
         lw->updateParsers(parserNames);
         linkers->addLinker(lw);
-        lw->changeConnection(settings.value("Connection").toString());
+        lw->setConnection(settings.value("Connection").toString());
         lw->changeParser(settings.value("Parser").toString());
     }
     settings.endArray();
@@ -466,7 +458,7 @@ void Flipp::saveSettings()
                     settings.setValue("Match",pw->variableList[i].vector.at(j).match);
                     if(pw->variableList[i].vector.at(j).match)
                     {
-                        qDebug() << pw->variableList[i].vector.at(j).matchBytes;
+//                        qDebug() << pw->variableList[i].vector.at(j).matchBytes;
                         settings.setValue("MBytes",pw->variableList[i].vector.at(j).matchBytes);
                     }
 

@@ -1,7 +1,6 @@
 #include "connectionunit.h"
 
-ConnectionUnit::ConnectionUnit(QWidget *parent) :
-    QWidget(parent)
+ConnectionUnit::ConnectionUnit()
 {
 
 #ifdef SERIAL_WINDOWS

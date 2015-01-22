@@ -1,7 +1,7 @@
 #ifndef CONNECTIONUNIT_H
 #define CONNECTIONUNIT_H
 
-#include <QWidget>
+#include <QObject>
 #include <QTcpSocket>
 #include <QUdpSocket>
 #include <QByteArray>
@@ -25,11 +25,11 @@ struct connectionInfo
     bool valid;
 };
 
-class ConnectionUnit : public QWidget
+class ConnectionUnit : public QObject
 {
     Q_OBJECT
 public:
-    ConnectionUnit(QWidget *parent = 0);
+    ConnectionUnit();
     QString getName();
     connectionType getType();
     QString getAddress_Port();

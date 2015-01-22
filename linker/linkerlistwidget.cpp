@@ -10,8 +10,9 @@ LinkerListWidget::LinkerListWidget(QWidget *parent) :
     widgetNameLabel->setFont(font);
 
     newLinkerButton = new QPushButton("New");
-    newLinkerButton->setFixedHeight(24);
-    newLinkerButton->setFixedWidth(100);
+    newLinkerButton->setFont(font);
+//    newLinkerButton->setFixedHeight(24);
+    newLinkerButton->setFixedWidth(90);
 
     splitter = new QSplitter(this);
     splitter->setOrientation(Qt::Vertical);

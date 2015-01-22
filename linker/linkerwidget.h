@@ -12,7 +12,8 @@
 #include <QTableWidget>
 #include "../parser/parserwidget.h"
 #include "../parser/parserengine.h"
-#include "../connection/connectionwidget.h"
+#include "../connection/connectionunit.h"
+#include "../linker/parsingunit.h"
 #include <QThread>
 
 class ParsedVariable{
@@ -21,8 +22,6 @@ public:
     double value;
     QByteArray content;
 };
-
-//typedef QList<RepeatedVector> VariableList;
 
 class LinkerWidget : public QWidget
 {
@@ -47,7 +46,8 @@ public slots:
 
     void updateConnections(QStringList);
     void updateParsers(QStringList);
-    void assignConnection(ConnectionWidget *);
+    void setConnection(QString);
+    void assignConnection(ConnectionUnit *);
     void changeConnection(QString);
     void detachConnection(void);
     void assignParser(ParserWidget *);
@@ -67,12 +67,14 @@ private:
     QComboBox *parserBox;
     QPushButton *removeButton;
     QTableWidget *tableWidget;
-    QList<QCheckBox*> *boxList;
+//    QList<QCheckBox*> *boxList;
 
     ParserEngine *parserEngine;
     QThread *thread;
-    ConnectionWidget *connectionWidget;
+//    ConnectionWidget *connectionWidget;
+    ConnectionUnit *connectionUnit;
     quint8 calcRowCount();
+    void setupUI();
 };
 
 #endif // LINKERWIDGET_H

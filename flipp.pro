@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     plotter/plotterlistwidget.cpp \
     linker/linkerwidget.cpp \
     linker/linkerlistwidget.cpp \
-    connection/connectionunit.cpp
+    connection/connectionunit.cpp \
+    parsingunit.cpp \
+    linker/parsingunit.cpp
 
 HEADERS  += flipp.h \
     livelistwidget/livelistwidget.h \
@@ -49,7 +51,9 @@ HEADERS  += flipp.h \
     plotter/plotterlistwidget.h \
     linker/linkerwidget.h \
     linker/linkerlistwidget.h \
-    connection/connectionunit.h
+    connection/connectionunit.h \
+    parsingunit.h \
+    linker/parsingunit.h
 
 RESOURCES += \
     resources.qrc

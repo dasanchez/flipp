@@ -1,7 +1,6 @@
 #include "parserengine.h"
 
-ParserEngine::ParserEngine(QObject *parent) :
-    QObject(parent)
+ParserEngine::ParserEngine()
 {
     qRegisterMetaType<VariableList> ("VariableList");
     //    targetVars = QList<ComplexVariable>;

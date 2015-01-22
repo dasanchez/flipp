@@ -63,7 +63,7 @@ class ParserEngine : public QObject
 {
     Q_OBJECT
 public:
-    explicit ParserEngine(QObject *parent = 0);
+    explicit ParserEngine();
     void setVariables(QList<ComplexVariable>);
     bool isValid(QByteArray *);
 
