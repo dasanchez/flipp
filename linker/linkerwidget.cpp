@@ -7,6 +7,7 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     thread = new QThread;
 
     connectionUnit = new ConnectionUnit;
+    linkerUnit = new LinkerUnit;
 
     parserEngine->moveToThread(thread);
 

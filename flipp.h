@@ -25,12 +25,13 @@ public:
 private:
 
     QList<ConnectionUnit*> *connections;
+    QList<LinkerUnit*> *linkers;
     ConnectionListWidget *connectionListWidget;
     TerminalListWidget *terminals;
     ParserListWidget *parsers;
     PlotterWidget *plotter;
 //    PlotterListWidget *plotters;
-    LinkerListWidget *linkers;
+    LinkerListWidget *linkerListWidget;
     // Dock Widgets:
     QDockWidget *connectionDock;
     QDockWidget *parserDock;

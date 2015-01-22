@@ -4,7 +4,6 @@
 ConnectionListWidget::ConnectionListWidget(QWidget *parent, QList<ConnectionUnit*> *conns)
     : QWidget(parent)
 {
-    //    nameList = new QStringList;
     connections = conns;
     widgetNameLabel = new QLabel("Connections");
     QFont font = widgetNameLabel->font();
@@ -27,7 +26,7 @@ ConnectionListWidget::ConnectionListWidget(QWidget *parent, QList<ConnectionUnit
     mainLayout->addWidget(listWidget);
 
     this->setLayout(mainLayout);
-    setMinimumWidth(550);
+    setMinimumWidth(560);
     connect(newConnBtn,SIGNAL(clicked()),this,SLOT(newConnection()));
     connect(listWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
     connect(listWidget,SIGNAL(itemMoved(int, int, QListWidgetItem*)),this,SLOT(resorted(int,int)));

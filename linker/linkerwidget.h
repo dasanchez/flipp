@@ -10,18 +10,11 @@
 #include <QScrollArea>
 #include <QComboBox>
 #include <QTableWidget>
+#include <QThread>
 #include "../parser/parserwidget.h"
 #include "../parser/parserengine.h"
 #include "../connection/connectionunit.h"
-#include "../linker/parsingunit.h"
-#include <QThread>
-
-class ParsedVariable{
-public:
-    int type;
-    double value;
-    QByteArray content;
-};
+#include "../linker/linkerunit.h"
 
 class LinkerWidget : public QWidget
 {
@@ -74,6 +67,8 @@ private:
 //    ConnectionWidget *connectionWidget;
     ConnectionUnit *connectionUnit;
     quint8 calcRowCount();
+    LinkerUnit *linkerUnit;
+
     void setupUI();
 };
 

@@ -8,29 +8,15 @@ Flipp::Flipp(QWidget *parent)
     terminals = new TerminalListWidget(this);
     parsers = new ParserListWidget(this);
     //    plotters = new PlotterListWidget(this);
-    linkers = new LinkerListWidget(this);
+
+    linkers = new QList<LinkerUnit*>;
+    linkerListWidget = new LinkerListWidget(this);
     plotter = new PlotterWidget(this);
 
     m_sSettingsFile = QApplication::applicationDirPath() + "/lastSettings.flp";
-    //    qDebug() << m_sSettingsFile;
-    //        initSettings();
-
-
-    connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
-    connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),linkers,SLOT(updateConnections(QStringList)));
-    connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
-    connect(parsers,SIGNAL(parserListChanged(QStringList)),linkers,SLOT(updateParsers(QStringList)));
-    connect(linkers,SIGNAL(linkerConnectionRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerConnectionRequest(LinkerWidget*, QString)));
-    connect(linkers,SIGNAL(linkerParserRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerParserRequest(LinkerWidget*, QString)));
-    connect(linkers,SIGNAL(linkerListChanged(QList<LinkerWidget*>)),plotter,SLOT(updateLinkerList(QList<LinkerWidget*>)));
-
     setCentralWidget(plotter);
-
     createDocks();
     createMenus();
-
-    restoreSettings();
-//    terminals->update();
 
     this->setWindowTitle(tr("f l i p p"));
 
@@ -38,6 +24,16 @@ Flipp::Flipp(QWidget *parent)
     qss.open(QFile::ReadOnly);
     setStyleSheet(qss.readAll());
     qss.close();
+
+    connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
+    connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),linkerListWidget,SLOT(updateConnections(QStringList)));
+    connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
+    connect(parsers,SIGNAL(parserListChanged(QStringList)),linkerListWidget,SLOT(updateParsers(QStringList)));
+    connect(linkerListWidget,SIGNAL(linkerConnectionRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerConnectionRequest(LinkerWidget*, QString)));
+    connect(linkerListWidget,SIGNAL(linkerParserRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerParserRequest(LinkerWidget*, QString)));
+    connect(linkerListWidget,SIGNAL(linkerListChanged(QList<LinkerWidget*>)),plotter,SLOT(updateLinkerList(QList<LinkerWidget*>)));
+
+    restoreSettings();
 }
 
 Flipp::~Flipp()
@@ -64,7 +60,7 @@ void Flipp::handleLinkerParserRequest(LinkerWidget* linker, QString name)
         {
 
             linker->assignParser(parser);
-            plotter->updateLinkerList(linkers->linkerList);
+            plotter->updateLinkerList(linkerListWidget->linkerList);
         }
     }
 }
@@ -79,8 +75,6 @@ void Flipp::handleTerminalRequest(TerminalWidget *terminal,QString name)
         }
     }
 }
-
-
 
 void Flipp::createDocks()
 {
@@ -113,8 +107,8 @@ void Flipp::createDocks()
     addDockWidget(Qt::TopDockWidgetArea,parserDock);
 
     linkerDock = new QDockWidget(tr("Linker list"));
-    linkerDock->setObjectName("Linkers_Dock");
-    linkerDock->setWidget(linkers);
+    linkerDock->setObjectName("linkerListWidget_Dock");
+    linkerDock->setWidget(linkerListWidget);
     linkerDock->setFeatures(QDockWidget::DockWidgetClosable|
                             QDockWidget::DockWidgetMovable|
                             QDockWidget::DockWidgetFloatable);
@@ -149,7 +143,6 @@ void Flipp::createMenus()
 
     connectionDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+Q")));
     viewMenu->addAction(connectionDock->toggleViewAction());
-
 
     terminalDock->toggleViewAction()->setShortcut(QKeySequence(tr("Alt+W")));
     viewMenu->addAction(terminalDock->toggleViewAction());
@@ -194,7 +187,6 @@ void Flipp::initSettings()
     settings.endArray();
 
     // PARSERS
-
     settings.beginGroup("Parsers");
 
     // VARIABLE WIDGETS
@@ -357,16 +349,39 @@ void Flipp::restoreSettings()
     settings.endArray();
 
     // Restore linker widgets
-    int linkerCount = settings.beginReadArray("Linkers");
+    int linkerCount = settings.beginReadArray("linkerListWidget");
     for(int i=0;i<linkerCount;i++)
     {
         settings.setArrayIndex(i);
+        LinkerUnit *lUnit = new LinkerUnit;
+        // Restore connection
+        for(quint8 j=0;j<connections->count();j++)
+        {
+            if(connections->at(j)->getName()==settings.value("Connection").toString())
+            {
+                lUnit->assignConnection(connections->at(j));
+                break;
+            }
+
+        }
+        // Restore variables
+        for(quint8 j=0;j<parserCount;j++)
+        {
+            if(parsers->parserList->at(j)->getName()==settings.value("Parser").toString())
+             {
+                lUnit->assignVariables(parsers->parserList->at(j)->variableList);
+                break;
+            }
+        }
+        linkers->append(lUnit);
+
         LinkerWidget *lw = new LinkerWidget;
         lw->updateConnections(connectionNames);
         lw->updateParsers(parserNames);
-        linkers->addLinker(lw);
-        lw->setConnection(settings.value("Connection").toString());
-        lw->changeParser(settings.value("Parser").toString());
+        linkerListWidget->addLinker(lw);
+//        lw->setLinkerUnit(lUnit);
+//        lw->setConnection(settings.value("Connection").toString());
+//        lw->changeParser(settings.value("Parser").toString());
     }
     settings.endArray();
 
@@ -487,11 +502,11 @@ void Flipp::saveSettings()
     }
     settings.endArray();
 
-    // Linkers
-    settings.beginWriteArray("Linkers");
+    // linkerListWidget
+    settings.beginWriteArray("linkerListWidget");
     int linkerCount=0;
-    //    qDebug() << linkers->linkerList.size();
-    foreach(LinkerWidget *lw, linkers->linkerList)
+    //    qDebug() << linkerListWidget->linkerList.size();
+    foreach(LinkerWidget *lw, linkerListWidget->linkerList)
     {
         if(connectionListWidget->connectionList.size()>0 && parsers->parserList->size()>0)
         {
