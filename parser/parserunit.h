@@ -9,7 +9,7 @@ class ParserUnit : public QObject
     Q_OBJECT
 public:
     ParserUnit();
-    QList<ComplexVariable> *variableList;
+    QList<ComplexVariable> variableList;
     bool isValid();
     void setValid(bool);
     QString getName();

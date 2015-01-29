@@ -46,10 +46,23 @@ void ParserListWidget::newParser()
     ParserWidget *parser = new ParserWidget(this,pUnit);
 
     pUnit->setName(newParserName());
+    parsers->append(pUnit);
+
     //    parser->setName(newParserName());
     parserList->append(parser);
     splitter->addWidget(parser);
 
+    connect(parser,SIGNAL(nameChange()),this,SLOT(nameChanged()));
+    connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
+    connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
+    updateList();
+}
+
+void ParserListWidget::addParser(ParserUnit *pUnit)
+{
+    ParserWidget *parser = new ParserWidget(this,pUnit);
+    parserList->append(parser);
+    splitter->addWidget(parser);
     connect(parser,SIGNAL(nameChange()),this,SLOT(nameChanged()));
     connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
     connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));

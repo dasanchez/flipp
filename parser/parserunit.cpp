@@ -2,7 +2,7 @@
 
 ParserUnit::ParserUnit()
 {
-    variableList = new QList<ComplexVariable>;
+    variableList.clear();
 }
 
 bool ParserUnit::isValid()
@@ -27,14 +27,14 @@ void ParserUnit::setName(QString newName)
 
 void ParserUnit::addVariable(ComplexVariable newVariable)
 {
-    variableList->append(newVariable);
+    variableList.append(newVariable);
 }
 
 void ParserUnit::setVariableList(QList<ComplexVariable> newList)
 {
-    variableList->clear();
+    variableList.clear();
     for(quint8 i=0;i<newList.size();i++)
     {
-        variableList->append(newList.at(i));
+        variableList.append(newList.at(i));
     }
 }

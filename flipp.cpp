@@ -58,12 +58,12 @@ void Flipp::handleLinkerParserRequest(LinkerWidget* linker, QString name)
 {
     foreach(ParserWidget *parser,*parserListWidget->parserList)
     {
-//        if(parser->getName()==name)
-//        {
+        //        if(parser->getName()==name)
+        //        {
 
-//            linker->assignParser(parser);
-//            plotter->updateLinkerList(linkerListWidget->linkerList);
-//        }
+        //            linker->assignParser(parser);
+        //            plotter->updateLinkerList(linkerListWidget->linkerList);
+        //        }
     }
 }
 
@@ -277,20 +277,21 @@ void Flipp::restoreSettings()
     for(int i=0;i<parserCount;i++)
     {
         settings.setArrayIndex(i);
-        ParserWidget *pw = new ParserWidget;
-//        pw->setName(settings.value("Name").toString());
-//        parserNames.append(pw->getName());
+        ParserUnit *pUnit = new ParserUnit;
+        pUnit->setName(settings.value("Name").toString());
+        parserNames.append(pUnit->getName());
 
         int varSize = settings.beginReadArray("Complex");
         for(int j=0;j<varSize;j++)
         {
             settings.setArrayIndex(j);
-            VariableWidget *vw = new VariableWidget;
-            //            vw->itemList->clear();
-            vw->setName(settings.value("Name").toString());
-            vw->setType(settings.value("Type").toInt());
+            ComplexVariable cVar;
+            cVar.name = settings.value("Name").toString();
+            cVar.type = settings.value("Type").toInt();
+
             if(settings.value("Type").toInt()==VECTYPE)
             {
+                /* FIX eventually
                 vw->setRepeat(settings.value("Repeat").toInt());
                 int vecSize = settings.beginReadArray("Base");
                 for(int k=0;k<vecSize;k++)
@@ -327,26 +328,26 @@ void Flipp::restoreSettings()
                     vw->addVectorVariable(bv);
                 }
                 settings.endArray();
+            */
             }
             else
             {
-                vw->setFixed(settings.value("Fixed").toBool());
-                if(vw->fixed)
+                cVar.fixed = settings.value("Fixed").toBool();
+                if(cVar.fixed)
                 {
-                    vw->setLength(settings.value("Length").toInt());
+                    cVar.length = settings.value("Length").toInt();
                 }
-                vw->setMatched(settings.value("Match").toBool());
-                if(vw->matched)
+                cVar.match = settings.value("Match").toBool();
+                if(cVar.match)
                 {
-                    vw->setMatchBytes(settings.value("MBytes").toByteArray());
+                       cVar.matchBytes = settings.value("MBytes").toByteArray();
                 }
             }
-            pw->addVariableWidget(vw);
+            pUnit->addVariable(cVar);
         }
         settings.endArray();
-
-        //        settings.endGroup();
-        parserListWidget->addParser(pw);
+        parsers->append(pUnit);
+        parserListWidget->addParser(pUnit);
     }
     settings.endArray();
 
@@ -369,11 +370,15 @@ void Flipp::restoreSettings()
         // Restore variables
         for(quint8 j=0;j<parserCount;j++)
         {
-//            if(parserListWidget->parserList->at(j)->getName()==settings.value("Parser").toString())
-//            {
-//                lUnit->assignVariables(parserListWidget->parserList->at(j)->variableList);
-//                break;
-//            }
+            if(parsers->at(j)->getName()==settings.value("Parser").toString())
+            {
+                lUnit->assignVariables(parsers->at(j)->variableList);
+            }
+            //            if(parserListWidget->parserList->at(j)->getName()==settings.value("Parser").toString())
+            //            {
+            //                lUnit->assignVariables(parserListWidget->parserList->at(j)->variableList);
+            //                break;
+            //            }
         }
         linkers->append(lUnit);
 
@@ -446,7 +451,7 @@ void Flipp::saveSettings()
     foreach(ParserWidget *pw, *parserListWidget->parserList)
     {
         settings.setArrayIndex(parserCount);
-//        settings.setValue("Name",pw->getName());
+        //        settings.setValue("Name",pw->getName());
 
         // Save an array of variable widgets
 
