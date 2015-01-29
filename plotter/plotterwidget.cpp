@@ -1,5 +1,18 @@
 #include "plotterwidget.h"
 
+PlotterWidget::PlotterWidget(QWidget *parent, QList<LinkerUnit*> *linkerList) :
+    QWidget(parent),
+    linkers(linkerList)
+{
+//    linkers = linkerList;
+    plotTimer = new QTimer;
+    plotTimer->setInterval(10);
+    plotTimer->start();
+    setupUI();
+    //    yAxisAutoRange = false;
+    connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
+}
+
 PlotterWidget::PlotterWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -43,6 +56,10 @@ void PlotterWidget::updateVariableBox()
 {
     if(linkerList.count()>0)
     {
+//        for(quint8 i=0;i<linkerBox->size();i++)
+//        {
+//            if(linkers->at(i)-)
+//        }
         LinkerWidget *linker = linkerList.at(linkerBox->currentIndex());
         connect(linker,SIGNAL(newDataPoint()),this,SLOT(newData()));
         variableBox->clear();

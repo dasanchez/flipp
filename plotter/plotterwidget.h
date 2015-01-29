@@ -27,6 +27,7 @@ class PlotterWidget : public QWidget
     Q_OBJECT
     
 public:
+    PlotterWidget(QWidget *parent, QList<LinkerUnit*> *linkerList);
     PlotterWidget(QWidget *parent = 0);
     ~PlotterWidget();
 
@@ -44,6 +45,7 @@ private:
     QComboBox *linkerBox;
     QComboBox *variableBox;
     QList<LinkerWidget*> linkerList;
+    QList<LinkerUnit*> *linkers;
 //    QPushButton *toggleTableButton;
 //    QPushButton *removeButton;
 //    QPixmap delIconPixmap;

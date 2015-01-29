@@ -18,9 +18,14 @@ class LinkerUnit : public QObject
     Q_OBJECT
 public:
     LinkerUnit();
-      QList<ParsedVariable> results;
+    QList<ParsedVariable> results;
+    QString getConnectionName();
+    QList<ComplexVariable> getVariables();
+    QString getName();
+    void setName(QString);
 signals:
     void newDataPoint();
+    void newData(VariableList parsedData);
 public slots:
     void assignConnection(ConnectionUnit *);
     void detachConnection();
@@ -29,6 +34,7 @@ public slots:
 private:
     ConnectionUnit *connectionUnit;
     ParserEngine *parserEngine;
+    QString name;
     QThread *thread;
 
 };

@@ -5,82 +5,37 @@
 ParserWidget::ParserWidget(QWidget *parent) :
     QWidget(parent)
 {
-    quint8 controlHeight = 28;
+    parserUnit = new ParserUnit;
+    setupUI();
 
-    // Assets
-    expanded=true;
+    // Connect ParserUnit signals
+}
 
-    nameEdit = new QLineEdit("Parser 1");
-    nameEdit->setFixedHeight(controlHeight);
+ParserWidget::ParserWidget(QWidget *parent, ParserUnit *pUnit) :
+    QWidget(parent),
+    parserUnit(pUnit)
+{
+    setupUI();
 
-    statusBar = new QLabel("Ready");
-    statusBar->setFixedHeight(controlHeight);
-
-    addByteButton = new QPushButton("Add bytes");
-    addByteButton->setFixedHeight(controlHeight);
-    addNumberButton = new QPushButton("Add number");
-    addNumberButton->setFixedHeight(controlHeight);
-    addVectorButton = new QPushButton("Add vector");
-    addVectorButton->setFixedHeight(controlHeight);
-
-    expandButton = new QPushButton("Less");
-    expandButton->setFixedWidth(50);
-    expandButton->setFixedHeight(controlHeight);
-
-    deleteButton = new QPushButton("Delete");
-    deleteButton->setFixedWidth(80);
-    deleteButton->setFixedHeight(controlHeight);
-
-    vwList = new QList<VariableWidget*>;
-    lw = new LiveListWidget(this);
-
-    controlLayout = new QHBoxLayout;
-    controlLayout->addWidget(nameEdit);
-    controlLayout->addWidget(expandButton);
-    controlLayout->addWidget(deleteButton);
-
-    controlLayoutBottom = new QHBoxLayout;
-    controlLayoutBottom->addWidget(statusBar);
-
-    newItemLayout = new QHBoxLayout;
-    newItemLayout->addWidget(addByteButton);
-    newItemLayout->addWidget(addNumberButton);
-    newItemLayout->addWidget(addVectorButton);
-
-    mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(controlLayout);
-    mainLayout->addLayout(controlLayoutBottom);
-    mainLayout->addLayout(newItemLayout);
-    mainLayout->addWidget(lw);
-    setLayout(mainLayout);
-    setMinimumWidth(500);
-    setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
-
-    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
-    connect(addByteButton,SIGNAL(clicked()),this,SLOT(newVariable()));
-    connect(addNumberButton,SIGNAL(clicked()),this,SLOT(newVariable()));
-    connect(addVectorButton,SIGNAL(clicked()),this,SLOT(newVariable()));
-    connect(expandButton,SIGNAL(clicked()),this,SLOT(toggleExpand()));
-    connect(deleteButton,SIGNAL(clicked()),this,SIGNAL(deleteParser()));
-    connect(lw,SIGNAL(itemMoved(int,int,QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
-    connect(lw,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
+    // Connect ParserUnit signals
 
 }
+
 
 ParserWidget::~ParserWidget()
 {
     //    delete ui;
 }
 
-QString ParserWidget::getName()
-{
-    return nameEdit->text();
-}
+//QString ParserWidget::getName()
+//{
+//    return nameEdit->text();
+//}
 
-bool ParserWidget::hasValidName()
-{
-    return validName;
-}
+//bool ParserWidget::hasValidName()
+//{
+//    return validName;
+//}
 
 void ParserWidget::setNameValid(bool isValid)
 {
@@ -103,41 +58,39 @@ void ParserWidget::setNameValid(bool isValid)
     }
 }
 
-void ParserWidget::setName(QString newName)
-{
-    disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
-    nameEdit->setText(newName);
-    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
-}
+//void ParserWidget::setName(QString newName)
+//{
+//    disconnect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
+//    nameEdit->setText(newName);
+//    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
+//}
+
 
 void ParserWidget::toggleExpand()
 {
     expanded=!expanded;
     if(expanded)
     {
-//        mainLayout->addWidget();
         newItemLayout->addWidget(addByteButton);
         newItemLayout->addWidget(addNumberButton);
         newItemLayout->addWidget(addVectorButton);
-        mainLayout->addWidget(lw);
+        mainLayout->addWidget(liveListWidget);
         addByteButton->setVisible(true);
         addNumberButton->setVisible(true);
         addVectorButton->setVisible(true);
-        lw->setVisible(true);
+        liveListWidget->setVisible(true);
         expandButton->setText("Less");
     }
     else
     {
-//        mainLayout->removel
         newItemLayout->removeWidget(addByteButton);
         newItemLayout->removeWidget(addNumberButton);
         newItemLayout->removeWidget(addVectorButton);
-        mainLayout->removeWidget(lw);
+        mainLayout->removeWidget(liveListWidget);
         addByteButton->setVisible(false);
         addNumberButton->setVisible(false);
         addVectorButton->setVisible(false);
-        lw->setVisible(false);
-        //        expandButton->setIcon(QIcon(lessIconPixmap));
+        liveListWidget->setVisible(false);
         expandButton->setText("More");
     }
     emit update();
@@ -159,11 +112,10 @@ void ParserWidget::variableListChanged()
     emit updateVariableList(variableList);
 }
 
-
 void ParserWidget::newVariable()
 {
     QPushButton *senderButton = static_cast<QPushButton*>(QObject::sender());
-    VariableWidget *vw = new VariableWidget(lw);
+    VariableWidget *vw = new VariableWidget(liveListWidget);
     if(senderButton==addNumberButton)
     {
         vw->setNumber();
@@ -175,11 +127,11 @@ void ParserWidget::newVariable()
 
     vwList->append(vw);
     variableList.append(vw->variable);
-    QListWidgetItem *item = new QListWidgetItem(lw);
+    QListWidgetItem *item = new QListWidgetItem(liveListWidget);
 
-    lw->addItem(item);
+    liveListWidget->addItem(item);
     item->setSizeHint(vw->sizeHint());
-    lw->setItemWidget(item,vw);
+    liveListWidget->setItemWidget(item,vw);
 
     connect(vw,SIGNAL(sizeToggled(QSize)),this,SLOT(itemSize(QSize)));
     connect(vw,SIGNAL(deleteVar()),this,SLOT(remVariable()));
@@ -187,14 +139,15 @@ void ParserWidget::newVariable()
     variableListChanged();
 }
 
+
 void ParserWidget::addVariableWidget(VariableWidget *vw)
 {
     vwList->append(vw);
     variableList.append(vw->variable);
-    QListWidgetItem *item = new QListWidgetItem(lw);
-    lw->addItem(item);
+    QListWidgetItem *item = new QListWidgetItem(liveListWidget);
+    liveListWidget->addItem(item);
     item->setSizeHint(vw->sizeHint());
-    lw->setItemWidget(item,vw);
+    liveListWidget->setItemWidget(item,vw);
 
     connect(vw,SIGNAL(sizeToggled(QSize)),this,SLOT(itemSize(QSize)));
     connect(vw,SIGNAL(deleteVar()),this,SLOT(remVariable()));
@@ -206,10 +159,10 @@ void ParserWidget::remVariable()
 {
     VariableWidget *vw = static_cast<VariableWidget*>(QObject::sender());
     int row = vwList->indexOf(vw);
-    QListWidgetItem *item = lw->item(row);
+    QListWidgetItem *item = liveListWidget->item(row);
     variableList.removeAt(row);
-    lw->removeItemWidget(item);
-    lw->takeItem(row);
+    liveListWidget->removeItemWidget(item);
+    liveListWidget->takeItem(row);
     vwList->removeAt(row);
     delete vw;
     variableListChanged();
@@ -219,14 +172,12 @@ void ParserWidget::itemSize(QSize newSize)
 {
     VariableWidget *vw = static_cast<VariableWidget*>(QObject::sender());
     int row = vwList->indexOf(vw);
-    QListWidgetItem *item = lw->item(row);
+    QListWidgetItem *item = liveListWidget->item(row);
     item->setSizeHint(newSize);
 }
 
 void ParserWidget::resorted(int src,int dest,QListWidgetItem* item)
 {
-//    VariableWidget *vw = static_cast<VariableWidget*>(lw->itemWidget(item));
-
     // Resort in list:
     vwList->insert(dest, vwList->takeAt(src));
     variableList.insert(dest,variableList.takeAt(src));
@@ -243,7 +194,6 @@ void ParserWidget::itemRemoved(int row)
 
 void ParserWidget::printList()
 {
-    //    qDebug() << "variables:";
     foreach(ComplexVariable item, variableList)
     {
         QString outString = item.name;
@@ -321,7 +271,70 @@ void ParserWidget::printList()
                 outString.append("match: no");
             }
         }
-        //        qDebug() << outString;
     }
 }
 
+void ParserWidget::setupUI()
+{
+
+    quint8 controlHeight = 28;
+
+    // Assets
+    expanded=true;
+
+    nameEdit = new QLineEdit("Parser 1");
+    nameEdit->setFixedHeight(controlHeight);
+
+    statusBar = new QLabel("Ready");
+    statusBar->setFixedHeight(controlHeight);
+
+    addByteButton = new QPushButton("Add bytes");
+    addByteButton->setFixedHeight(controlHeight);
+    addNumberButton = new QPushButton("Add number");
+    addNumberButton->setFixedHeight(controlHeight);
+    addVectorButton = new QPushButton("Add vector");
+    addVectorButton->setFixedHeight(controlHeight);
+
+    expandButton = new QPushButton("Less");
+    expandButton->setFixedWidth(50);
+    expandButton->setFixedHeight(controlHeight);
+
+    deleteButton = new QPushButton("Delete");
+    deleteButton->setFixedWidth(80);
+    deleteButton->setFixedHeight(controlHeight);
+
+    vwList = new QList<VariableWidget*>;
+    liveListWidget = new LiveListWidget(this);
+
+    controlLayout = new QHBoxLayout;
+    controlLayout->addWidget(nameEdit);
+    controlLayout->addWidget(expandButton);
+    controlLayout->addWidget(deleteButton);
+
+    controlLayoutBottom = new QHBoxLayout;
+    controlLayoutBottom->addWidget(statusBar);
+
+    newItemLayout = new QHBoxLayout;
+    newItemLayout->addWidget(addByteButton);
+    newItemLayout->addWidget(addNumberButton);
+    newItemLayout->addWidget(addVectorButton);
+
+    mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(controlLayout);
+    mainLayout->addLayout(controlLayoutBottom);
+    mainLayout->addLayout(newItemLayout);
+    mainLayout->addWidget(liveListWidget);
+    setLayout(mainLayout);
+    setMinimumWidth(500);
+    setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
+    connect(addByteButton,SIGNAL(clicked()),this,SLOT(newVariable()));
+    connect(addNumberButton,SIGNAL(clicked()),this,SLOT(newVariable()));
+    connect(addVectorButton,SIGNAL(clicked()),this,SLOT(newVariable()));
+    connect(expandButton,SIGNAL(clicked()),this,SLOT(toggleExpand()));
+    connect(deleteButton,SIGNAL(clicked()),this,SIGNAL(deleteParser()));
+    connect(liveListWidget,SIGNAL(itemMoved(int,int,QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
+    connect(liveListWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
+
+}

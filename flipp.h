@@ -26,9 +26,10 @@ private:
 
     QList<ConnectionUnit*> *connections;
     QList<LinkerUnit*> *linkers;
+    QList<ParserUnit*> *parsers;
     ConnectionListWidget *connectionListWidget;
     TerminalListWidget *terminals;
-    ParserListWidget *parsers;
+    ParserListWidget *parserListWidget;
     PlotterWidget *plotter;
 //    PlotterListWidget *plotters;
     LinkerListWidget *linkerListWidget;

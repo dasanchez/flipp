@@ -49,8 +49,10 @@ public slots:
 
     void newParserVariables(QList<ComplexVariable>);
     void populateParserTable();
-    void parsedDataReady(VariableList parsedData);
-    void threadStarted();
+    void linkerDataReady();
+
+//    void parsedDataReady(VariableList parsedData);
+//    void threadStarted();
 
 private:
     QVBoxLayout *mainLayout;
@@ -62,10 +64,10 @@ private:
     QTableWidget *tableWidget;
 //    QList<QCheckBox*> *boxList;
 
-    ParserEngine *parserEngine;
-    QThread *thread;
+//    ParserEngine *parserEngine;
+//    QThread *thread;
 //    ConnectionWidget *connectionWidget;
-    ConnectionUnit *connectionUnit;
+//    ConnectionUnit *connectionUnit;
     quint8 calcRowCount();
     LinkerUnit *linkerUnit;
 

@@ -6,9 +6,14 @@ LinkerUnit::LinkerUnit()
     parserEngine = new ParserEngine;
     thread = new QThread;
     parserEngine->moveToThread(thread);
-
+    parserEngine->setParser(true);  // WATCH OUT FOR THIS FLAG DURING OPERATION
     connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     thread->start();
+}
+
+QString LinkerUnit::getConnectionName()
+{
+    return connectionUnit->getName();
 }
 
 void LinkerUnit::assignConnection(ConnectionUnit *cUnit)
@@ -16,6 +21,10 @@ void LinkerUnit::assignConnection(ConnectionUnit *cUnit)
     disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     disconnect(connectionUnit,SIGNAL(destroyed()),this,SLOT(detachConnection()));
     connectionUnit = cUnit;
+    name.clear();
+    name.append(connectionUnit->getName());
+    name.append(':');
+    //name.append(parserUnit.getName());
     connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(connectionUnit,SIGNAL(destroyed()),this,SLOT(detachConnection()));
 }
@@ -41,6 +50,11 @@ void LinkerUnit::assignVariables(QList<ComplexVariable> newVariables)
     connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
 }
 
+QList<ComplexVariable> LinkerUnit::getVariables()
+{
+    return parserEngine->getVariables();
+}
+
 void LinkerUnit::parsedDataReady(VariableList parsedData)
 {
     int complexCount=0;
@@ -48,8 +62,9 @@ void LinkerUnit::parsedDataReady(VariableList parsedData)
     {
         if(repVector.vectors.size()<2)
         {
+            results[complexCount].type = repVector.vectors.at(0).vector.at(0).varType;
             // Single variable
-            if(repVector.vectors.at(0).vector.at(0).varType==BYTTYPE)
+            if(results[complexCount].type==BYTTYPE)
             {
                 results[complexCount].content = repVector.vectors.at(0).vector.at(0).varBytes;
             }

@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     linker/linkerwidget.cpp \
     linker/linkerlistwidget.cpp \
     connection/connectionunit.cpp \
-    linker/linkerunit.cpp
+    linker/linkerunit.cpp \
+    parser/parserunit.cpp
 
 HEADERS  += flipp.h \
     livelistwidget/livelistwidget.h \
@@ -51,7 +52,8 @@ HEADERS  += flipp.h \
     linker/linkerwidget.h \
     linker/linkerlistwidget.h \
     connection/connectionunit.h \
-    linker/linkerunit.h
+    linker/linkerunit.h \
+    parser/parserunit.h
 
 RESOURCES += \
     resources.qrc

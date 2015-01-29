@@ -1,5 +1,5 @@
-#ifndef WIDGETDRAG_H
-#define WIDGETDRAG_H
+#ifndef PARSERWIDGET_H
+#define PARSERWIDGET_H
 
 #include <QWidget>
 #include "variablewidget.h"
@@ -7,6 +7,7 @@
 #include <QModelIndexList>
 #include <QListWidgetItem>
 #include "../livelistwidget/livelistwidget.h"
+#include "../parser/parserunit.h"
 
 class ParserWidget : public QWidget
 {
@@ -14,11 +15,14 @@ class ParserWidget : public QWidget
 
 public:
     explicit ParserWidget(QWidget *parent = 0);
+    ParserWidget(QWidget *parent, ParserUnit *pUnit = new ParserUnit);
     ~ParserWidget();
+    ParserUnit *parserUnit;
+
     QList<ComplexVariable> variableList;
-    QString getName();
-    bool hasValidName(void);
-    void setName(QString);
+//    QString getName();
+//    bool hasValidName(void);
+//    void setName(QString);
     QList<VariableWidget*> *vwList;
     QString parserName;
 
@@ -46,11 +50,12 @@ private:
     QPushButton *expandButton;
     QPushButton *deleteButton;
 
-    LiveListWidget *lw;
+    LiveListWidget *liveListWidget;
 
     bool validName;
     bool expanded;
 
+    void setupUI();
     // Assets
 //    QPixmap addByteIconPixmap;
 //    QPixmap addNumberIconPixmap;
@@ -72,4 +77,4 @@ private slots:
     void printList();
 };
 
-#endif // WIDGETDRAG_H
+#endif // PARSERWIDGET_H
