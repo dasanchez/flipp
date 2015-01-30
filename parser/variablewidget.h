@@ -21,55 +21,8 @@ class VariableWidget : public QWidget
 {
     Q_OBJECT
 
-private:
-    QVBoxLayout *mainLayout;
-
-    // Title
-    QLineEdit *nameEdit;
-    QPushButton *typeButton;
-    QPushButton *lengthButton;
-    QPushButton *matchButton;
-    QPushButton *moreButton;
-    QPushButton *delButton;
-    QHBoxLayout *titleLayout;
-
-    QSpinBox *lengthSpin;
-    QLineEdit *matchEdit;
-    QPushButton *hexButton;
-
-    // Vector variable
-    QLabel *repeatLabel;
-    QSpinBox *repeatSpin;
-
-    QPushButton *addByteButton;
-    QPushButton *addNumberButton;
-
-    LiveListWidget *vectorItemList;
-    QHBoxLayout *vectorListLayout;
-
-    // Assets
-//    QPixmap byteIconPixmap;
-//    QPixmap numberIconPixmap;
-//    QPixmap vectorIconPixmap;
-    QPixmap varlenIconPixmap;
-    QPixmap fixlenIconPixmap;
-    QPixmap matchoffIconPixmap;
-    QPixmap matchonIconPixmap;
-    QPixmap hexonIconPixmap;
-    QPixmap hexoffIconPixmap;
-    QPixmap cycleIconPixmap;
-    QPixmap addbyteIconPixmap;
-    QPixmap addnumberIconPixmap;
-    QPixmap moreIconPixmap;
-    QPixmap lessIconPixmap;
-    QPixmap deleteIconPixmap;
-
-    void setupUI();
-    QString char2hex(QString characters);
-    QString hex2char(QString hexChars);
-    QRegExp hexRegex;
-
 public:
+    VariableWidget(QWidget *parent, ComplexVariable cVar);
     explicit VariableWidget(QWidget *parent = 0);
     ComplexVariable variable;
 
@@ -110,8 +63,11 @@ public slots:
     void setNumber();
     void setVector();
     void toggleType();
+    void updateType();
+    void updateFixed();
     void toggleLength();
     void changeLength(int);
+    void updateMatch();
     void toggleMatch();
     void changeMatch(QString);
     void toggleHex();
@@ -126,10 +82,60 @@ public slots:
     void vectorItemRemoved();
     void addVectorByte(void);
     void addVectorVariable(BaseVariable);
-//    void addVectorByte(QString varName, bool fixed, int length, bool matched, QByteArray mbytes);
+    //    void addVectorByte(QString varName, bool fixed, int length, bool matched, QByteArray mbytes);
     void addVectorNumber(void);
-//    void addVectorNumber(QString varName, bool fixed, int length);
-//    void addVectorNumber(QString varName, bool fixed);
+    //    void addVectorNumber(QString varName, bool fixed, int length);
+    //    void addVectorNumber(QString varName, bool fixed);
+
+private:
+    QVBoxLayout *mainLayout;
+
+    // Title
+    QLineEdit *nameEdit;
+    QPushButton *typeButton;
+    QPushButton *lengthButton;
+    QPushButton *matchButton;
+    QPushButton *moreButton;
+    QPushButton *delButton;
+    QHBoxLayout *titleLayout;
+
+    QSpinBox *lengthSpin;
+    QLineEdit *matchEdit;
+    QPushButton *hexButton;
+
+    // Vector variable
+    QLabel *repeatLabel;
+    QSpinBox *repeatSpin;
+
+    QPushButton *addByteButton;
+    QPushButton *addNumberButton;
+
+    LiveListWidget *vectorItemList;
+    QHBoxLayout *vectorListLayout;
+
+    // Assets
+    //    QPixmap byteIconPixmap;
+    //    QPixmap numberIconPixmap;
+    //    QPixmap vectorIconPixmap;
+    QPixmap varlenIconPixmap;
+    QPixmap fixlenIconPixmap;
+    QPixmap matchoffIconPixmap;
+    QPixmap matchonIconPixmap;
+    QPixmap hexonIconPixmap;
+    QPixmap hexoffIconPixmap;
+    QPixmap cycleIconPixmap;
+    QPixmap addbyteIconPixmap;
+    QPixmap addnumberIconPixmap;
+    QPixmap moreIconPixmap;
+    QPixmap lessIconPixmap;
+    QPixmap deleteIconPixmap;
+
+    void setupUI();
+    void setupUI_fromVariable();
+    QString char2hex(QString characters);
+    QString hex2char(QString hexChars);
+    QRegExp hexRegex;
+
 };
 
 #endif // PARSERWIDGET_H

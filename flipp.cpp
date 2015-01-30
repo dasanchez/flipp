@@ -340,13 +340,15 @@ void Flipp::restoreSettings()
                 cVar.match = settings.value("Match").toBool();
                 if(cVar.match)
                 {
-                       cVar.matchBytes = settings.value("MBytes").toByteArray();
+                    cVar.matchBytes = settings.value("MBytes").toByteArray();
                 }
             }
             pUnit->addVariable(cVar);
         }
         settings.endArray();
         parsers->append(pUnit);
+        qDebug() << pUnit->variableList.size() << " vars in parser @ flipp";
+        parserNames.append(pUnit->getName());
         parserListWidget->addParser(pUnit);
     }
     settings.endArray();
@@ -448,61 +450,78 @@ void Flipp::saveSettings()
     // Parsers
     settings.beginWriteArray("Parsers");
     int parserCount=0;
-    foreach(ParserWidget *pw, *parserListWidget->parserList)
+
+    //    foreach(ParserWidget *pw, *parserListWidget->parserList)
+    for(quint8 i=0;i<parsers->size();i++)
     {
+        ParserUnit *pUnit = parsers->at(i);
         settings.setArrayIndex(parserCount);
         //        settings.setValue("Name",pw->getName());
 
         // Save an array of variable widgets
 
         settings.beginWriteArray("Complex");
-        for(int i=0;i<pw->variableList.size();i++)
+        for(quint8 j=0;j<pUnit->variableList.size();j++)
+            //        for(int i=0;i<pw->variableList.size();i++)
         {
-            settings.setArrayIndex(i);
-            settings.setValue("Name",pw->variableList[i].name);
-            settings.setValue("Type",pw->variableList[i].type);
-            if(pw->variableList[i].type==VECTYPE)
+            settings.setArrayIndex(j);
+            settings.setValue("Name",pUnit->variableList[j].name);
+            settings.setValue("Type",pUnit->variableList[j].type);
+
+            //            settings.setValue("Name",pw->variableList[i].name);
+            //            settings.setValue("Type",pw->variableList[i].type);
+
+            if(pUnit->variableList[j].type==VECTYPE)
+                //            if(pw->variableList[i].type==VECTYPE)
             {
-                settings.setValue("Repeat",pw->variableList[i].repeat);
-                // Save an array of base variables
-                settings.beginWriteArray("Base");
-                for(int j=0;j<pw->variableList[i].vector.size();j++)
-                {
-                    settings.setArrayIndex(j);
+                //                settings.setValue("Repeat",pw->variableList[i].repeat);
+                //                // Save an array of base variables
+                //                settings.beginWriteArray("Base");
+                //                for(int j=0;j<pw->variableList[i].vector.size();j++)
+                //                {
+                //                    settings.setArrayIndex(j);
 
-                    settings.setValue("Name",pw->variableList[i].vector.at(j).name);
-                    settings.setValue("Type",pw->variableList[i].vector.at(j).type);
-                    settings.setValue("Fixed",pw->variableList[i].vector.at(j).fixed);
-                    if(pw->variableList[i].vector.at(j).fixed)
-                    {
-                        settings.setValue("Length",pw->variableList[i].vector.at(j).length);
-                    }
-                    settings.setValue("Match",pw->variableList[i].vector.at(j).match);
-                    if(pw->variableList[i].vector.at(j).match)
-                    {
-                        //                        qDebug() << pw->variableList[i].vector.at(j).matchBytes;
-                        settings.setValue("MBytes",pw->variableList[i].vector.at(j).matchBytes);
-                    }
+                //                    settings.setValue("Name",pw->variableList[i].vector.at(j).name);
+                //                    settings.setValue("Type",pw->variableList[i].vector.at(j).type);
+                //                    settings.setValue("Fixed",pw->variableList[i].vector.at(j).fixed);
+                //                    if(pw->variableList[i].vector.at(j).fixed)
+                //                    {
+                //                        settings.setValue("Length",pw->variableList[i].vector.at(j).length);
+                //                    }
+                //                    settings.setValue("Match",pw->variableList[i].vector.at(j).match);
+                //                    if(pw->variableList[i].vector.at(j).match)
+                //                    {
+                //                        //                        qDebug() << pw->variableList[i].vector.at(j).matchBytes;
+                //                        settings.setValue("MBytes",pw->variableList[i].vector.at(j).matchBytes);
+                //                    }
 
-                }
-                settings.endArray();
+                //                }
+                //                settings.endArray();
             }
             else
             {
                 // Save an individual complex variable
-                settings.setValue("Fixed",pw->variableList[i].fixed);
-                if(pw->variableList[i].fixed)
+                settings.setValue("Fixed",pUnit->variableList[j].fixed);
+                //                settings.setValue("Fixed",pw->variableList[i].fixed);
+
+                if(pUnit->variableList[j].fixed)
+                    //                if(pw->variableList[i].fixed)
                 {
-                    settings.setValue("Length",pw->variableList[i].length);
+                    settings.setValue("Length",pUnit->variableList[j].length);
+                    //                    settings.setValue("Length",pw->variableList[i].length);
                 }
-                settings.setValue("Match",pw->variableList[i].match);
-                if(pw->variableList[i].match)
+                settings.setValue("Match",pUnit->variableList[j].match);
+                //                settings.setValue("Match",pw->variableList[i].match);
+
+                if(pUnit->variableList[j].match)
+                    //                if(pw->variableList[i].match)
                 {
-                    settings.setValue("MBytes",pw->variableList[i].matchBytes);
+                    settings.setValue("MBytes",pUnit->variableList[j].matchBytes);
+                    //                    settings.setValue("MBytes",pw->variableList[i].matchBytes);
                 }
             }
         }
-
+        qDebug() << pUnit->variableList.size() << " vars saved in parser @ flipp";
         settings.endArray();
         //        settings.endGroup();
         parserCount++;

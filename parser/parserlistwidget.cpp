@@ -60,6 +60,7 @@ void ParserListWidget::newParser()
 
 void ParserListWidget::addParser(ParserUnit *pUnit)
 {
+    qDebug() << pUnit->variableList.size() << " variables in this parser";
     ParserWidget *parser = new ParserWidget(this,pUnit);
     parserList->append(parser);
     splitter->addWidget(parser);

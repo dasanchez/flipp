@@ -15,10 +15,19 @@ ParserWidget::ParserWidget(QWidget *parent, ParserUnit *pUnit) :
     QWidget(parent),
     parserUnit(pUnit)
 {
-    setupUI();
+    setupUI_fromParser();
+
+    // Populate variable widgets
+//    qDebug() << parserUnit->variableList.size() << " variables in this parser";
+
+    foreach(ComplexVariable cVar,parserUnit->variableList)
+    {
+        // Generate variable widget
+        VariableWidget *vWidget = new VariableWidget(this,cVar);
+        addVariableWidget(vWidget);
+    }
 
     // Connect ParserUnit signals
-
 }
 
 
@@ -336,5 +345,70 @@ void ParserWidget::setupUI()
     connect(deleteButton,SIGNAL(clicked()),this,SIGNAL(deleteParser()));
     connect(liveListWidget,SIGNAL(itemMoved(int,int,QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
     connect(liveListWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
+}
+
+void ParserWidget::setupUI_fromParser()
+{
+
+    quint8 controlHeight = 28;
+
+    // Assets
+    expanded=true;
+
+    nameEdit = new QLineEdit(parserUnit->getName());
+    nameEdit->setFixedHeight(controlHeight);
+
+    statusBar = new QLabel("Ready");
+    statusBar->setFixedHeight(controlHeight);
+
+    addByteButton = new QPushButton("Add bytes");
+    addByteButton->setFixedHeight(controlHeight);
+    addNumberButton = new QPushButton("Add number");
+    addNumberButton->setFixedHeight(controlHeight);
+    addVectorButton = new QPushButton("Add vector");
+    addVectorButton->setFixedHeight(controlHeight);
+
+    expandButton = new QPushButton("Less");
+    expandButton->setFixedWidth(50);
+    expandButton->setFixedHeight(controlHeight);
+
+    deleteButton = new QPushButton("Delete");
+    deleteButton->setFixedWidth(80);
+    deleteButton->setFixedHeight(controlHeight);
+
+    vwList = new QList<VariableWidget*>;
+    liveListWidget = new LiveListWidget(this);
+
+    controlLayout = new QHBoxLayout;
+    controlLayout->addWidget(nameEdit);
+    controlLayout->addWidget(expandButton);
+    controlLayout->addWidget(deleteButton);
+
+    controlLayoutBottom = new QHBoxLayout;
+    controlLayoutBottom->addWidget(statusBar);
+
+    newItemLayout = new QHBoxLayout;
+    newItemLayout->addWidget(addByteButton);
+    newItemLayout->addWidget(addNumberButton);
+    newItemLayout->addWidget(addVectorButton);
+
+    mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(controlLayout);
+    mainLayout->addLayout(controlLayoutBottom);
+    mainLayout->addLayout(newItemLayout);
+    mainLayout->addWidget(liveListWidget);
+    setLayout(mainLayout);
+    setMinimumWidth(500);
+    setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
+    connect(addByteButton,SIGNAL(clicked()),this,SLOT(newVariable()));
+    connect(addNumberButton,SIGNAL(clicked()),this,SLOT(newVariable()));
+    connect(addVectorButton,SIGNAL(clicked()),this,SLOT(newVariable()));
+    connect(expandButton,SIGNAL(clicked()),this,SLOT(toggleExpand()));
+    connect(deleteButton,SIGNAL(clicked()),this,SIGNAL(deleteParser()));
+    connect(liveListWidget,SIGNAL(itemMoved(int,int,QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
+    connect(liveListWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
 
 }
+

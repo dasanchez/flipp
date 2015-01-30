@@ -56,6 +56,7 @@ private:
     bool expanded;
 
     void setupUI();
+    void setupUI_fromParser();
     // Assets
 //    QPixmap addByteIconPixmap;
 //    QPixmap addNumberIconPixmap;

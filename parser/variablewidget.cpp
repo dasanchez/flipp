@@ -9,7 +9,7 @@ VariableWidget::VariableWidget(QWidget *parent) :
     matched=false;
     hexed=false;
 
-//    variable = new ComplexVariable;
+    //    variable = new ComplexVariable;
     variable.name = "variable";
     variable.type = BYTTYPE;
     variable.fixed=true;
@@ -23,6 +23,31 @@ VariableWidget::VariableWidget(QWidget *parent) :
 
     hexRegex.setPattern(QString("([A-Fa-f0-9]{2}( )?)+"));
     setupUI();
+}
+
+VariableWidget::VariableWidget(QWidget *parent, ComplexVariable cVar) :
+    QWidget(parent),
+    variable(cVar)
+{
+    currentType = variable.type;
+    fixed=variable.fixed;
+    matched=variable.match;
+
+    hexed=false;
+    isExpanded = true;
+
+    itemList = new QList<VectorItemWidget*>;
+
+    hexRegex.setPattern(QString("([A-Fa-f0-9]{2}( )?)+"));
+    setupUI_fromVariable();
+
+    // Populate UI
+    nameEdit->setText(variable.name);
+    updateType();
+    updateFixed();
+    updateMatch();
+//    update
+
 }
 
 void VariableWidget::nameChanged(QString newName)
@@ -46,6 +71,65 @@ void VariableWidget::setName(QString newName)
     variable.name = newName;
     emit variableChanged();
     emit nameChange(newName);
+}
+
+void VariableWidget::updateType()
+{
+    switch(variable.type)
+    {
+    case BYTTYPE:
+        typeButton->setText("BYTES");
+        mainLayout->removeItem(vectorListLayout);
+        repeatLabel->setVisible(false);
+        repeatSpin->setVisible(false);
+        addByteButton->setVisible(false);
+        addNumberButton->setVisible(false);
+        moreButton->setVisible(false);
+        vectorItemList->setVisible(false);
+
+        lengthButton->setVisible(true);
+        lengthButton->setEnabled(true);
+        lengthSpin->setVisible(true);
+        lengthSpin->setEnabled(true);
+
+        matchButton->setVisible(true);
+        matchButton->setEnabled(true);
+        matchEdit->setVisible(true);
+        matchEdit->setEnabled(true);
+        hexButton->setVisible(true);
+        hexButton->setEnabled(true);
+        currentType=BYTTYPE;
+        emit sizeToggled(this->sizeHint());
+        break;
+    case NUMTYPE:
+        typeButton->setText("NUMBER");
+        // Widgets
+        mainLayout->removeItem(vectorListLayout);
+
+        repeatLabel->setVisible(false);
+        repeatSpin->setVisible(false);
+        addByteButton->setVisible(false);
+        addNumberButton->setVisible(false);
+        moreButton->setVisible(false);
+        vectorItemList->setVisible(false);
+
+        lengthButton->setVisible(true);
+        lengthButton->setEnabled(true);
+        lengthSpin->setVisible(true);
+        lengthButton->setEnabled(true);
+
+        matchButton->setVisible(true);
+        matchButton->setEnabled(false);
+        matchEdit->setVisible(true);
+        matchEdit->setEnabled(false);
+        hexButton->setVisible(true);
+        hexButton->setEnabled(false);
+
+        currentType=NUMTYPE;
+        emit sizeToggled(this->sizeHint());
+    default:
+        break;
+    }
 }
 
 void VariableWidget::setType(int newType)
@@ -84,6 +168,21 @@ void VariableWidget::setFixed(bool fixedOn)
     emit lengthToggle(fixed);
 }
 
+void VariableWidget::updateFixed()
+{
+    QIcon lengthIcon;
+    if(variable.fixed)
+    {
+        lengthIcon=fixlenIconPixmap;
+        lengthSpin->setValue(variable.length);
+    }
+    else
+    {
+        lengthIcon=varlenIconPixmap;
+    }
+    lengthButton->setIcon(lengthIcon);
+}
+
 void VariableWidget::setLength(int newLength)
 {
     variable.length=newLength;
@@ -93,6 +192,19 @@ void VariableWidget::setLength(int newLength)
 
     emit variableChanged();
     emit lengthChange(newLength);
+}
+
+void VariableWidget::updateMatch()
+{
+    if(variable.match)
+    {
+        matchButton->setChecked(true);
+        matchEdit->setText(variable.matchBytes);
+    }
+    else
+    {
+        matchButton->setChecked(false);
+    }
 }
 
 void VariableWidget::setMatched(bool matchOn)
@@ -567,9 +679,9 @@ QString VariableWidget::hex2char(QString hexChars)
 void VariableWidget::setupUI()
 {
     quint8 controlHeight = 28;
-//    byteIconPixmap = QPixmap(":/images/byte_icon.png");
-//    numberIconPixmap = QPixmap(":/images/number_icon.png");
-//    vectorIconPixmap = QPixmap(":/images/vector_icon.png");
+    //    byteIconPixmap = QPixmap(":/images/byte_icon.png");
+    //    numberIconPixmap = QPixmap(":/images/number_icon.png");
+    //    vectorIconPixmap = QPixmap(":/images/vector_icon.png");
     varlenIconPixmap = QPixmap(":/images/varlen_icon.png");
     fixlenIconPixmap = QPixmap(":/images/fixlen_icon.png");
     matchoffIconPixmap = QPixmap(":/images/matchoff_icon.png");
@@ -584,9 +696,9 @@ void VariableWidget::setupUI()
     deleteIconPixmap = QPixmap(":/images/delete_icon.png");
     cycleIconPixmap = cycleIconPixmap.scaled(20,20,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
 
-//    QIcon typeIcon=byteIconPixmap;
+    //    QIcon typeIcon=byteIconPixmap;
     QIcon lengthIcon=fixlenIconPixmap;
-//    QIcon matchoffIcon = matchoffIconPixmap;
+    //    QIcon matchoffIcon = matchoffIconPixmap;
     QIcon hexoffIcon = hexoffIconPixmap;
     QIcon addbyteIcon = addbyteIconPixmap;
     QIcon addnumberIcon = addnumberIconPixmap;
@@ -712,6 +824,171 @@ void VariableWidget::setupUI()
     // Main
     mainLayout = new QVBoxLayout(this);
 
+    mainLayout->addLayout(titleLayout);
+    this->setLayout(mainLayout);
+    this->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Maximum);
+
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(nameChanged(QString)));
+    connect(delButton,SIGNAL(clicked()),this,SIGNAL(deleteVar()));
+    connect(typeButton,SIGNAL(clicked()),this,SLOT(toggleType()));
+    connect(lengthButton,SIGNAL(clicked()),this,SLOT(toggleLength()));
+    connect(lengthSpin,SIGNAL(valueChanged(int)),this,SLOT(changeLength(int)));
+    connect(matchButton,SIGNAL(clicked()),this,SLOT(toggleMatch()));
+    connect(hexButton,SIGNAL(clicked()),this,SLOT(toggleHex()));
+    connect(matchEdit,SIGNAL(textChanged(QString)),this,SLOT(changeMatch(QString)));
+    connect(repeatSpin,SIGNAL(valueChanged(int)),this,SLOT(changeRepeat(int)));
+    connect(addByteButton,SIGNAL(clicked()),this,SLOT(addVectorByte()));
+    connect(addNumberButton,SIGNAL(clicked()),this,SLOT(addVectorNumber()));
+    connect(moreButton,SIGNAL(clicked()),this,SLOT(toggleExpand()));
+    connect(vectorItemList,SIGNAL(itemMoved(int,int,QListWidgetItem*)),this,SLOT(vectorItemResorted(int,int,QListWidgetItem*)));
+
+    emit sizeToggled(this->sizeHint());
+}
+
+void VariableWidget::setupUI_fromVariable()
+{
+    quint8 controlHeight = 28;
+    //    byteIconPixmap = QPixmap(":/images/byte_icon.png");
+    //    numberIconPixmap = QPixmap(":/images/number_icon.png");
+    //    vectorIconPixmap = QPixmap(":/images/vector_icon.png");
+    varlenIconPixmap = QPixmap(":/images/varlen_icon.png");
+    fixlenIconPixmap = QPixmap(":/images/fixlen_icon.png");
+    matchoffIconPixmap = QPixmap(":/images/matchoff_icon.png");
+    matchonIconPixmap = QPixmap(":/images/matchon_icon.png");
+    hexoffIconPixmap = QPixmap(":/images/hexoff_icon.png");
+    hexonIconPixmap = QPixmap(":/images/hexon_icon.png");
+    cycleIconPixmap = QPixmap(":/images/cycle_icon.png");
+    addbyteIconPixmap = QPixmap(":/images/addbyte_icon.png");
+    addnumberIconPixmap = QPixmap(":/images/addnumber_icon.png");
+    moreIconPixmap = QPixmap(":/images/more_icon.png");
+    lessIconPixmap = QPixmap(":/images/less_icon.png");
+    deleteIconPixmap = QPixmap(":/images/delete_icon.png");
+    cycleIconPixmap = cycleIconPixmap.scaled(20,20,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+
+    //    QIcon typeIcon=byteIconPixmap;
+    QIcon lengthIcon=fixlenIconPixmap;
+    //    QIcon matchoffIcon = matchoffIconPixmap;
+    QIcon hexoffIcon = hexoffIconPixmap;
+    QIcon addbyteIcon = addbyteIconPixmap;
+    QIcon addnumberIcon = addnumberIconPixmap;
+    QIcon moreIcon = moreIconPixmap;
+    QIcon deleteIcon = deleteIconPixmap;
+
+    // Title
+
+    // typeButton & lengthButton
+    nameEdit = new QLineEdit;
+    nameEdit->setToolTip("Enter the variable name");
+    nameEdit->setMinimumWidth(40);
+    nameEdit->setFixedHeight(controlHeight);
+    nameEdit->setFrame(false);
+    nameEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+
+    typeButton = new QPushButton;
+    typeButton->setToolTip("Toggle between byte, number, and vector type");
+    typeButton->setFixedWidth(90);
+    typeButton->setFixedHeight(controlHeight);
+
+    // Single variable
+    lengthButton= new QPushButton;
+    lengthButton->setToolTip("Toggle fixed length on or off");
+    lengthButton->setIcon(lengthIcon);
+    lengthButton->setFixedWidth(24);
+    lengthButton->setFixedHeight(controlHeight);
+
+    lengthSpin = new QSpinBox;
+    lengthSpin->setToolTip("Enter a fixed length");
+    lengthSpin->setMinimum(1);
+    lengthSpin->setFixedWidth(40);
+    lengthSpin->setFixedHeight(controlHeight);
+
+    matchButton = new QPushButton("Match");
+    matchButton->setToolTip("Toggle match on or off");
+    matchButton->setFixedWidth(48);
+    matchButton->setFixedHeight(controlHeight);
+    matchButton->setCheckable(true);
+    matchButton->setChecked(false);
+    matchButton->setObjectName("matchButton");
+
+    matchEdit = new QLineEdit;
+    matchEdit->setToolTip("Enter the byte array to match");
+    matchEdit->setFixedHeight(controlHeight);
+    matchEdit->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+
+    hexButton = new QPushButton;
+    hexButton->setToolTip("Toggle between ASCII and hexadecimal display");
+    hexButton->setFixedWidth(24);
+    hexButton->setFixedHeight(controlHeight);
+    hexButton->setIcon(hexoffIcon);
+
+    // Repeat
+    repeatLabel = new QLabel;
+    repeatLabel->setPixmap(cycleIconPixmap);
+    repeatLabel->setFixedSize(24,controlHeight);
+    repeatLabel->setVisible(false);
+
+    repeatSpin = new QSpinBox;
+    repeatSpin->setToolTip("Enter the number of times the vector will be received");
+    repeatSpin->setMinimum(1);
+    repeatSpin->setValue(5);
+    repeatSpin->setVisible(false);
+    repeatSpin->setFixedWidth(40);
+    repeatSpin->setFixedHeight(controlHeight);
+
+    addByteButton = new QPushButton;
+    addByteButton->setToolTip("Add byte variable");
+    addByteButton->setIcon(addbyteIcon);
+    addByteButton->setFixedWidth(30);
+    addByteButton->setFixedHeight(controlHeight);
+    addByteButton->setVisible(false);
+
+    addNumberButton = new QPushButton;
+    addNumberButton->setToolTip("Add number variable");
+    addNumberButton->setIcon(addnumberIcon);
+    addNumberButton->setFixedWidth(30);
+    addNumberButton->setFixedHeight(controlHeight);
+    addNumberButton->setVisible(false);
+
+    // Expand / Delete Buttons
+    moreButton = new QPushButton;
+    moreButton->setToolTip("Show or hide variable details");
+    moreButton->setFixedWidth(30);
+    moreButton->setFixedHeight(controlHeight);
+    moreButton->setIcon(moreIcon);
+    moreButton->setVisible(false);
+
+    delButton = new QPushButton;
+    delButton->setToolTip("Remove variable");
+    delButton->setFixedWidth(30);
+    delButton->setFixedHeight(controlHeight);
+    delButton->setIcon(deleteIcon);
+
+    titleLayout = new QHBoxLayout;
+    titleLayout->addWidget(nameEdit);
+    titleLayout->addWidget(typeButton);
+    titleLayout->addWidget(lengthButton);
+    titleLayout->addWidget(repeatLabel);
+    titleLayout->addWidget(lengthSpin);
+    titleLayout->addWidget(repeatSpin);
+    titleLayout->addWidget(addByteButton);
+    titleLayout->addWidget(addNumberButton);
+    titleLayout->addWidget(matchButton);
+    titleLayout->addWidget(matchEdit);
+    titleLayout->addWidget(hexButton);
+    titleLayout->addWidget(moreButton);
+    titleLayout->addWidget(delButton);
+    titleLayout->setMargin(0);
+
+    vectorItemList = new LiveListWidget(this);
+    vectorItemList->setVisible(false);
+    vectorItemList->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Maximum);
+
+    vectorListLayout = new QHBoxLayout;
+    vectorListLayout->addSpacing(10);
+    vectorListLayout->addWidget(vectorItemList);
+
+    // Main
+    mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(titleLayout);
     this->setLayout(mainLayout);
     this->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Maximum);
