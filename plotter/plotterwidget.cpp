@@ -63,9 +63,10 @@ void PlotterWidget::updateVariableBox()
         LinkerWidget *linker = linkerList.at(linkerBox->currentIndex());
         connect(linker,SIGNAL(newDataPoint()),this,SLOT(newData()));
         variableBox->clear();
-        foreach(ComplexVariable var,linker->variables)
+//        foreach(ComplexVariable var,linker->variables)
+        for(quint8 i=0;i<linker->variables->size();i++)
         {
-            variableBox->addItem(var.name);
+            variableBox->addItem(linker->variables->at(i)->name);
         }
     }
 }

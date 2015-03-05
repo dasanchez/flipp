@@ -3,10 +3,6 @@
 LinkerWidget::LinkerWidget(QWidget *parent) :
     QWidget(parent)
 {
-    //    parserEngine = new ParserEngine;
-    //    thread = new QThread;
-    //    connectionUnit = new ConnectionUnit;
-    //    parserEngine->moveToThread(thread);
     linkerUnit = new LinkerUnit;
 
     setupUI();
@@ -15,10 +11,6 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
     connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removeLinker()));
     connect(linkerUnit,SIGNAL(newDataPoint()),this,SLOT(linkerDataReady()));
-
-    //    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
-    //    connect(thread,SIGNAL(started()),this,SLOT(threadStarted()));
-    //    thread->start();
 }
 
 LinkerWidget::~LinkerWidget()
@@ -66,11 +58,6 @@ void LinkerWidget::setupUI()
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 }
 
-
-//void LinkerWidget::threadStarted()
-//{
-//}
-
 void LinkerWidget::updateConnections(QStringList connectionNames)
 {
     connectionBox->clear();
@@ -90,7 +77,6 @@ void LinkerWidget::updateParsers(QStringList parserNames)
 QString LinkerWidget::getConnection()
 {
     return linkerUnit->getConnectionName();
-    //    return connectionBox->currentText();
 }
 
 QString LinkerWidget::getParser()
@@ -112,36 +98,26 @@ void LinkerWidget::changeConnection(QString connection)
 void LinkerWidget::assignConnection(ConnectionUnit *connUnit)
 {
     linkerUnit->assignConnection(connUnit);
-
-    //    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    //    disconnect(connectionUnit,SIGNAL(destroyed()),this,SLOT(detachConnection()));
-    //    connectionUnit=connUnit;
-    //    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    //    connect(connectionUnit,SIGNAL(destroyed()),this,SLOT(detachConnection()));
 }
 
 void LinkerWidget::detachConnection()
 {
     linkerUnit->detachConnection();
-    //    connectionUnit = new ConnectionUnit;
 }
 
 void LinkerWidget::changeParser(QString parserName)
 {
-    emit linkerParserRequest(parserName);
-    //    parserEngine->setParser(false);
-    //    disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
-    //    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    //    emit linkerParserRequest(parserName);
+//    emit linkerParserRequest(parserName);
 }
 
 
-void LinkerWidget::assignParser(ParserWidget *parser)
-{
-    variables = parser->variableList;
+//void LinkerWidget::assignParser(ParserUnit *pUnit)
+//{
+//    linkerUnit->
+//    variables = parser->variableList;
 
-    linkerUnit->assignVariables(variables);
-    populateParserTable();
+//    linkerUnit->assignVariables(parser->parserUnit->getList());
+//    populateParserTable();
 
 
     //    variables = parser->variableList;
@@ -159,11 +135,11 @@ void LinkerWidget::assignParser(ParserWidget *parser)
     //    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     //    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
     //    parserEngine->setParser(true);
-}
+//}
 
 void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
 {    
-    variables = newVars;
+//    variables = newVars;
     linkerUnit->assignVariables(newVars);
     populateParserTable();
 
@@ -187,6 +163,8 @@ void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
 
 void LinkerWidget::detachParser()
 {
+
+
     //    if(parserBox->count()>0)
     //    {
     //        emit linkerParserRequest(parserBox->currentText());
@@ -210,6 +188,8 @@ void LinkerWidget::populateParserTable()
     {
         foreach(ComplexVariable var, linkerUnit->getVariables())
             //        foreach(ComplexVariable var, parserEngine->getVariables())
+//        variables = linkerUnit->getVariables();
+//        for(quint8 j=0;j<variables->size();j++)
         {
             if(var.type==VECTYPE)
             {
@@ -260,8 +240,10 @@ quint8 LinkerWidget::calcRowCount()
 {
     // Calculate the total number of rows to use based on the total amount of variables.
     quint8 total=0;
+//    variables = linkerUnit->getVariables();
     foreach(ComplexVariable cv, linkerUnit->getVariables())
         //    foreach(ComplexVariable cv, parserEngine->getVariables())
+//    for(quint8 j=0;j<variables->size();j++)
     {
         if(cv.type==VECTYPE)
         {

@@ -43,10 +43,11 @@ void ParserListWidget::parserRemoved()
 void ParserListWidget::newParser()
 {
     ParserUnit *pUnit = new ParserUnit;
-    ParserWidget *parser = new ParserWidget(this,pUnit);
-
     pUnit->setName(newParserName());
     parsers->append(pUnit);
+
+    ParserWidget *parser = new ParserWidget(this,pUnit);
+
 
     //    parser->setName(newParserName());
     parserList->append(parser);
@@ -60,7 +61,8 @@ void ParserListWidget::newParser()
 
 void ParserListWidget::addParser(ParserUnit *pUnit)
 {
-    qDebug() << pUnit->variableList.size() << " variables in this parser";
+//    qDebug() << pUnit->variableList.size() << " variables in this parser";
+        qDebug() << pUnit->variableList->size() << " variables in this parser";
     ParserWidget *parser = new ParserWidget(this,pUnit);
     parserList->append(parser);
     splitter->addWidget(parser);
@@ -157,12 +159,13 @@ void ParserListWidget::checkAllNames()
 
 void ParserListWidget::updateList()
 {
-    nameList.clear();
-    foreach(ParserWidget *parser,*parserList)
-    {
+    emit parserListChanged();
+//    nameList.clear();
+//    foreach(ParserWidget *parser,*parserList)
+//    {
         //        nameList.append(parser->getName());
-    }
-    emit parserListChanged(nameList);
+//    }
+//    emit parserListChanged(nameList);
 }
 
 void ParserListWidget::setupUI()

@@ -6,6 +6,7 @@ ParserWidget::ParserWidget(QWidget *parent) :
     QWidget(parent)
 {
     parserUnit = new ParserUnit;
+    variableList = parserUnit->variableList;
     setupUI();
 
     // Connect ParserUnit signals
@@ -15,17 +16,25 @@ ParserWidget::ParserWidget(QWidget *parent, ParserUnit *pUnit) :
     QWidget(parent),
     parserUnit(pUnit)
 {
+    variableList = parserUnit->variableList;
     setupUI_fromParser();
 
     // Populate variable widgets
-//    qDebug() << parserUnit->variableList.size() << " variables in this parser";
+    //    qDebug() << parserUnit->variableList.size() << " variables in this parser";
 
-    foreach(ComplexVariable cVar,parserUnit->variableList)
+    for(quint8 i=0;i<parserUnit->variableList->size();i++)
     {
         // Generate variable widget
-        VariableWidget *vWidget = new VariableWidget(this,cVar);
+        VariableWidget *vWidget = new VariableWidget(this,parserUnit->variableList->at(i));
         addVariableWidget(vWidget);
     }
+
+    //    foreach(ComplexVariable *cVar,parserUnit->variableList)
+    //    {
+    //        // Generate variable widget
+    //        VariableWidget *vWidget = new VariableWidget(this,cVar);
+    //        addVariableWidget(vWidget);
+    //    }
 
     // Connect ParserUnit signals
 }
@@ -50,7 +59,20 @@ void ParserWidget::setNameValid(bool isValid)
 {
     validName = isValid;
     QByteArray *ba = new QByteArray;
-    if(validName && listIsValid(variableList,ba))
+    QList<ComplexVariable> checkList;
+    for(quint8 i=0;i<variableList->size();i++)
+    {
+        ComplexVariable cVar;
+        cVar.name = variableList->at(i)->name;
+        cVar.type = variableList->at(i)->type;
+        cVar.fixed = variableList->at(i)->fixed;
+        cVar.length = variableList->at(i)->length;
+        cVar.match = variableList->at(i)->match;
+        cVar.matchBytes = variableList->at(i)->matchBytes;
+        checkList.append(cVar);
+    }
+
+    if(validName && listIsValid(checkList,ba))
     {
         statusBar->setText("Ready");
     }
@@ -58,11 +80,11 @@ void ParserWidget::setNameValid(bool isValid)
     {
         if(validName)
         {
-         statusBar->setText(*ba);
+            statusBar->setText(*ba);
         }
         else
         {
-        statusBar->setText("Name is not valid");
+            statusBar->setText("Name is not valid");
         }
     }
 }
@@ -108,34 +130,65 @@ void ParserWidget::toggleExpand()
 
 void ParserWidget::variableListChanged()
 {
-    for(int i=0;i<variableList.size();i++)
+    for(int i=0;i<variableList->size();i++)
     {
-        variableList[i]=vwList->at(i)->variable;
+        ComplexVariable *cVar = vwList->at(i)->variable;
+        variableList->replace(i,cVar);
     }
 
     QByteArray *validResponse = new QByteArray;
-    listIsValid(variableList, validResponse);
+    listIsValid(buildList(), validResponse);
     statusBar->setText(*validResponse);
 
     printList();
     emit updateVariableList(variableList);
 }
 
+QList<ComplexVariable> ParserWidget::buildList()
+{
+    QList<ComplexVariable> vList;
+    for(quint8 i=0;i<variableList->size();i++)
+    {
+        ComplexVariable cVar;
+        cVar.name = variableList->at(i)->name;
+        cVar.type = variableList->at(i)->type;
+        cVar.fixed = variableList->at(i)->fixed;
+        cVar.length = variableList->at(i)->length;
+        cVar.match = variableList->at(i)->match;
+        cVar.matchBytes = variableList->at(i)->matchBytes;
+        vList.append(cVar);
+    }
+    return vList;
+}
+
 void ParserWidget::newVariable()
 {
     QPushButton *senderButton = static_cast<QPushButton*>(QObject::sender());
-    VariableWidget *vw = new VariableWidget(liveListWidget);
+    ComplexVariable *cVar = new ComplexVariable;
+    cVar->name = "variable";
+    cVar->type = BYTTYPE;
+    cVar->fixed=true;
+    cVar->match=false;
+    cVar->length=1;
+    cVar->repeat=5;
+    cVar->matchBytes.clear();
+    parserUnit->addVariable(cVar);
+
+
+//    VariableWidget *vw = new VariableWidget(liveListWidget);
     if(senderButton==addNumberButton)
     {
-        vw->setNumber();
+        cVar->type = NUMTYPE;
     }
     else if(senderButton==addVectorButton)
     {
-        vw->setVector();
+        cVar->type = VECTYPE;
     }
 
+    VariableWidget *vw = new VariableWidget(this,cVar);
     vwList->append(vw);
-    variableList.append(vw->variable);
+    //    variableList.append(vw->variable);
+//    variableList->append(vw->variable);
     QListWidgetItem *item = new QListWidgetItem(liveListWidget);
 
     liveListWidget->addItem(item);
@@ -148,11 +201,11 @@ void ParserWidget::newVariable()
     variableListChanged();
 }
 
-
 void ParserWidget::addVariableWidget(VariableWidget *vw)
 {
     vwList->append(vw);
-    variableList.append(vw->variable);
+    //    variableList.append(vw->variable);
+    variableList->append(vw->variable);
     QListWidgetItem *item = new QListWidgetItem(liveListWidget);
     liveListWidget->addItem(item);
     item->setSizeHint(vw->sizeHint());
@@ -169,7 +222,8 @@ void ParserWidget::remVariable()
     VariableWidget *vw = static_cast<VariableWidget*>(QObject::sender());
     int row = vwList->indexOf(vw);
     QListWidgetItem *item = liveListWidget->item(row);
-    variableList.removeAt(row);
+    //    variableList.removeAt(row);
+    variableList->removeAt(row);
     liveListWidget->removeItemWidget(item);
     liveListWidget->takeItem(row);
     vwList->removeAt(row);
@@ -189,13 +243,15 @@ void ParserWidget::resorted(int src,int dest,QListWidgetItem* item)
 {
     // Resort in list:
     vwList->insert(dest, vwList->takeAt(src));
-    variableList.insert(dest,variableList.takeAt(src));
+    //    variableList.insert(dest,variableList.takeAt(src));
+    variableList->insert(dest,variableList->takeAt(src));
     variableListChanged();
 }
 
 void ParserWidget::itemRemoved(int row)
 {
-    variableList.removeAt(row);
+    //    variableList.removeAt(row);
+    variableList->removeAt(row);
     delete vwList->at(row);
     vwList->removeAt(row);
     variableListChanged();
@@ -203,11 +259,13 @@ void ParserWidget::itemRemoved(int row)
 
 void ParserWidget::printList()
 {
-    foreach(ComplexVariable item, variableList)
+    //    foreach(ComplexVariable item, variableList)
+    for(quint8 i=0; i<variableList->size();i++)
     {
-        QString outString = item.name;
+        QString outString = variableList->at(i)->name;
         outString.append("| type: ");
-        switch(item.type)
+        //        switch(item.type)
+        switch(variableList->at(i)->type)
         {
         case BYTTYPE:
             outString.append("byt, ");
@@ -217,9 +275,11 @@ void ParserWidget::printList()
             break;
         default:
             outString.append("vec, rep: ");
-            outString.append(QString("%1:\n").arg(item.repeat));
+            //            outString.append(QString("%1:\n").arg(item.repeat));
+            outString.append(QString("%1:\n").arg(variableList->at(i)->repeat));
             // Print vector contents
-            foreach(BaseVariable vecItem, item.vector)
+            //            foreach(BaseVariable vecItem, item.vector)
+            foreach(BaseVariable vecItem, variableList->at(i)->vector)
             {
                 outString.append("\t");
                 outString.append(vecItem.name);
@@ -258,22 +318,26 @@ void ParserWidget::printList()
 
             break;
         }
-        if(item.type!=VECTYPE)
+//        if(item.type!=VECTYPE)
+        if(variableList->at(i)->type!=VECTYPE)
         {
-            if(item.fixed)
+//            if(item.fixed)
+            if(variableList->at(i)->fixed)
             {
                 outString.append("length: fix, ");
-                outString.append(QString("len_val: %1, ").arg(item.length));
+//                outString.append(QString("len_val: %1, ").arg(item.length));
+                outString.append(QString("len_val: %1, ").arg(variableList->at(i)->length));
             }
             else
             {
                 outString.append("length: var, ");
             }
 
-            if(item.match)
+            if(variableList->at(i)->match)
             {
                 outString.append("match: yes: ");
-                outString.append(item.matchBytes.toHex());
+//                outString.append(item.matchBytes.toHex());
+                outString.append(variableList->at(i)->matchBytes.toHex());
             }
             else
             {
@@ -349,7 +413,6 @@ void ParserWidget::setupUI()
 
 void ParserWidget::setupUI_fromParser()
 {
-
     quint8 controlHeight = 28;
 
     // Assets
@@ -409,6 +472,5 @@ void ParserWidget::setupUI_fromParser()
     connect(deleteButton,SIGNAL(clicked()),this,SIGNAL(deleteParser()));
     connect(liveListWidget,SIGNAL(itemMoved(int,int,QListWidgetItem*)),this,SLOT(resorted(int,int,QListWidgetItem*)));
     connect(liveListWidget,SIGNAL(itemRemoved(int)),this,SLOT(itemRemoved(int)));
-
 }
 

@@ -19,7 +19,7 @@ public:
     ~ParserWidget();
     ParserUnit *parserUnit;
 
-    QList<ComplexVariable> variableList;
+    QList<ComplexVariable*> *variableList;
 //    QString getName();
 //    bool hasValidName(void);
 //    void setName(QString);
@@ -27,7 +27,7 @@ public:
     QString parserName;
 
 signals:
-    void updateVariableList(QList<ComplexVariable>);
+    void updateVariableList(QList<ComplexVariable*>*);
     void changeSize(QSize);
     void deleteParser(void);
     void nameChange(void);
@@ -76,6 +76,7 @@ private slots:
     void variableListChanged();
     // Testing operation
     void printList();
+    QList<ComplexVariable> buildList();
 };
 
 #endif // PARSERWIDGET_H

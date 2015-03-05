@@ -22,9 +22,9 @@ class VariableWidget : public QWidget
     Q_OBJECT
 
 public:
-    VariableWidget(QWidget *parent, ComplexVariable cVar);
+    VariableWidget(QWidget *parent, ComplexVariable *cVar);
     explicit VariableWidget(QWidget *parent = 0);
-    ComplexVariable variable;
+    ComplexVariable *variable;
 
     int currentType;
     bool matched;

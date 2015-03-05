@@ -9,16 +9,17 @@ class ParserUnit : public QObject
     Q_OBJECT
 public:
     ParserUnit();
-    QList<ComplexVariable> variableList;
+    QList<ComplexVariable*> *variableList;
     bool isValid();
     void setValid(bool);
     QString getName();
     void setName(QString);
+    QList<ComplexVariable> getList();
 signals:
 
 public slots:
-    void addVariable(ComplexVariable);
-    void setVariableList(QList<ComplexVariable>);
+    void addVariable(ComplexVariable*);
+    void setVariableList(QList<ComplexVariable*>*);
 
 private:
     bool validName;

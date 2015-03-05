@@ -20,9 +20,8 @@ public:
     QStringList nameList;
     QList<ParserUnit*> *parsers;
 signals:
-    void parserListChanged(QStringList);
+    void parserListChanged();
 public slots:
-
     void newParser();
     void addParser(ParserUnit *);
     void addParser(ParserWidget *);

@@ -27,7 +27,7 @@ public:
     ~LinkerWidget();
     QString getConnection(void);
     QString getParser(void);
-    QList<ComplexVariable> variables;
+    QList<ComplexVariable*> *variables;
     QList<ParsedVariable> results;
 
 signals:
@@ -43,7 +43,7 @@ public slots:
     void assignConnection(ConnectionUnit *);
     void changeConnection(QString);
     void detachConnection(void);
-    void assignParser(ParserWidget *);
+//    void assignParser(ParserUnit *);
     void changeParser(QString);
     void detachParser(void);
 

@@ -2,7 +2,8 @@
 
 ParserUnit::ParserUnit()
 {
-    variableList.clear();
+    variableList = new QList<ComplexVariable*>;
+//    variableList.clear();
 }
 
 bool ParserUnit::isValid()
@@ -25,16 +26,35 @@ void ParserUnit::setName(QString newName)
     parserName = newName;
 }
 
-void ParserUnit::addVariable(ComplexVariable newVariable)
+void ParserUnit::addVariable(ComplexVariable *newVariable)
 {
-    variableList.append(newVariable);
+    variableList->append(newVariable);
+//    variableList.append(newVariable);
 }
 
-void ParserUnit::setVariableList(QList<ComplexVariable> newList)
+QList<ComplexVariable> ParserUnit::getList()
 {
-    variableList.clear();
-    for(quint8 i=0;i<newList.size();i++)
+    QList<ComplexVariable> vList;
+    for(quint8 i=0;i<variableList->size();i++)
     {
-        variableList.append(newList.at(i));
+        ComplexVariable cVar;
+        cVar.name = variableList->at(i)->name;
+        cVar.type = variableList->at(i)->type;
+        cVar.fixed = variableList->at(i)->fixed;
+        cVar.length = variableList->at(i)->length;
+        cVar.match = variableList->at(i)->match;
+        cVar.matchBytes = variableList->at(i)->matchBytes;
+        vList.append(cVar);
     }
+    return vList;
+}
+
+void ParserUnit::setVariableList(QList<ComplexVariable*> *newList)
+{
+    variableList = newList;
+//    variableList.clear();
+//    for(quint8 i=0;i<newList.size();i++)
+//    {
+//        variableList.append(newList.at(i));
+//    }
 }

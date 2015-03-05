@@ -83,10 +83,8 @@ void ParserEngine::parseData(QByteArray dataIn)
                         // if the end of the buffer is reached.
                         i++;
                         if(i==dataIn.size())
-                            //                    if(i==buffer.size())
                         {
                             dataIn.clear();
-                            //                        buffer.clear();
                             if(vecIndex!=0 || varIndex!=0)
                             {
                                 packetRemains=true;
@@ -96,9 +94,7 @@ void ParserEngine::parseData(QByteArray dataIn)
                     break;
                 }
             }
-
         }
-        //    emit bufferEmpty();
     }
 }
 
@@ -311,9 +307,7 @@ void ParserEngine::resetVariables()
             masterList.append(repVec);
         }
     }
-
 }
-
 
 bool ParserEngine::verifyVariables()
 {
@@ -590,7 +584,6 @@ bool ParserEngine::verifyVariables()
     validList=true;
     return validList;
 }
-
 
 bool ParserEngine::isValid(QByteArray *checkOutput)
 {
