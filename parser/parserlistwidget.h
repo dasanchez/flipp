@@ -20,11 +20,10 @@ public:
     QStringList nameList;
     QList<ParserUnit*> *parsers;
 signals:
-    void parserListChanged();
+    void parserListChanged(QStringList);
 public slots:
     void newParser();
     void addParser(ParserUnit *);
-    void addParser(ParserWidget *);
 
     void checkAllNames(void);
     void updateList(void);
@@ -33,7 +32,6 @@ public slots:
 private slots:
     void itemRemoved(int row);
     void sizeChanged(QSize);
-//    void resorted(int,int,QListWidgetItem*);
     void parserRemoved(void);
 
 private:
@@ -50,7 +48,7 @@ private:
     void setupUI();
 
 private slots:
-    void nameChanged(void);
+    void nameChanged(QString);
 };
 
 #endif // VARIABLELISTWIDGET_H

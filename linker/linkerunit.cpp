@@ -3,6 +3,7 @@
 LinkerUnit::LinkerUnit()
 {
     connectionUnit = new ConnectionUnit;
+    parserUnit = new ParserUnit;
     parserEngine = new ParserEngine;
     thread = new QThread;
     parserEngine->moveToThread(thread);
@@ -34,6 +35,19 @@ void LinkerUnit::detachConnection()
     connectionUnit = new ConnectionUnit;
 }
 
+void LinkerUnit::assignParser(ParserUnit *pUnit)
+{
+    disconnect(parserUnit,SIGNAL(variableListChanged()),this,SLOT(assignVariables()));
+    parserUnit = pUnit;
+    assignVariables(parserUnit->getList());
+    connect(parserUnit,SIGNAL(variableListChanged()),this,SLOT(assignVariables()));
+}
+
+void LinkerUnit::assignVariables()
+{
+    assignVariables(parserUnit->getList());
+}
+
 void LinkerUnit::assignVariables(QList<ComplexVariable> newVariables)
 {
     disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
@@ -46,8 +60,10 @@ void LinkerUnit::assignVariables(QList<ComplexVariable> newVariables)
         ParsedVariable pv;
         results.append(pv);
     }
+    emit newVariableList();
     connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
+
 }
 
 QList<ComplexVariable> LinkerUnit::getVariables()

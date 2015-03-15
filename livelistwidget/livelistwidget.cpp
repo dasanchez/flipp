@@ -8,6 +8,7 @@ LiveListWidget::LiveListWidget(QWidget *parent) :
     setDragDropMode(QAbstractItemView::InternalMove);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+//    setAutoFillBackground(true);
 
 }
 

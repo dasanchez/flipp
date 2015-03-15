@@ -15,7 +15,8 @@ class ParserWidget : public QWidget
 
 public:
     explicit ParserWidget(QWidget *parent = 0);
-    ParserWidget(QWidget *parent, ParserUnit *pUnit = new ParserUnit);
+//    ParserWidget(QWidget *parent, ParserUnit *pUnit = new ParserUnit);
+        ParserWidget(QWidget *parent, ParserUnit *pUnit);
     ~ParserWidget();
     ParserUnit *parserUnit;
 
@@ -30,12 +31,13 @@ signals:
     void updateVariableList(QList<ComplexVariable*>*);
     void changeSize(QSize);
     void deleteParser(void);
-    void nameChange(void);
+    void nameChange(QString);
 public slots:
     void setNameValid(bool);
     void newVariable();
     void addVariableWidget(VariableWidget *);
     void remVariable();
+//    void variableChanged();
 private:
     QHBoxLayout *controlLayout;
     QHBoxLayout *controlLayoutBottom;
@@ -57,15 +59,10 @@ private:
 
     void setupUI();
     void setupUI_fromParser();
-    // Assets
-//    QPixmap addByteIconPixmap;
-//    QPixmap addNumberIconPixmap;
-//    QPixmap addVectorIconPixmap;
-//    QPixmap moreIconPixmap;
-//    QPixmap lessIconPixmap;
-//    QPixmap delIconPixmap;
+
 private slots:
     // Widget handling
+    void newName(QString);
 
     void resorted(int,int,QListWidgetItem*);
     void itemRemoved(int);

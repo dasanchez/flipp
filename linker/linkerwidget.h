@@ -21,14 +21,18 @@ class LinkerWidget : public QWidget
     Q_OBJECT
 public:
     explicit LinkerWidget(QWidget *parent = 0);
+    LinkerWidget(QWidget *parent, LinkerUnit *linkerUnit);
     QStringList connectionNamesList;
     QStringList parserNamesList;
+
+    LinkerUnit *linkerUnit;
 
     ~LinkerWidget();
     QString getConnection(void);
     QString getParser(void);
     QList<ComplexVariable*> *variables;
     QList<ParsedVariable> results;
+
 
 signals:
     void linkerConnectionRequest(QString);
@@ -47,7 +51,7 @@ public slots:
     void changeParser(QString);
     void detachParser(void);
 
-    void newParserVariables(QList<ComplexVariable>);
+//    void newParserVariables(QList<ComplexVariable>);
     void populateParserTable();
     void linkerDataReady();
 
@@ -69,7 +73,6 @@ private:
 //    ConnectionWidget *connectionWidget;
 //    ConnectionUnit *connectionUnit;
     quint8 calcRowCount();
-    LinkerUnit *linkerUnit;
 
     void setupUI();
 };

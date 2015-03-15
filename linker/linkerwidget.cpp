@@ -6,10 +6,22 @@ LinkerWidget::LinkerWidget(QWidget *parent) :
     linkerUnit = new LinkerUnit;
 
     setupUI();
-
     connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
     connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
     connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removeLinker()));
+    connect(linkerUnit,SIGNAL(newVariableList()),this,SLOT(populateParserTable()));
+    connect(linkerUnit,SIGNAL(newDataPoint()),this,SLOT(linkerDataReady()));
+}
+
+LinkerWidget::LinkerWidget(QWidget *parent, LinkerUnit *lUnit) :
+    QWidget(parent),
+    linkerUnit(lUnit)
+{
+    setupUI();
+    connect(connectionBox,SIGNAL(activated(QString)),this,SLOT(changeConnection(QString)));
+    connect(parserBox,SIGNAL(activated(QString)),this,SLOT(changeParser(QString)));
+    connect(removeButton,SIGNAL(clicked()),this,SIGNAL(removeLinker()));
+    connect(linkerUnit,SIGNAL(newVariableList()),this,SLOT(populateParserTable()));
     connect(linkerUnit,SIGNAL(newDataPoint()),this,SLOT(linkerDataReady()));
 }
 
@@ -107,7 +119,7 @@ void LinkerWidget::detachConnection()
 
 void LinkerWidget::changeParser(QString parserName)
 {
-//    emit linkerParserRequest(parserName);
+        emit linkerParserRequest(parserName);
 }
 
 
@@ -120,46 +132,47 @@ void LinkerWidget::changeParser(QString parserName)
 //    populateParserTable();
 
 
-    //    variables = parser->variableList;
-    //    results.clear();
-    //    foreach(ComplexVariable cv,variables)
-    //    {
-    //        ParsedVariable i;
-    //        i.type=cv.type;
-    //        results.append(i);
-    //    }
-    //    parserEngine->setVariables(parser->variableList);
-    //    populateParserTable();
-    //    connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
-    //    connect(parser,SIGNAL(deleteParser()),this,SLOT(detachParser()));
-    //    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    //    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
-    //    parserEngine->setParser(true);
+//    variables = parser->variableList;
+//    results.clear();
+//    foreach(ComplexVariable cv,variables)
+//    {
+//        ParsedVariable i;
+//        i.type=cv.type;
+//        results.append(i);
+//    }
+//    parserEngine->setVariables(parser->variableList);
+//    populateParserTable();
+//    connect(parser,SIGNAL(updateVariableList(QList<ComplexVariable>)),this,SLOT(newParserVariables(QList<ComplexVariable>)));
+//    connect(parser,SIGNAL(deleteParser()),this,SLOT(detachParser()));
+//    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
+//    parserEngine->setParser(true);
 //}
 
-void LinkerWidget::newParserVariables(QList<ComplexVariable> newVars)
-{    
+//void LinkerWidget::newParserVariables()
+//{
+//        populateParserTable();
 //    variables = newVars;
-    linkerUnit->assignVariables(newVars);
-    populateParserTable();
+//    linkerUnit->assignVariables(newVars);
 
-    //    variables = newVars;
-    //    results.clear();
-    //    foreach(ComplexVariable cv,newVars)
-    //    {
-    //        ParsedVariable i;
-    //        i.type=cv.type;
-    //        results.append(i);
-    //    }
 
-    //    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    //    disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
-    //    parserEngine->setVariables(newVars);
-    //    parserEngine->clearVariables();
-    //    populateParserTable();
-    //    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
-    //    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
-}
+//    variables = newVars;
+//    results.clear();
+//    foreach(ComplexVariable cv,newVars)
+//    {
+//        ParsedVariable i;
+//        i.type=cv.type;
+//        results.append(i);
+//    }
+
+//    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    disconnect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
+//    parserEngine->setVariables(newVars);
+//    parserEngine->clearVariables();
+//    populateParserTable();
+//    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
+//    connect(parserEngine,SIGNAL(dataParsed(VariableList)),this,SLOT(parsedDataReady(VariableList)));
+//}
 
 void LinkerWidget::detachParser()
 {
@@ -188,8 +201,8 @@ void LinkerWidget::populateParserTable()
     {
         foreach(ComplexVariable var, linkerUnit->getVariables())
             //        foreach(ComplexVariable var, parserEngine->getVariables())
-//        variables = linkerUnit->getVariables();
-//        for(quint8 j=0;j<variables->size();j++)
+            //        variables = linkerUnit->getVariables();
+            //        for(quint8 j=0;j<variables->size();j++)
         {
             if(var.type==VECTYPE)
             {
@@ -240,10 +253,10 @@ quint8 LinkerWidget::calcRowCount()
 {
     // Calculate the total number of rows to use based on the total amount of variables.
     quint8 total=0;
-//    variables = linkerUnit->getVariables();
+    //    variables = linkerUnit->getVariables();
     foreach(ComplexVariable cv, linkerUnit->getVariables())
         //    foreach(ComplexVariable cv, parserEngine->getVariables())
-//    for(quint8 j=0;j<variables->size();j++)
+        //    for(quint8 j=0;j<variables->size();j++)
     {
         if(cv.type==VECTYPE)
         {

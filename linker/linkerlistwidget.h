@@ -15,15 +15,17 @@ class LinkerListWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit LinkerListWidget(QWidget *parent = 0);
-    QList<LinkerWidget*> linkerList;
+//    explicit LinkerListWidget(QWidget *parent = 0);
+    LinkerListWidget(QWidget *parent = 0, QList<LinkerUnit*> *lUnits = 0);
+    QList<LinkerWidget*> *linkerList;
     QStringList connectionNamesList;
     QStringList parserNamesList;
+    QList<LinkerUnit*> *linkers;
 
 signals:
-    void linkerConnectionRequest(LinkerWidget*,QString);
-    void linkerParserRequest(LinkerWidget*,QString);
-    void linkerListChanged(QList<LinkerWidget*>);
+    void linkerConnectionRequest(LinkerUnit*,QString);
+    void linkerParserRequest(LinkerUnit*,QString);
+    void linkerListChanged(QList<LinkerWidget*>*);
 
 public slots:
     void newLinker();
@@ -45,6 +47,8 @@ private:
     QScrollArea *scrollArea;
     QVBoxLayout *scrollAreaVLayout;
     QWidget *saWidgetContents;
+
+    void setupUI();
 
 private slots:
     void linkerRemoved();

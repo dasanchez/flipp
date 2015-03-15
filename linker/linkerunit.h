@@ -5,6 +5,7 @@
 #include <QThread>
 #include "../parser/parserengine.h"
 #include "../connection/connectionunit.h"
+#include "../parser/parserunit.h"
 
 class ParsedVariable{
 public:
@@ -25,14 +26,18 @@ public:
     void setName(QString);
 signals:
     void newDataPoint();
+    void newVariableList();
     void newData(VariableList parsedData);
 public slots:
     void assignConnection(ConnectionUnit *);
     void detachConnection();
+    void assignParser(ParserUnit *);
+    void assignVariables(void);
     void assignVariables(QList<ComplexVariable>);
     void parsedDataReady(VariableList parsedData);
 private:
     ConnectionUnit *connectionUnit;
+    ParserUnit *parserUnit;
     ParserEngine *parserEngine;
     QString name;
     QThread *thread;

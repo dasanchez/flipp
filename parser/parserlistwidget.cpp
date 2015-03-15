@@ -13,7 +13,7 @@ void ParserListWidget::itemRemoved(int row)
     parserList->removeAt(row);
 }
 
-void ParserListWidget::sizeChanged(QSize newSize)
+void ParserListWidget::sizeChanged(QSize /*newSize*/)
 {
     QList<int> sizes;
     foreach(ParserWidget *pw,*parserList)
@@ -25,16 +25,13 @@ void ParserListWidget::sizeChanged(QSize newSize)
     splitter->update();
 }
 
-//void ParserListWidget::resorted(int src, int dest, QListWidgetItem *item)
-//{
-//    parserList->insert(dest, parserList->takeAt(src));
-//}
-
 void ParserListWidget::parserRemoved()
 {
     ParserWidget* parser = static_cast<ParserWidget*>(QObject::sender());
     int row = parserList->indexOf(parser);
     parserList->removeAt(row);
+    qDebug() << "Removing index " << parsers->indexOf(parser->parserUnit);
+    parsers->removeAt(parsers->indexOf(parser->parserUnit));
     parser->deleteLater();
     checkAllNames();
     updateList();
@@ -48,37 +45,26 @@ void ParserListWidget::newParser()
 
     ParserWidget *parser = new ParserWidget(this,pUnit);
 
-
-    //    parser->setName(newParserName());
     parserList->append(parser);
     splitter->addWidget(parser);
 
-    connect(parser,SIGNAL(nameChange()),this,SLOT(nameChanged()));
+    connect(parser,SIGNAL(nameChange(QString)),this,SLOT(nameChanged(QString)));
     connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
     connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
+//    connect(pUnit,SIGNAL(variableListChanged()),this,SLOT(updateList()));
     updateList();
 }
 
 void ParserListWidget::addParser(ParserUnit *pUnit)
 {
-//    qDebug() << pUnit->variableList.size() << " variables in this parser";
-        qDebug() << pUnit->variableList->size() << " variables in this parser";
+    qDebug() << pUnit->variableList->size() << " variables in this parser";
     ParserWidget *parser = new ParserWidget(this,pUnit);
     parserList->append(parser);
     splitter->addWidget(parser);
-    connect(parser,SIGNAL(nameChange()),this,SLOT(nameChanged()));
+    connect(parser,SIGNAL(nameChange(QString)),this,SLOT(nameChanged(QString)));
     connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
     connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
-    updateList();
-}
-
-void ParserListWidget::addParser(ParserWidget *paw)
-{
-    parserList->append(paw);
-    splitter->addWidget(paw);
-    connect(paw,SIGNAL(nameChange()),this,SLOT(nameChanged()));
-    connect(paw,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
-    connect(paw,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
+//    connect(pUnit,SIGNAL(variableListChanged()),this,SLOT(updateList()));
     updateList();
 }
 
@@ -93,14 +79,14 @@ QString ParserListWidget::newParserName()
         {
             match=false;
             newName=QString("Parser %1").arg(nameCounter);
-            foreach(ParserWidget *parser, *parserList)
+            foreach(ParserUnit *parser, *parsers)
             {
-                //                if(newName==parser->getName())
-                //                {
-                //                    match=true;
-                //                    nameCounter++;
-                //                    break;
-                //                }
+                if(newName==parser->getName())
+                {
+                    match=true;
+                    nameCounter++;
+                    break;
+                }
             }
             if(!match)
             {
@@ -113,23 +99,25 @@ QString ParserListWidget::newParserName()
     return QString("Parser 1");
 }
 
-void ParserListWidget::nameChanged()
+void ParserListWidget::nameChanged(QString newString)
 {
     ParserWidget* parser = qobject_cast<ParserWidget*>(QObject::sender());
-    // Compare sender string against other connections
-    quint16 index = parserList->indexOf(parser);
-    for(quint16 i=0;i<parserList->size();i++)
+
+    quint16 index = parsers->indexOf(parser->parserUnit);
+    parsers->at(index)->setNameValid(true);
+    // Compare sender string against other parser names
+    for(quint16 i=0;i<parsers->size();i++)
     {
         if(i!=index)
         {
-            //            if(parser->getName() == parserList->at(i)->getName())
-            //            {
-            //                parser->setNameValid(false);
-            //                return;
-            //            }
+            //            qDebug() << parsers->at(i)->getName() << " vs " << newString;
+            if(parsers->at(i)->getName() == newString)
+            {
+                parsers->at(index)->setNameValid(false);
+                //                qDebug() << "New name not OK";
+            }
         }
     }
-    parser->setNameValid(true);
 
     checkAllNames();
     updateList();
@@ -137,35 +125,54 @@ void ParserListWidget::nameChanged()
 
 void ParserListWidget::checkAllNames()
 {
-    bool valid;
+    bool duplicate;
     // Compare all connections to see if there are any we can validate
-    for(quint16 i=0;i<parserList->size();i++)
+    for(quint16 i=0;i<parsers->size();i++)
     {
-        valid=true;
-        //        if(!parserList->at(i)->hasValidName())
-        //        {
-        //            for(quint16 j=0;j<parserList->size();j++)
-        //            {
-        //                if(j==i) break;
-        //                if(parserList->at(i)->getName() == parserList->at(j)->getName())
-        //                {
-        //                    valid=false;
-        //                }
-        //            }
-        //            parserList->at(i)->setNameValid(valid);
-        //        }
+        duplicate = false;
+        if(!parsers->at(i)->hasValidName())
+        {
+            //            qDebug() << "Attempting to clear parser # " << i;
+            for(quint16 j=0;j<parsers->size();j++)
+            {
+                if(j!=i)
+                {
+                    if(parsers->at(i)->getName() == parsers->at(j)->getName())
+                    {
+                        duplicate=true;
+                        j=parsers->size();
+                    }
+                }
+            }
+            if(!duplicate) parsers->at(i)->setNameValid(true);
+        }
     }
 }
 
 void ParserListWidget::updateList()
 {
-    emit parserListChanged();
-//    nameList.clear();
-//    foreach(ParserWidget *parser,*parserList)
-//    {
-        //        nameList.append(parser->getName());
-//    }
-//    emit parserListChanged(nameList);
+
+    qDebug() << "Parser list:";
+    foreach(ParserUnit *pUnit, *parsers)
+    {
+        qDebug() << pUnit->getName() << ": valid name: " << pUnit->hasValidName() << " variables:";
+        foreach(ComplexVariable *cVar, *pUnit->variableList)
+        {
+            qDebug() << "Name: " << cVar->name << "| Type: " << cVar->type
+                     << "| Fixed: " << cVar->fixed << "| Length: " << cVar->length;
+        }
+    }
+
+
+    nameList.clear();
+    foreach(ParserUnit *parser,*parsers)
+    {
+        if(parser->hasValidName())
+            nameList.append(parser->getName());
+    }
+
+    emit parserListChanged(nameList);
+
 }
 
 void ParserListWidget::setupUI()

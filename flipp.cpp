@@ -11,7 +11,7 @@ Flipp::Flipp(QWidget *parent)
     //    plotters = new PlotterListWidget(this);
 
     linkers = new QList<LinkerUnit*>;
-    linkerListWidget = new LinkerListWidget(this);
+    linkerListWidget = new LinkerListWidget(this, linkers);
     plotter = new PlotterWidget(this,linkers);
     //    plotter = new PlotterWidget(this);
 
@@ -30,10 +30,11 @@ Flipp::Flipp(QWidget *parent)
     connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),terminals,SLOT(updateConnections(QStringList)));
     connect(connectionListWidget,SIGNAL(connectionListChanged(QStringList)),linkerListWidget,SLOT(updateConnections(QStringList)));
     connect(terminals,SIGNAL(terminalRequest(TerminalWidget*,QString)),this,SLOT(handleTerminalRequest(TerminalWidget*,QString)));
-//    connect(parserListWidget,SIGNAL(parserListChanged(QStringList)),linkerListWidget,SLOT(updateParsers(QStringList)));
-    connect(linkerListWidget,SIGNAL(linkerConnectionRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerConnectionRequest(LinkerWidget*, QString)));
-    connect(linkerListWidget,SIGNAL(linkerParserRequest(LinkerWidget*,QString)),this,SLOT(handleLinkerParserRequest(LinkerWidget*, QString)));
-    connect(linkerListWidget,SIGNAL(linkerListChanged(QList<LinkerWidget*>)),plotter,SLOT(updateLinkerList(QList<LinkerWidget*>)));
+    connect(parserListWidget,SIGNAL(parserListChanged(QStringList)),linkerListWidget,SLOT(updateParsers(QStringList)));
+
+    connect(linkerListWidget,SIGNAL(linkerConnectionRequest(LinkerUnit*,QString)),this,SLOT(handleLinkerConnectionRequest(LinkerUnit*, QString)));
+    connect(linkerListWidget,SIGNAL(linkerParserRequest(LinkerUnit*,QString)),this,SLOT(handleLinkerParserRequest(LinkerUnit*, QString)));
+    //    connect(linkerListWidget,SIGNAL(linkerListChanged(QList<LinkerWidget*>*)),plotter,SLOT(updateLinkerList(QList<LinkerWidget*>*)));
 
     restoreSettings();
 }
@@ -43,7 +44,7 @@ Flipp::~Flipp()
 
 }
 
-void Flipp::handleLinkerConnectionRequest(LinkerWidget* linker, QString name)
+void Flipp::handleLinkerConnectionRequest(LinkerUnit* linker, QString name)
 {
     for(quint8 i=0;i<connections->count();i++)
     {
@@ -54,16 +55,18 @@ void Flipp::handleLinkerConnectionRequest(LinkerWidget* linker, QString name)
     }
 }
 
-void Flipp::handleLinkerParserRequest(LinkerWidget* linker, QString name)
+void Flipp::handleLinkerParserRequest(LinkerUnit* linker, QString name)
 {
-    foreach(ParserWidget *parser,*parserListWidget->parserList)
+    foreach(ParserUnit *parser,*parsers)
     {
-        //        if(parser->getName()==name)
-        //        {
-
-        //            linker->assignParser(parser);
-        //            plotter->updateLinkerList(linkerListWidget->linkerList);
-        //        }
+        if(parser->getName()==name && parser->hasValidName())
+        {
+            linker->assignParser(parser);
+//            linker->assignVariables(parser->getList());
+//            connect(parser,SIGNAL(variableListChanged()),linker,SIGNAL(newVariableList()));
+//            linker->assignParser(parser);
+            //                    plotter->updateLinkerList(linkerListWidget->linkerList);
+        }
     }
 }
 
@@ -271,87 +274,87 @@ void Flipp::restoreSettings()
 
     settings.endArray();
 
-//    // Restore parser widgets
-//    int parserCount = settings.beginReadArray("Parsers");
+    //    // Restore parser widgets
+    //    int parserCount = settings.beginReadArray("Parsers");
 
-//    for(int i=0;i<parserCount;i++)
-//    {
-//        settings.setArrayIndex(i);
-//        ParserUnit *pUnit = new ParserUnit;
-//        pUnit->setName(settings.value("Name").toString());
-//        parserNames.append(pUnit->getName());
+    //    for(int i=0;i<parserCount;i++)
+    //    {
+    //        settings.setArrayIndex(i);
+    //        ParserUnit *pUnit = new ParserUnit;
+    //        pUnit->setName(settings.value("Name").toString());
+    //        parserNames.append(pUnit->getName());
 
-//        int varSize = settings.beginReadArray("Complex");
-//        for(int j=0;j<varSize;j++)
-//        {
-//            settings.setArrayIndex(j);
-//            ComplexVariable *cVar = new ComplexVariable;
-//            cVar->name = settings.value("Name").toString();
-//            cVar->type = settings.value("Type").toInt();
+    //        int varSize = settings.beginReadArray("Complex");
+    //        for(int j=0;j<varSize;j++)
+    //        {
+    //            settings.setArrayIndex(j);
+    //            ComplexVariable *cVar = new ComplexVariable;
+    //            cVar->name = settings.value("Name").toString();
+    //            cVar->type = settings.value("Type").toInt();
 
-//            if(settings.value("Type").toInt()==VECTYPE)
-//            {
-//                /* FIX eventually
-//                vw->setRepeat(settings.value("Repeat").toInt());
-//                int vecSize = settings.beginReadArray("Base");
-//                for(int k=0;k<vecSize;k++)
-//                {
-//                    settings.setArrayIndex(k);
+    //            if(settings.value("Type").toInt()==VECTYPE)
+    //            {
+    //                /* FIX eventually
+    //                vw->setRepeat(settings.value("Repeat").toInt());
+    //                int vecSize = settings.beginReadArray("Base");
+    //                for(int k=0;k<vecSize;k++)
+    //                {
+    //                    settings.setArrayIndex(k);
 
-//                    // Get variable features and initialize each vector item with them:
-//                    BaseVariable bv;// = new BaseVariable;
-//                    bv.name = settings.value("Name").toString();
-//                    if(settings.value("Fixed").toBool())
-//                    {
-//                        bv.fixed = true;
-//                        bv.length = settings.value("Length").toInt();
-//                    }
-//                    else
-//                    {
-//                        bv.fixed = false;
-//                    }
+    //                    // Get variable features and initialize each vector item with them:
+    //                    BaseVariable bv;// = new BaseVariable;
+    //                    bv.name = settings.value("Name").toString();
+    //                    if(settings.value("Fixed").toBool())
+    //                    {
+    //                        bv.fixed = true;
+    //                        bv.length = settings.value("Length").toInt();
+    //                    }
+    //                    else
+    //                    {
+    //                        bv.fixed = false;
+    //                    }
 
-//                    if(settings.value("Type").toInt()==NUMTYPE)
-//                    {
-//                        bv.type = NUMTYPE;
+    //                    if(settings.value("Type").toInt()==NUMTYPE)
+    //                    {
+    //                        bv.type = NUMTYPE;
 
-//                    }
-//                    else
-//                    {
-//                        bv.type = BYTTYPE;
-//                        if(settings.value("Match").toBool())
-//                        {
-//                            bv.match = true;
-//                            bv.matchBytes = settings.value("MBytes").toByteArray();
-//                        }
-//                    }
-//                    vw->addVectorVariable(bv);
-//                }
-//                settings.endArray();
-//            */
-//            }
-//            else
-//            {
-//                cVar->fixed = settings.value("Fixed").toBool();
-//                if(cVar->fixed)
-//                {
-//                    cVar->length = settings.value("Length").toInt();
-//                }
-//                cVar->match = settings.value("Match").toBool();
-//                if(cVar->match)
-//                {
-//                    cVar->matchBytes = settings.value("MBytes").toByteArray();
-//                }
-//            }
-//            pUnit->addVariable(cVar);
-//        }
-//        settings.endArray();
-//        parsers->append(pUnit);
-//        qDebug() << pUnit->variableList->size() << " vars in parser @ flipp";
-//        parserNames.append(pUnit->getName());
-//        parserListWidget->addParser(pUnit);
-//    }
-//    settings.endArray();
+    //                    }
+    //                    else
+    //                    {
+    //                        bv.type = BYTTYPE;
+    //                        if(settings.value("Match").toBool())
+    //                        {
+    //                            bv.match = true;
+    //                            bv.matchBytes = settings.value("MBytes").toByteArray();
+    //                        }
+    //                    }
+    //                    vw->addVectorVariable(bv);
+    //                }
+    //                settings.endArray();
+    //            */
+    //            }
+    //            else
+    //            {
+    //                cVar->fixed = settings.value("Fixed").toBool();
+    //                if(cVar->fixed)
+    //                {
+    //                    cVar->length = settings.value("Length").toInt();
+    //                }
+    //                cVar->match = settings.value("Match").toBool();
+    //                if(cVar->match)
+    //                {
+    //                    cVar->matchBytes = settings.value("MBytes").toByteArray();
+    //                }
+    //            }
+    //            pUnit->addVariable(cVar);
+    //        }
+    //        settings.endArray();
+    //        parsers->append(pUnit);
+    //        qDebug() << pUnit->variableList->size() << " vars in parser @ flipp";
+    //        parserNames.append(pUnit->getName());
+    //        parserListWidget->addParser(pUnit);
+    //    }
+    //    settings.endArray();
 
     // Restore linker widgets
     int linkerCount = settings.beginReadArray("linkerListWidget");
@@ -370,19 +373,19 @@ void Flipp::restoreSettings()
 
         }
         // Restore variables
-//        for(quint8 j=0;j<parserCount;j++)
-//        {
-//            if(parsers->at(j)->getName()==settings.value("Parser").toString())
-//            {
-//                lUnit->assignVariables(parsers->at(j)->getList());
-//            }
-//        }
-//        linkers->append(lUnit);
+        //        for(quint8 j=0;j<parserCount;j++)
+        //        {
+        //            if(parsers->at(j)->getName()==settings.value("Parser").toString())
+        //            {
+        //                lUnit->assignVariables(parsers->at(j)->getList());
+        //            }
+        //        }
+        //        linkers->append(lUnit);
 
-//        LinkerWidget *lw = new LinkerWidget;
-//        lw->updateConnections(connectionNames);
-//        lw->updateParsers(parserNames);
-//        linkerListWidget->addLinker(lw);
+        //        LinkerWidget *lw = new LinkerWidget;
+        //        lw->updateConnections(connectionNames);
+        //        lw->updateParsers(parserNames);
+        //        linkerListWidget->addLinker(lw);
     }
     settings.endArray();
 
@@ -440,85 +443,85 @@ void Flipp::saveSettings()
     settings.endArray();
 
     // Parsers
-//    settings.beginWriteArray("Parsers");
-//    int parserCount=0;
+    //    settings.beginWriteArray("Parsers");
+    //    int parserCount=0;
 
-//    for(quint8 i=0;i<parsers->size();i++)
-//    {
-//        ParserUnit *pUnit = parsers->at(i);
-//        settings.setArrayIndex(parserCount);
+    //    for(quint8 i=0;i<parsers->size();i++)
+    //    {
+    //        ParserUnit *pUnit = parsers->at(i);
+    //        settings.setArrayIndex(parserCount);
 
-//        // Save an array of variable widgets
+    //        // Save an array of variable widgets
 
-//        settings.beginWriteArray("Complex");
-//        for(quint8 j=0;j<pUnit->variableList->size();j++)
-//        {
-//            settings.setArrayIndex(j);
-//            settings.setValue("Name",pUnit->variableList->at(j)->name);
-//            settings.setValue("Type",pUnit->variableList->at(j)->type);
-//            if(pUnit->variableList->at(j)->type == VECTYPE)
-//            {
-//                //                settings.setValue("Repeat",pw->variableList[i].repeat);
-//                //                // Save an array of base variables
-//                //                settings.beginWriteArray("Base");
-//                //                for(int j=0;j<pw->variableList[i].vector.size();j++)
-//                //                {
-//                //                    settings.setArrayIndex(j);
+    //        settings.beginWriteArray("Complex");
+    //        for(quint8 j=0;j<pUnit->variableList->size();j++)
+    //        {
+    //            settings.setArrayIndex(j);
+    //            settings.setValue("Name",pUnit->variableList->at(j)->name);
+    //            settings.setValue("Type",pUnit->variableList->at(j)->type);
+    //            if(pUnit->variableList->at(j)->type == VECTYPE)
+    //            {
+    //                //                settings.setValue("Repeat",pw->variableList[i].repeat);
+    //                //                // Save an array of base variables
+    //                //                settings.beginWriteArray("Base");
+    //                //                for(int j=0;j<pw->variableList[i].vector.size();j++)
+    //                //                {
+    //                //                    settings.setArrayIndex(j);
 
-//                //                    settings.setValue("Name",pw->variableList[i].vector.at(j).name);
-//                //                    settings.setValue("Type",pw->variableList[i].vector.at(j).type);
-//                //                    settings.setValue("Fixed",pw->variableList[i].vector.at(j).fixed);
-//                //                    if(pw->variableList[i].vector.at(j).fixed)
-//                //                    {
-//                //                        settings.setValue("Length",pw->variableList[i].vector.at(j).length);
-//                //                    }
-//                //                    settings.setValue("Match",pw->variableList[i].vector.at(j).match);
-//                //                    if(pw->variableList[i].vector.at(j).match)
-//                //                    {
-//                //                        //                        qDebug() << pw->variableList[i].vector.at(j).matchBytes;
-//                //                        settings.setValue("MBytes",pw->variableList[i].vector.at(j).matchBytes);
-//                //                    }
+    //                //                    settings.setValue("Name",pw->variableList[i].vector.at(j).name);
+    //                //                    settings.setValue("Type",pw->variableList[i].vector.at(j).type);
+    //                //                    settings.setValue("Fixed",pw->variableList[i].vector.at(j).fixed);
+    //                //                    if(pw->variableList[i].vector.at(j).fixed)
+    //                //                    {
+    //                //                        settings.setValue("Length",pw->variableList[i].vector.at(j).length);
+    //                //                    }
+    //                //                    settings.setValue("Match",pw->variableList[i].vector.at(j).match);
+    //                //                    if(pw->variableList[i].vector.at(j).match)
+    //                //                    {
+    //                //                        //                        qDebug() << pw->variableList[i].vector.at(j).matchBytes;
+    //                //                        settings.setValue("MBytes",pw->variableList[i].vector.at(j).matchBytes);
+    //                //                    }
 
-//                //                }
-//                //                settings.endArray();
-//            }
-//            else
-//            {
-//                // Save an individual complex variable
-//                settings.setValue("Fixed",pUnit->variableList->at(j)->fixed);
+    //                //                }
+    //                //                settings.endArray();
+    //            }
+    //            else
+    //            {
+    //                // Save an individual complex variable
+    //                settings.setValue("Fixed",pUnit->variableList->at(j)->fixed);
 
-//                if(pUnit->variableList->at(j)->fixed)
-//                {
-//                      settings.setValue("Length",pUnit->variableList->at(j)->length);
-//                }
-//                settings.setValue("Match",pUnit->variableList->at(j)->match);
+    //                if(pUnit->variableList->at(j)->fixed)
+    //                {
+    //                      settings.setValue("Length",pUnit->variableList->at(j)->length);
+    //                }
+    //                settings.setValue("Match",pUnit->variableList->at(j)->match);
 
-//                if(pUnit->variableList->at(j)->match)
-//                {
-//                    settings.setValue("MBytes",pUnit->variableList->at(j)->matchBytes);
-//                }
-//            }
-//        }
-//        qDebug() << pUnit->variableList->size() << " vars saved in parser @ flipp";
-//        settings.endArray();
-//        parserCount++;
-//    }
-//    settings.endArray();
+    //                if(pUnit->variableList->at(j)->match)
+    //                {
+    //                    settings.setValue("MBytes",pUnit->variableList->at(j)->matchBytes);
+    //                }
+    //            }
+    //        }
+    //        qDebug() << pUnit->variableList->size() << " vars saved in parser @ flipp";
+    //        settings.endArray();
+    //        parserCount++;
+    //    }
+    //    settings.endArray();
 
     // linkerListWidget
-//    settings.beginWriteArray("linkerListWidget");
-//    int linkerCount=0;
-//    foreach(LinkerWidget *lw, linkerListWidget->linkerList)
-//    {
-//        if(connectionListWidget->connectionList.size()>0 && parserListWidget->parserList->size()>0)
-//        {
-//            settings.setArrayIndex(linkerCount);
-//            settings.setValue("Connection", lw->getConnection());
-//            settings.setValue("Parser",lw->getParser());
-//        }
-//        linkerCount++;
-//    }
-//    settings.endArray();
+    //    settings.beginWriteArray("linkerListWidget");
+    //    int linkerCount=0;
+    //    foreach(LinkerWidget *lw, linkerListWidget->linkerList)
+    //    {
+    //        if(connectionListWidget->connectionList.size()>0 && parserListWidget->parserList->size()>0)
+    //        {
+    //            settings.setArrayIndex(linkerCount);
+    //            settings.setValue("Connection", lw->getConnection());
+    //            settings.setValue("Parser",lw->getParser());
+    //        }
+    //        linkerCount++;
+    //    }
+    //    settings.endArray();
 
     settings.setValue("DOCK_LOCATIONS",saveState(1));
 

@@ -130,18 +130,20 @@ void ParserWidget::toggleExpand()
 
 void ParserWidget::variableListChanged()
 {
-    for(int i=0;i<variableList->size();i++)
-    {
-        ComplexVariable *cVar = vwList->at(i)->variable;
-        variableList->replace(i,cVar);
-    }
+//    for(int i=0;i<variableList->size();i++)
+//    {
+//        ComplexVariable *cVar = vwList->at(i)->variable;
+//        variableList->replace(i,cVar);
+//    }
+
 
     QByteArray *validResponse = new QByteArray;
     listIsValid(buildList(), validResponse);
     statusBar->setText(*validResponse);
 
     printList();
-    emit updateVariableList(variableList);
+    parserUnit->variablesUpdated();
+//    emit updateVariableList(variableList);
 }
 
 QList<ComplexVariable> ParserWidget::buildList()
@@ -198,6 +200,7 @@ void ParserWidget::newVariable()
     connect(vw,SIGNAL(sizeToggled(QSize)),this,SLOT(itemSize(QSize)));
     connect(vw,SIGNAL(deleteVar()),this,SLOT(remVariable()));
     connect(vw,SIGNAL(variableChanged()),this,SLOT(variableListChanged()));
+//    connect(vw,SIGNAL(variableChanged()),parserUnit,SLOT(variablesUpdated());
     variableListChanged();
 }
 
@@ -214,6 +217,7 @@ void ParserWidget::addVariableWidget(VariableWidget *vw)
     connect(vw,SIGNAL(sizeToggled(QSize)),this,SLOT(itemSize(QSize)));
     connect(vw,SIGNAL(deleteVar()),this,SLOT(remVariable()));
     connect(vw,SIGNAL(variableChanged()),this,SLOT(variableListChanged()));
+//    connect(vw,SIGNAL(variableChanged()),parserUnit,SLOT(variablesUpdated());
     variableListChanged();
 }
 
@@ -222,8 +226,10 @@ void ParserWidget::remVariable()
     VariableWidget *vw = static_cast<VariableWidget*>(QObject::sender());
     int row = vwList->indexOf(vw);
     QListWidgetItem *item = liveListWidget->item(row);
-    //    variableList.removeAt(row);
+
+    // QList<ComplexVariable*>*
     variableList->removeAt(row);
+
     liveListWidget->removeItemWidget(item);
     liveListWidget->takeItem(row);
     vwList->removeAt(row);
@@ -239,7 +245,13 @@ void ParserWidget::itemSize(QSize newSize)
     item->setSizeHint(newSize);
 }
 
-void ParserWidget::resorted(int src,int dest,QListWidgetItem* item)
+void ParserWidget::newName(QString newName)
+{
+    parserUnit->setName(newName);
+    emit nameChange(newName);
+}
+
+void ParserWidget::resorted(int src,int dest,QListWidgetItem* /*item*/)
 {
     // Resort in list:
     vwList->insert(dest, vwList->takeAt(src));
@@ -464,7 +476,9 @@ void ParserWidget::setupUI_fromParser()
     setMinimumWidth(500);
     setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
 
-    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange()));
+//    connect(nameEdit,SIGNAL(textChanged(QString)),this,SIGNAL(nameChange(QString)));
+//    connect(nameEdit,SIGNAL(textChanged(QString)),parserUnit,SLOT(setName(QString)));
+    connect(nameEdit,SIGNAL(textChanged(QString)),this,SLOT(newName(QString)));
     connect(addByteButton,SIGNAL(clicked()),this,SLOT(newVariable()));
     connect(addNumberButton,SIGNAL(clicked()),this,SLOT(newVariable()));
     connect(addVectorButton,SIGNAL(clicked()),this,SLOT(newVariable()));

@@ -40,9 +40,6 @@ VariableWidget::VariableWidget(QWidget *parent, ComplexVariable *cVar) :
     currentType = variable->type;
     fixed = variable->fixed;
     matched = variable->match;
-    //    currentType = variable.type;
-    //    fixed=variable.fixed;
-    //    matched=variable.match;
 
     hexed=false;
     isExpanded = true;
@@ -54,12 +51,9 @@ VariableWidget::VariableWidget(QWidget *parent, ComplexVariable *cVar) :
 
     // Populate UI
     nameEdit->setText(variable->name);
-    //    nameEdit->setText(variable.name);
     updateType();
     updateFixed();
     updateMatch();
-    //    update
-
 }
 
 void VariableWidget::nameChanged(QString newName)
@@ -537,28 +531,28 @@ void VariableWidget::toggleExpand()
     toggleExpand(isExpanded);
 }
 
-void VariableWidget::vectorItemNameChanged(QString newName)
+void VariableWidget::vectorItemNameChanged(QString /*newName*/)
 {
-    VectorItemWidget *iw = static_cast<VectorItemWidget*>(QObject::sender());
-    int row = itemList->indexOf(iw);
+    //VectorItemWidget *iw = static_cast<VectorItemWidget*>(QObject::sender());
+//    int row = itemList->indexOf(iw);
 }
 
-void VariableWidget::vectorItemTypeChanged(int newType)
+void VariableWidget::vectorItemTypeChanged(int /*newType*/)
 {
-    VectorItemWidget *iw = static_cast<VectorItemWidget*>(QObject::sender());
-    int row = itemList->indexOf(iw);
+//    VectorItemWidget *iw = static_cast<VectorItemWidget*>(QObject::sender());
+//    int row = itemList->indexOf(iw);
 }
 
-void VariableWidget::vectorItemLengthToggled(bool fixed)
+void VariableWidget::vectorItemLengthToggled(bool /*fixed*/)
 {
 }
 
-void VariableWidget::vectorItemLengthChanged(int newLength)
+void VariableWidget::vectorItemLengthChanged(int /*newLength*/)
 {
 
 }
 
-void VariableWidget::vectorItemMatchToggled(bool matched)
+void VariableWidget::vectorItemMatchToggled(bool /*matched*/)
 {
 
 }
@@ -646,7 +640,7 @@ void VariableWidget::addVectorNumber()
 
 //}
 
-void VariableWidget::vectorItemResorted(int src,int dest,QListWidgetItem* item)
+void VariableWidget::vectorItemResorted(int src,int dest,QListWidgetItem* /*item*/)
 {
     // Resort in list:
     itemList->insert(dest,itemList->takeAt(src));
