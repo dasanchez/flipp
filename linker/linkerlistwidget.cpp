@@ -10,7 +10,10 @@ LinkerListWidget::LinkerListWidget(QWidget *parent, QList<LinkerUnit*> *lUnits) 
 
 void LinkerListWidget::newLinker()
 {
-    LinkerWidget *linker = new LinkerWidget;
+    LinkerUnit *lUnit = new LinkerUnit;
+    linkers->append(lUnit);
+
+    LinkerWidget *linker = new LinkerWidget(this,lUnit);
 
     linker->updateConnections(connectionNamesList);
     linker->updateParsers(parserNamesList);
@@ -19,7 +22,7 @@ void LinkerListWidget::newLinker()
     connect(linker,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
     connect(linker,SIGNAL(removeLinker()),this,SLOT(linkerRemoved()));
 
-//    qDebug() << "Linker lists: " << linkerList.count();
+    //    qDebug() << "Linker lists: " << linkerList.count();
 
     if(connectionNamesList.count()>0)
     {
@@ -28,31 +31,39 @@ void LinkerListWidget::newLinker()
 
     if(parserNamesList.count()>0)
     {
-    linker->changeParser(parserNamesList.at(0));
+        linker->changeParser(parserNamesList.at(0));
     }
     linkerList->append(linker);
     splitter->addWidget(linker);
 
-    emit linkerListChanged(linkerList);
-
-//    connect(parser,SIGNAL(nameChange()),this,SLOT(nameChanged()));
-//    connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
-//    connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
-//    updateList();
+    emit linkerListChanged();
 }
 
-void LinkerListWidget::addLinker(LinkerWidget *liw)
+void LinkerListWidget::addLinker(LinkerUnit *lUnit)
 {
-    linkerList->append(liw);
-    splitter->addWidget(liw);
+    LinkerWidget *liw = new LinkerWidget(this, lUnit);
+
+    liw->updateConnections(connectionNamesList);
+    liw->updateParsers(parserNamesList);
 
     connect(liw,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(linkerRequestedConnection(QString)));
     connect(liw,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
     connect(liw,SIGNAL(removeLinker()),this,SLOT(linkerRemoved()));
 
-//    qDebug() << "Linker lists: " << linkerList.count();
+    linkerList->append(liw);
+    splitter->addWidget(liw);
 
-    emit linkerListChanged(linkerList);
+    if(!lUnit->getConnectionName().isEmpty())
+    {
+        liw->changeConnection(lUnit->getConnectionName());
+    }
+
+    if(!lUnit->getParserName().isEmpty())
+    {
+        liw->changeParser(lUnit->getParserName());
+    }
+
+    emit linkerListChanged();
 }
 
 void LinkerListWidget::linkerRemoved()
@@ -60,10 +71,11 @@ void LinkerListWidget::linkerRemoved()
     LinkerWidget* linker = qobject_cast<LinkerWidget *>(QObject::sender());
     disconnect(linker,SIGNAL(linkerConnectionRequest(QString)),this,SLOT(linkerRequestedConnection(QString)));
     disconnect(linker,SIGNAL(linkerParserRequest(QString)),this,SLOT(linkerRequestedParser(QString)));
+    linkers->removeAt(linkers->indexOf(linker->linkerUnit));
     linkerList->removeAt(linkerList->indexOf(linker));
     linker->deleteLater();
-//    qDebug() << "Linker lists: " << linkerList.count();
-    emit linkerListChanged(linkerList);
+    //    qDebug() << "Linker lists: " << linkerList.count();
+    emit linkerListChanged();
 }
 
 void LinkerListWidget::updateConnections(QStringList connectionNames)
@@ -88,12 +100,14 @@ void LinkerListWidget::linkerRequestedConnection(QString connectionName)
 {
     LinkerWidget *linker = qobject_cast<LinkerWidget *>(QObject::sender());
     emit linkerConnectionRequest(linker->linkerUnit,connectionName);
+    emit linkerListChanged();
 }
 
 void LinkerListWidget::linkerRequestedParser(QString parserName)
 {
     LinkerWidget *linker = qobject_cast<LinkerWidget *>(QObject::sender());
     emit linkerParserRequest(linker->linkerUnit,parserName);
+    emit linkerListChanged();
 }
 
 void LinkerListWidget::setupUI()
@@ -106,7 +120,7 @@ void LinkerListWidget::setupUI()
 
     newLinkerButton = new QPushButton("New");
     newLinkerButton->setFont(font);
-//    newLinkerButton->setFixedHeight(24);
+    //    newLinkerButton->setFixedHeight(24);
     newLinkerButton->setFixedWidth(90);
 
     splitter = new QSplitter(this);

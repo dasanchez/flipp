@@ -3,7 +3,7 @@
 ParserUnit::ParserUnit()
 {
     variableList = new QList<ComplexVariable*>;
-//    variableList.clear();
+    parserName.clear();
 }
 
 bool ParserUnit::hasValidName()

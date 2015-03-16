@@ -4,7 +4,8 @@ PlotterWidget::PlotterWidget(QWidget *parent, QList<LinkerUnit*> *linkerList) :
     QWidget(parent),
     linkers(linkerList)
 {
-//    linkers = linkerList;
+    //    linkers = linkerList;
+    linkerUnit = new LinkerUnit;
     plotTimer = new QTimer;
     plotTimer->setInterval(10);
     plotTimer->start();
@@ -24,51 +25,39 @@ PlotterWidget::PlotterWidget(QWidget *parent)
     connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
 }
 
-//void PlotterWidget::updatePlot()
-//{
-//    customPlot->replot();
-//}
-
 PlotterWidget::~PlotterWidget()
 {
 
 }
 
-void PlotterWidget::updateLinkerList(QList<LinkerWidget*> list)
+void PlotterWidget::updateLinkerList()
 {
-    linkerList = list;
+
+    //    linkerList = list;
     //    qDebug() << "Linker lists: " << list.count();
     linkerBox->clear();
-    foreach(LinkerWidget *lw, list)
+    foreach(LinkerUnit *lUnit, *linkers)
     {
-        QString linkerName;
-        linkerName.append(lw->getConnection());
-        linkerName.append(":");
-        linkerName.append(lw->getParser());
-        linkerBox->addItem(linkerName);
-        //        linkerBox->addItem(QString("[%1]:[%2]").arg(lw->getConnection()).arg(lw->getParser()));
-        //        qDebug() << "Connection: " << lw->getConnection() << ", parser: " << lw->getParser();
+        linkerBox->addItem(lUnit->getName());
     }
     updateVariableBox();
+
 }
 
 void PlotterWidget::updateVariableBox()
 {
-    if(linkerList.count()>0)
+    disconnect(linkerUnit,SIGNAL(newDataPoint()),this,SLOT(newData()));
+    if(linkers->count()>0)
     {
-//        for(quint8 i=0;i<linkerBox->size();i++)
-//        {
-//            if(linkers->at(i)-)
-//        }
-        LinkerWidget *linker = linkerList.at(linkerBox->currentIndex());
-        connect(linker,SIGNAL(newDataPoint()),this,SLOT(newData()));
+        linkerUnit = linkers->at(linkerBox->currentIndex());
+
         variableBox->clear();
-//        foreach(ComplexVariable var,linker->variables)
-        for(quint8 i=0;i<linker->variables->size();i++)
+        for(quint8 i=0;i<linkerUnit->getVariables().size();i++)
         {
-            variableBox->addItem(linker->variables->at(i)->name);
+            variableBox->addItem(linkerUnit->getVariables().at(i).name);
         }
     }
+    connect(linkerUnit,SIGNAL(newDataPoint()),this,SLOT(newData()));
 }
 
 void PlotterWidget::updatePlot()
@@ -83,11 +72,15 @@ void PlotterWidget::newData()
     double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
     //qDebug() << "updating plot, data point:" << dataPoint.name << ", current variable:" << variableBox->currentText();
     // add data to lines:
-    LinkerWidget *linker = qobject_cast<LinkerWidget *>(QObject::sender());
+    LinkerUnit *linker = qobject_cast<LinkerUnit *>(QObject::sender());
 
-//    qDebug() << "type: " << linker->results.at(variableBox->currentIndex()).type;
+    //    qDebug() << "type: " << linker->results.at(variableBox->currentIndex()).type;
 
-    if(linker->results.at(variableBox->currentIndex()).type == NUMTYPE)
+//    qDebug() << "Linker results: " << linker->results.size() << ", variable box: " << variableBox->count();
+    ParsedVariable pVar = linker->results.at(variableBox->currentIndex());
+
+//    if(linker->results.at(variableBox->currentIndex()).type == NUMTYPE)
+    if(pVar.type == NUMTYPE)
     {
         graph->addData(key, linker->results.at(variableBox->currentIndex()).value);
         graph->removeDataBefore(key-5);

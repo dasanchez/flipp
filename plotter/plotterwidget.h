@@ -32,7 +32,7 @@ public:
     ~PlotterWidget();
 
 public slots:
-    void updateLinkerList(QList<LinkerWidget*>);
+    void updateLinkerList();
 void updateVariableBox();
     //    void setXRange(double);
 //    void setYMin(QString);
@@ -42,6 +42,7 @@ signals:
 //    void removePlotter();
 
 private:
+LinkerUnit *linkerUnit;
     QComboBox *linkerBox;
     QComboBox *variableBox;
     QList<LinkerWidget*> linkerList;

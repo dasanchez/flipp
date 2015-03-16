@@ -25,11 +25,11 @@ public:
 signals:
     void linkerConnectionRequest(LinkerUnit*,QString);
     void linkerParserRequest(LinkerUnit*,QString);
-    void linkerListChanged(QList<LinkerWidget*>*);
+    void linkerListChanged();
 
 public slots:
     void newLinker();
-    void addLinker(LinkerWidget *);
+    void addLinker(LinkerUnit *);
 
     void updateConnections(QStringList);
     void updateParsers(QStringList);

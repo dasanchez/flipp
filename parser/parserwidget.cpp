@@ -24,18 +24,10 @@ ParserWidget::ParserWidget(QWidget *parent, ParserUnit *pUnit) :
 
     for(quint8 i=0;i<parserUnit->variableList->size();i++)
     {
-        // Generate variable widget
+//        // Generate variable widget
         VariableWidget *vWidget = new VariableWidget(this,parserUnit->variableList->at(i));
         addVariableWidget(vWidget);
     }
-
-    //    foreach(ComplexVariable *cVar,parserUnit->variableList)
-    //    {
-    //        // Generate variable widget
-    //        VariableWidget *vWidget = new VariableWidget(this,cVar);
-    //        addVariableWidget(vWidget);
-    //    }
-
     // Connect ParserUnit signals
 }
 
@@ -208,7 +200,7 @@ void ParserWidget::addVariableWidget(VariableWidget *vw)
 {
     vwList->append(vw);
     //    variableList.append(vw->variable);
-    variableList->append(vw->variable);
+//    variableList->append(vw->variable);
     QListWidgetItem *item = new QListWidgetItem(liveListWidget);
     liveListWidget->addItem(item);
     item->setSizeHint(vw->sizeHint());

@@ -21,6 +21,7 @@ public:
     LinkerUnit();
     QList<ParsedVariable> results;
     QString getConnectionName();
+    QString getParserName();
     QList<ComplexVariable> getVariables();
     QString getName();
     void setName(QString);

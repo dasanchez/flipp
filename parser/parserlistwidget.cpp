@@ -57,14 +57,13 @@ void ParserListWidget::newParser()
 
 void ParserListWidget::addParser(ParserUnit *pUnit)
 {
-    qDebug() << pUnit->variableList->size() << " variables in this parser";
+//    qDebug() << pUnit->variableList->size() << " variables in this parser";
     ParserWidget *parser = new ParserWidget(this,pUnit);
     parserList->append(parser);
     splitter->addWidget(parser);
     connect(parser,SIGNAL(nameChange(QString)),this,SLOT(nameChanged(QString)));
     connect(parser,SIGNAL(changeSize(QSize)),this,SLOT(sizeChanged(QSize)));
     connect(parser,SIGNAL(deleteParser()),this,SLOT(parserRemoved()));
-//    connect(pUnit,SIGNAL(variableListChanged()),this,SLOT(updateList()));
     updateList();
 }
 
@@ -152,17 +151,16 @@ void ParserListWidget::checkAllNames()
 void ParserListWidget::updateList()
 {
 
-    qDebug() << "Parser list:";
-    foreach(ParserUnit *pUnit, *parsers)
-    {
-        qDebug() << pUnit->getName() << ": valid name: " << pUnit->hasValidName() << " variables:";
-        foreach(ComplexVariable *cVar, *pUnit->variableList)
-        {
-            qDebug() << "Name: " << cVar->name << "| Type: " << cVar->type
-                     << "| Fixed: " << cVar->fixed << "| Length: " << cVar->length;
-        }
-    }
-
+//    qDebug() << "Parser list:";
+//    foreach(ParserUnit *pUnit, *parsers)
+//    {
+//        qDebug() << pUnit->getName() << ": valid name: " << pUnit->hasValidName() << " variables:";
+//        foreach(ComplexVariable *cVar, *pUnit->variableList)
+//        {
+//            qDebug() << "Name: " << cVar->name << "| Type: " << cVar->type
+//                     << "| Fixed: " << cVar->fixed << "| Length: " << cVar->length;
+//        }
+//    }
 
     nameList.clear();
     foreach(ParserUnit *parser,*parsers)

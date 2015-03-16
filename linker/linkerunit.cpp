@@ -17,6 +17,16 @@ QString LinkerUnit::getConnectionName()
     return connectionUnit->getName();
 }
 
+QString LinkerUnit::getParserName()
+{
+    return parserUnit->getName();
+}
+
+QString LinkerUnit::getName()
+{
+    return name;
+}
+
 void LinkerUnit::assignConnection(ConnectionUnit *cUnit)
 {
     disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
@@ -25,7 +35,7 @@ void LinkerUnit::assignConnection(ConnectionUnit *cUnit)
     name.clear();
     name.append(connectionUnit->getName());
     name.append(':');
-    //name.append(parserUnit.getName());
+    name.append(parserUnit->getName());
     connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(connectionUnit,SIGNAL(destroyed()),this,SLOT(detachConnection()));
 }
@@ -37,9 +47,15 @@ void LinkerUnit::detachConnection()
 
 void LinkerUnit::assignParser(ParserUnit *pUnit)
 {
+    disconnect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     disconnect(parserUnit,SIGNAL(variableListChanged()),this,SLOT(assignVariables()));
     parserUnit = pUnit;
     assignVariables(parserUnit->getList());
+    name.clear();
+    name.append(connectionUnit->getName());
+    name.append(':');
+    name.append(parserUnit->getName());
+    connect(connectionUnit,SIGNAL(dataIn(QByteArray)),parserEngine,SLOT(parseData(QByteArray)));
     connect(parserUnit,SIGNAL(variableListChanged()),this,SLOT(assignVariables()));
 }
 

@@ -8,6 +8,7 @@ ConnectionUnit::ConnectionUnit()
 #else
     serialPrefix.clear();
 #endif
+    connConfig.connName.clear();
     tcpSocket = new QTcpSocket;
     udpSocket = new QUdpSocket;
     serialPort = new QSerialPort("COM3");
