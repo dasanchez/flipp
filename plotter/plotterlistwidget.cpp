@@ -45,12 +45,12 @@ PlotterListWidget::~PlotterListWidget()
 
 void PlotterListWidget::newPlotter()
 {
-    PlotterWidget *plotWidget = new PlotterWidget;
+//    PlotterWidget *plotWidget = new PlotterWidget;
 
-    plotterList.append(plotWidget);
-    splitter->addWidget(plotWidget);
+//    plotterList.append(plotWidget);
+//    splitter->addWidget(plotWidget);
 
-    connect(plotWidget,SIGNAL(removePlotter()),this,SLOT(plotterRemoved()));
+//    connect(plotWidget,SIGNAL(removePlotter()),this,SLOT(plotterRemoved()));
 }
 
 void PlotterListWidget::plotterRemoved()

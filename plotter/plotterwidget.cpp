@@ -1,29 +1,35 @@
 #include "plotterwidget.h"
 
-PlotterWidget::PlotterWidget(QWidget *parent, QList<LinkerUnit*> *linkerList) :
-    QWidget(parent),
+//PlotterWidget::PlotterWidget(QWidget *parent, QList<LinkerUnit*> *linkerList) :
+//    QWidget(parent),
+//    linkers(linkerList)
+
+PlotterWidget::PlotterWidget(QList<LinkerUnit*> *linkerList) :
     linkers(linkerList)
 {
     //    linkers = linkerList;
     linkerUnit = new LinkerUnit;
     plotTimer = new QTimer;
-    plotTimer->setInterval(10);
+    plotTimer->setInterval(20);
     plotTimer->start();
     setupUI();
-    //    yAxisAutoRange = false;
+
+    xval = 0;
+    //        yAxisAutoRange = false;
     connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
+//    connect(plotTimer,SIGNAL(timeout()),this,SLOT(newSimData()));
 }
 
-PlotterWidget::PlotterWidget(QWidget *parent)
-    : QWidget(parent)
-{
-    plotTimer = new QTimer;
-    plotTimer->setInterval(10);
-    plotTimer->start();
-    setupUI();
-    //    yAxisAutoRange = false;
-    connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
-}
+//PlotterWidget::PlotterWidget(QWidget *parent)
+//    : QWidget(parent)
+//{
+//    plotTimer = new QTimer;
+//    plotTimer->setInterval(10);
+//    plotTimer->start();
+//    setupUI();
+//    //    yAxisAutoRange = false;
+//    connect(plotTimer,SIGNAL(timeout()),this,SLOT(updatePlot()));
+//}
 
 PlotterWidget::~PlotterWidget()
 {
@@ -62,29 +68,48 @@ void PlotterWidget::updateVariableBox()
 
 void PlotterWidget::updatePlot()
 {
+    //     QCPGraph *graph = customPlot->graph(0);
+    //     graph->rescaleValueAxis();
     customPlot->replot();
+}
+
+void PlotterWidget::newSimData()
+{
+    QCPGraph *graph = customPlot->graph(0);
+    xval+=.01;
+    if(xval>=6.28)
+    {
+        xval=0;
+    }
+    yval=sin(xval);
+    double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+    graph->addData(key, yval);
+    graph->removeDataBefore(key-20);
+    customPlot->xAxis->setRange(key+0.1, 20, Qt::AlignRight);
+    graph->rescaleValueAxis();
+    customPlot->replot();
+
 }
 
 void PlotterWidget::newData()
 {
     QCPGraph *graph = customPlot->graph(0);
-
-    double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
     //qDebug() << "updating plot, data point:" << dataPoint.name << ", current variable:" << variableBox->currentText();
     // add data to lines:
     LinkerUnit *linker = qobject_cast<LinkerUnit *>(QObject::sender());
 
     //    qDebug() << "type: " << linker->results.at(variableBox->currentIndex()).type;
 
-//    qDebug() << "Linker results: " << linker->results.size() << ", variable box: " << variableBox->count();
+    //    qDebug() << "Linker results: " << linker->results.size() << ", variable box: " << variableBox->count();
     ParsedVariable pVar = linker->results.at(variableBox->currentIndex());
-
-//    if(linker->results.at(variableBox->currentIndex()).type == NUMTYPE)
+    double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+    //    if(linker->results.at(variableBox->currentIndex()).type == NUMTYPE)
     if(pVar.type == NUMTYPE)
     {
         graph->addData(key, linker->results.at(variableBox->currentIndex()).value);
-        graph->removeDataBefore(key-5);
-        customPlot->xAxis->setRange(key+0.1, 5, Qt::AlignRight);
+        graph->removeDataBefore(key-20);
+        customPlot->xAxis->setRange(key+0.1, 20, Qt::AlignRight);
+        //        customPlot->replot();
         graph->rescaleValueAxis();
     }
 }
@@ -233,6 +258,7 @@ void PlotterWidget::setupUI()
     variableBox = new QComboBox;
 
     customPlot = new QCustomPlot;
+    //    customPlot->setUpdatesEnabled(true);
     //    customPlot->yAxis->setRange(yMin,yMax);
 
     customPlot->addGraph();

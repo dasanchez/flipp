@@ -31,6 +31,8 @@ private:
     TerminalListWidget *terminals;
     ParserListWidget *parserListWidget;
     PlotterWidget *plotter;
+//    QThread *thread;
+
 //    PlotterListWidget *plotters;
     LinkerListWidget *linkerListWidget;
     // Dock Widgets:

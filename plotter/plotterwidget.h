@@ -27,13 +27,15 @@ class PlotterWidget : public QWidget
     Q_OBJECT
     
 public:
-    PlotterWidget(QWidget *parent, QList<LinkerUnit*> *linkerList);
-    PlotterWidget(QWidget *parent = 0);
+//    PlotterWidget(QWidget *parent, QList<LinkerUnit*> *linkerList);
+    PlotterWidget(QList<LinkerUnit*> *linkerList);
+//    PlotterWidget(QWidget *parent = 0);
     ~PlotterWidget();
 
 public slots:
     void updateLinkerList();
 void updateVariableBox();
+void newSimData();
     //    void setXRange(double);
 //    void setYMin(QString);
 //    void setYMax(QString);
@@ -51,7 +53,8 @@ LinkerUnit *linkerUnit;
 //    QPushButton *removeButton;
 //    QPixmap delIconPixmap;
 //    QTableWidget *tableWidget;
-
+double xval;
+double yval;
     // Plot settings
 //    QLabel *xRangeLabel;
 //    QDoubleSpinBox *xRangeSpin;

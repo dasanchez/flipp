@@ -10,7 +10,12 @@ Flipp::Flipp(QWidget *parent)
     parserListWidget = new ParserListWidget(this, parsers);
     linkers = new QList<LinkerUnit*>;
     linkerListWidget = new LinkerListWidget(this, linkers);
-    plotter = new PlotterWidget(this,linkers);
+//    plotter = new PlotterWidget(this,linkers);
+        plotter = new PlotterWidget(linkers);
+//    thread = new QThread;
+//    plotter->moveToThread(thread);
+//    thread->start();
+
     //    plotter = new PlotterWidget(this);
 
     m_sSettingsFile = QApplication::applicationDirPath() + "/lastSettings.flp";
