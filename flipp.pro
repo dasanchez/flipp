@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network serialport printsupport
+QT       += core gui network serialport printsupport opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     linker/linkerlistwidget.cpp \
     connection/connectionunit.cpp \
     linker/linkerunit.cpp \
-    parser/parserunit.cpp
+    parser/parserunit.cpp \
+    plotter/glplotterwidget.cpp
 
 HEADERS  += flipp.h \
     livelistwidget/livelistwidget.h \
@@ -53,7 +54,13 @@ HEADERS  += flipp.h \
     linker/linkerlistwidget.h \
     connection/connectionunit.h \
     linker/linkerunit.h \
-    parser/parserunit.h
+    parser/parserunit.h \
+    plotter/glplotterwidget.h
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    plotter/shader2.vert \
+    plotter/shader2d.frag \
+    plotter/shader2d.vert
