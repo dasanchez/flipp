@@ -36,6 +36,7 @@ public slots:
     void cleanup();
     void moveCamera();
     void addDataPoint(double);
+    void setXWindow(quint16);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;

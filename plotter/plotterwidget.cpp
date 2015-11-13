@@ -82,10 +82,19 @@ void PlotterWidget::newData()
     }
 }
 
+void PlotterWidget::xResize(int newVal)
+{
+    glPlot->setXWindow(newVal);
+}
+
 void PlotterWidget::setupUI()
 {
     linkerBox = new QComboBox;
     variableBox = new QComboBox;
+    xSpinBox = new QSpinBox;
+    xSpinBox->setMinimum(10);
+    xSpinBox->setMaximum(400);
+    xSpinBox->setValue(400);
 
     glPlot = new GLPlotterWidget;
 
@@ -121,6 +130,7 @@ void PlotterWidget::setupUI()
 
     dataSourceLayout->addWidget(linkerBox);
     dataSourceLayout->addWidget(variableBox);
+    dataSourceLayout->addWidget(xSpinBox);
 
     mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(dataSourceLayout);
@@ -130,4 +140,5 @@ void PlotterWidget::setupUI()
     this->setLayout(mainLayout);
 
     connect(linkerBox,SIGNAL(activated(int)),this,SLOT(updateVariableBox()));
+    connect(xSpinBox,SIGNAL(valueChanged(int)),this,SLOT(xResize(int)));
 }

@@ -165,6 +165,13 @@ void GLPlotterWidget::paintGL()
 //    m_proj.translate(1,1,1);
 //}
 
+void GLPlotterWidget::setXWindow(quint16 vCount)
+{
+    vertCount = vCount;
+    prepareXPos(vertCount*2);
+    vertPointer=0;
+}
+
 void GLPlotterWidget::prepareXPos(quint16 vertexCount)
 {
     // We will fill up the x position of each vert depending on the amount of vertices

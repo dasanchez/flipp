@@ -45,6 +45,8 @@ LinkerUnit *linkerUnit;
     QList<LinkerWidget*> linkerList;
     QList<LinkerUnit*> *linkers;
 
+    QSpinBox *xSpinBox;
+
 double xval;
 double yval;
 
@@ -64,7 +66,7 @@ double yval;
 private slots:
     void newData();
     void updatePlot();
-
+    void xResize(int);
 };
 
 #endif // CONNECTIONWIDGET_H
