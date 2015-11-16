@@ -37,6 +37,7 @@ public slots:
     void moveCamera();
     void addDataPoint(double);
     void setXWindow(quint16);
+    void setColor(QColor);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;

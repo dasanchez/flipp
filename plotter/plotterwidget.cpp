@@ -87,6 +87,13 @@ void PlotterWidget::xResize(int newVal)
     glPlot->setXWindow(newVal);
 }
 
+void PlotterWidget::colorButtonPushed()
+{
+QColor color;
+color = QColorDialog::getColor(Qt::red);
+glPlot->setColor(color);
+}
+
 void PlotterWidget::setupUI()
 {
     linkerBox = new QComboBox;
@@ -95,6 +102,7 @@ void PlotterWidget::setupUI()
     xSpinBox->setMinimum(10);
     xSpinBox->setMaximum(400);
     xSpinBox->setValue(400);
+    colorButton = new QPushButton("Color");
 
     glPlot = new GLPlotterWidget;
 
@@ -131,6 +139,7 @@ void PlotterWidget::setupUI()
     dataSourceLayout->addWidget(linkerBox);
     dataSourceLayout->addWidget(variableBox);
     dataSourceLayout->addWidget(xSpinBox);
+    dataSourceLayout->addWidget(colorButton);
 
     mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(dataSourceLayout);
@@ -141,4 +150,5 @@ void PlotterWidget::setupUI()
 
     connect(linkerBox,SIGNAL(activated(int)),this,SLOT(updateVariableBox()));
     connect(xSpinBox,SIGNAL(valueChanged(int)),this,SLOT(xResize(int)));
+    connect(colorButton,SIGNAL(clicked(bool)),this,SLOT(colorButtonPushed()));
 }

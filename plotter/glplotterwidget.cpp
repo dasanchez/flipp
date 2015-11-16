@@ -172,6 +172,13 @@ void GLPlotterWidget::setXWindow(quint16 vCount)
     vertPointer=0;
 }
 
+void GLPlotterWidget::setColor(QColor newColor)
+{
+    color[0]=newColor.redF();
+    color[1]=newColor.greenF();
+    color[2]=newColor.blueF();
+}
+
 void GLPlotterWidget::prepareXPos(quint16 vertexCount)
 {
     // We will fill up the x position of each vert depending on the amount of vertices
@@ -181,7 +188,7 @@ void GLPlotterWidget::prepareXPos(quint16 vertexCount)
     for(quint16 i=0;i<vertexCount*2;i+=2)
     {
         verts[i] = stepSize*(i/2);
-        verts[i+1] = 0.0f;
+//        verts[i+1] = 0.0f;
     }
 }
 void GLPlotterWidget::addDataPoint(double newPoint)

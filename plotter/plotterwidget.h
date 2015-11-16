@@ -18,6 +18,7 @@
 #include <QHeaderView>
 #include <QStyledItemDelegate>
 #include <QDoubleSpinBox>
+#include <QColorDialog>
 #include "../plotter/qcustomplot.h"
 #include "../linker/linkerlistwidget.h"
 #include "../livelistwidget/livelistwidget.h"
@@ -33,32 +34,31 @@ public:
 
 public slots:
     void updateLinkerList();
-void updateVariableBox();
+    void updateVariableBox();
 
 signals:
-//    void removePlotter();
+    //    void removePlotter();
 
 private:
-LinkerUnit *linkerUnit;
+    LinkerUnit *linkerUnit;
     QComboBox *linkerBox;
     QComboBox *variableBox;
     QList<LinkerWidget*> linkerList;
     QList<LinkerUnit*> *linkers;
 
     QSpinBox *xSpinBox;
+//    QColorDialog *colorDialog;
+    QPushButton *colorButton;
 
-double xval;
-double yval;
-
+    double xval;
+    double yval;
 
     QTimer *plotTimer;
 
     QHBoxLayout *dataSourceLayout;
-
-
     QVBoxLayout *mainLayout;
     
-//    QCustomPlot *customPlot;
+    //    QCustomPlot *customPlot;
     GLPlotterWidget *glPlot;
 
     void setupUI();
@@ -67,6 +67,7 @@ private slots:
     void newData();
     void updatePlot();
     void xResize(int);
+    void colorButtonPushed();
 };
 
 #endif // CONNECTIONWIDGET_H
