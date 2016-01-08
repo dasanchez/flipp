@@ -3,7 +3,7 @@ flipp
 
 ##Flexible Integrated Parser and Plotter
 
-![flipp Screenshot - Windows 8](./window.png "2013-03-14")
+![flipp Screenshot - Windows 10](./window.png "2016-01-08")
 
 This program will provide an interface to do the following:
 
