@@ -1,7 +1,7 @@
 flipp
 ==========
 
-##Flexible Integrated Parser and Plotter
+## Flexible Integrated Parser and Plotter
 
 ![flipp Screenshot - Windows 10](./window.png "2016-01-08")
 
